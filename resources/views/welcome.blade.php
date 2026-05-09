@@ -1,1 +1,5 @@
-<h1 class="mx-2 p-5">Falcon new Project</h1>
+
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<h1 class="text-5xl font-bold text-red-500">
+    Tailwind Works
+</h1>
