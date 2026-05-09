@@ -17,7 +17,9 @@
                     @foreach ($logs as $log)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4">
-                                <span class="font-medium text-gray-700">ID: {{ $log->user_id ?? 'Guest' }}</span>
+                                <span class="font-medium {{ $log->user ? 'text-blue-800' : 'text-red-500 italic' }}">
+                                    {{ $log->user?->name ?? 'Guest' }}
+                                    </span>
                             </td>
                             <td class="px-6 py-4">
                                 @php
@@ -47,7 +49,7 @@
                                         {{ $log->created_at->format('Y-m-d H:i') }}
                                     </div>
 
-                                    <div class="text-gray-400 text-xs " >
+                                    <div class="text-gray-400 text-xs ">
                                         {{ $log->created_at->diffForHumans() }}
                                     </div>
                                 </div>
@@ -59,7 +61,7 @@
         </div>
 
         <div class="mt-6">
-            {{ $logs->links() }}
+            {{ $logs->onEachSide(1)->links() }}
         </div>
     </div>
 </x-layout>
