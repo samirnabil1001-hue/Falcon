@@ -50,7 +50,5 @@ class User extends Authenticatable implements MustVerifyEmail
 
         ];
     }
-    protected $casts = [
-        'role' => UserRole::class,
-    ];
+
 }

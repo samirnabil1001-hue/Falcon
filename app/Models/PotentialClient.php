@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\PotentialClientStatus;
 
 class PotentialClient extends Model
 {
@@ -14,4 +15,10 @@ class PotentialClient extends Model
         'user_id',
         'status',
     ];
+    protected function casts(): array
+    {
+        return [
+            'status' => PotentialClientStatus::class,
+        ];
+    }
 }
