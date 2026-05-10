@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
     <x-slot:title>Logs</x-slot:title>
 
     <div class="container mx-auto py-8">
@@ -64,4 +64,4 @@
             {{ $logs->onEachSide(1)->links() }}
         </div>
     </div>
-</x-layout>
+</x-app-layout>
