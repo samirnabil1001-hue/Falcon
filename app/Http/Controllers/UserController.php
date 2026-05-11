@@ -9,9 +9,13 @@ use Illuminate\Validation\Rules\Enum;
 class UserController extends Controller
 {
     // Display the list of users
+    // App\Http\Controllers\UserController.php
+
     public function index()
     {
-        $users = User::all();
+        // Fetch 10 users per page (you can change this number)
+        $users = User::paginate(10);
+
         return view('users.index', compact('users'));
     }
 
