@@ -18,119 +18,91 @@
 
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 overflow-hidden h-screen">
 
-    <!-- Top Navigation -->
+    <!-- Top Navigation (Standard Breeze Nav) -->
     @include('layouts.navigation')
 
     <div class="flex h-screen overflow-hidden">
 
-        <!-- Overlay -->
+        <!-- Overlay: يظهر عند فتح القائمة في الموبايل -->
         <div id="overlay"
             class="fixed inset-0 bg-black/50 z-40 hidden md:hidden">
         </div>
 
-        <!-- Sidebar -->
+        <!-- Sidebar: تم تعديل الاتجاه لليمين -->
         <aside id="sidebar"
-            class="fixed md:static top-0 left-0 z-50 w-64 h-full
+            class="fixed md:static top-0 right-0 z-50 w-64 h-full
                    bg-white dark:bg-gray-800 shadow-lg
-                   transform -translate-x-full md:translate-x-0
+                   transform translate-x-full md:translate-x-0
                    transition-transform duration-300 ease-in-out">
 
-            <!-- Logo -->
-            <div
-                class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-
+            <!-- Logo & Close Btn -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <h1 class="text-xl font-bold text-gray-800 dark:text-white">
                     {{ config('app.name') }}
                 </h1>
 
-                <!-- Close Btn -->
-                <button id="closeBtn"
-                    class="md:hidden text-gray-700 dark:text-gray-300">
-                    ✕
+                <!-- Close Btn (Mobile only) -->
+                <button id="closeBtn" class="md:hidden text-gray-700 dark:text-gray-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
 
-            <!-- Navigation -->
+            <!-- Navigation Links -->
             <nav class="p-4 space-y-2">
-
                 <a href="{{ route('dashboard') }}"
-                    class="flex items-center px-4 py-3 rounded-lg
-                           text-gray-700 dark:text-gray-200
-                           hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-
-                    <span class="mr-3">icon</span>
+                    class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <span class="ml-3 italic text-xs text-gray-400">icon</span>
                     Dashboard
                 </a>
 
                 <a href="{{ route('users.index') }}"
-                    class="flex items-center px-4 py-3 rounded-lg
-                           text-gray-700 dark:text-gray-200
-                           hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-
-                    <span class="mr-3">icon</span>
+                    class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <span class="ml-3 italic text-xs text-gray-400">icon</span>
                     Users
                 </a>
 
                 <a href="#"
-                    class="flex items-center px-4 py-3 rounded-lg
-                           text-gray-700 dark:text-gray-200
-                           hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-
-                    <span class="mr-3">icon</span>
+                    class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <span class="ml-3 italic text-xs text-gray-400">icon</span>
                     Clients
                 </a>
 
                 <a href="#"
-                    class="flex items-center px-4 py-3 rounded-lg
-                           text-gray-700 dark:text-gray-200
-                           hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-
-                    <span class="mr-3">icon</span>
+                    class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <span class="ml-3 italic text-xs text-gray-400">icon</span>
                     Settings
                 </a>
-
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden text-right">
 
-            <!-- Page Header -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow shrink-0">
+            <!-- Page Header Container -->
+            <header class="bg-white dark:bg-gray-800 shadow shrink-0">
+                <div class="px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
+                    
+                    <!-- Burger Button: متاح دائماً في الموبايل -->
+                    <button id="menuBtn"
+                        class="md:hidden p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
 
-                    <div
-                        class="px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
-
-                        <!-- Mobile Menu Btn -->
-                        <button id="menuBtn"
-                            class="md:hidden p-2 rounded-lg
-                                   bg-gray-200 dark:bg-gray-700
-                                   text-gray-800 dark:text-white">
-
-                            <svg class="h-6 w-6"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 24 24">
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-
-                        </button>
-
-                        {{ $header }}
-
-                    </div>
-
-                </header>
-            @endisset
+                    <!-- Page Heading (Slot) -->
+                    @isset($header)
+                        <div class="font-medium text-lg text-gray-800 dark:text-white">
+                            {{ $header }}
+                        </div>
+                    @endisset
+                </div>
+            </header>
 
             <!-- Page Content -->
-            <main class="flex-1 p-4 md:p-6 overflow-hidden">
+            <main class="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900">
                 {{ $slot }}
             </main>
 
@@ -138,29 +110,30 @@
 
     </div>
 
-    <!-- Sidebar Script -->
+    <!-- Sidebar Control Script -->
     <script>
-        const menuBtn = document.getElementById('menuBtn');
-        const closeBtn = document.getElementById('closeBtn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('menuBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
 
-        menuBtn?.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-        });
+            // فتح السايدبار
+            menuBtn?.addEventListener('click', () => {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            });
 
-        closeBtn?.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        });
+            // وظيفة الإغلاق
+            const closeSidebar = () => {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            };
 
-        overlay?.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
+            closeBtn?.addEventListener('click', closeSidebar);
+            overlay?.addEventListener('click', closeSidebar);
         });
     </script>
 
 </body>
-
 </html>

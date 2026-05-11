@@ -14,7 +14,7 @@
             this.confirmModal = true;
         }
     }"
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden">
 
         <!-- Header Section -->
         <div class="flex items-center justify-between mb-4 shrink-0">
@@ -116,9 +116,27 @@
                                 <td class="p-3 text-center">
                                     @if ($user->hasVerifiedEmail())
                                         <span
-                                            class="text-xs font-bold {{ $user->is_active ? 'text-emerald-500' : 'text-gray-400' }}">Verified</span>
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border 
+            {{ $user->is_active
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                : 'bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700' }}">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Verified
+                                        </span>
                                     @else
-                                        <span class="text-gray-400 text-xs italic">Pending</span>
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Pending
+                                        </span>
                                     @endif
                                 </td>
 
@@ -139,7 +157,7 @@
                                                 @change="openConfirm('Change Role', 'Are you sure you want to change the role for {{ $user->name }}?', 'role-form-{{ $user->id }}', 'bg-blue-600')"
                                                 {{ !$user->is_active ? 'disabled' : '' }}
                                                 class="h-8 min-w-[110px] text-[11px] font-bold uppercase rounded-md ps-2 pe-7 border-gray-200 dark:border-gray-600 focus:ring-1 transition-all py-0 leading-none
-                {{ !$user->is_active ? 'bg-gray-100 text-gray-400' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 cursor-pointer hover:border-blue-400' }}">
+                                                     {{ !$user->is_active ? 'bg-gray-100 text-gray-400' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 cursor-pointer hover:border-blue-400' }}">
 
                                                 <option value="" disabled selected>
                                                     {{ $user->role->name ?? 'SELECT' }}
@@ -163,7 +181,7 @@
                                             <button type="button"
                                                 @click="openConfirm('{{ $user->is_active ? 'Deactivate' : 'Activate' }} User', 'Do you want to change status for {{ $user->name }}?', 'status-form-{{ $user->id }}', '{{ $user->is_active ? 'bg-amber-500' : 'bg-emerald-600' }}')"
                                                 class="h-8 px-3 text-[10px] sm:text-[11px] font-extrabold uppercase text-white rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center leading-none inline-flex
-                {{ $user->is_active ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700' }}">
+                                                {{ $user->is_active ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700' }}">
                                                 {{ $user->is_active ? 'Deactivate' : 'Activate' }}
                                             </button>
                                         </form>
