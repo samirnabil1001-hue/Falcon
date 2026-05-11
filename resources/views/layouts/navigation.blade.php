@@ -15,9 +15,7 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden sm:flex sm:items-center sm:ms-10 space-x-8">
-                    <x-nav-link :href="url('/')" :active="request()->is('/')">
-                        Home
-                    </x-nav-link>
+                
 
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

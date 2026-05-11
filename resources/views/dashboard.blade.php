@@ -21,7 +21,7 @@
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <h3 class="text-gray-500 dark:text-gray-400 text-sm">
-                Orders
+                clients
             </h3>
 
             <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
@@ -54,57 +54,7 @@
 
         <!-- Responsive Table -->
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[600px] border-collapse">
-
-                <thead>
-                    <tr class="bg-gray-100 dark:bg-gray-700 text-left">
-                        <th class="p-3 text-gray-700 dark:text-gray-200">
-                            Name
-                        </th>
-
-                        <th class="p-3 text-gray-700 dark:text-gray-200">
-                            Email
-                        </th>
-
-                        <th class="p-3 text-gray-700 dark:text-gray-200">
-                            Status
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <td class="p-3 text-gray-800 dark:text-gray-100">
-                            John Doe
-                        </td>
-
-                        <td class="p-3 text-gray-600 dark:text-gray-300">
-                            john@example.com
-                        </td>
-
-                        <td class="p-3 text-green-500 font-semibold">
-                            Active
-                        </td>
-                    </tr>
-
-                    <tr class="border-b border-gray-200 dark:border-gray-700">
-                        <td class="p-3 text-gray-800 dark:text-gray-100">
-                            Sarah Smith
-                        </td>
-
-                        <td class="p-3 text-gray-600 dark:text-gray-300">
-                            sarah@example.com
-                        </td>
-
-                        <td class="p-3 text-yellow-500 font-semibold">
-                            Pending
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
+           
         </div>
 
     </div>
