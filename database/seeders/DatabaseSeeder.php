@@ -19,10 +19,12 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'CEO User',
             'email' => 'ceo@example.com',
-            'password' => 'Demo@2020',
+            'password' => bcrypt('Demo@2020'),
             'is_active' => true,
             'email_verified_at' => now(),
             'role' => UserRole::CEO,
         ]);
+
+        User::factory(50)->create(); 
     }
 }
