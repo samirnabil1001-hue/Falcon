@@ -16,7 +16,13 @@ class CheckRole
     public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!$request->user() || !in_array($request->user()->role->value, $roles)) {
-            abort(403, 'غير مصرح لك بدخول هذه الصفحة.');
+
+            if ($request->expectsJson()) {
+                abort(403, 'Unauthorized.');
+            }
+
+            // العودة للصفحة السابقة مع إرسال رسالة الخطأ للـ Snackbar
+            return redirect()->back()->with('error', 'عذراً، لا تملك صلاحية الوصول لهذه الصفحة.');
         }
 
         return $next($request);
