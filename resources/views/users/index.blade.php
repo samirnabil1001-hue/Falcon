@@ -56,9 +56,11 @@
                             <th
                                 class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
                                 Joined At</th>
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
-                                Actions</th>
+                            @if (auth()->user()->role === \App\Enums\UserRole::CEO)
+                                <th
+                                    class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
+                                    Actions</th>
+                            @endif
                         </tr>
                     </thead>
 
@@ -143,62 +145,63 @@
                                 <td class="p-3 text-center text-gray-400 text-xs">
                                     {{ $user->created_at->format('M d, Y') }}
                                 </td>
+                                @if (auth()->user()->role === \App\Enums\UserRole::CEO)
+                                    <!-- Actions -->
+                                    <td class="p-3 text-center align-middle">
+                                        <div class="flex items-center justify-center gap-2">
 
-                                <!-- Actions -->
-                                <td class="p-3 text-center align-middle">
-                                    <div class="flex items-center justify-center gap-2">
-
-                                        <!-- Update Role -->
-                                        <form dir="ltr" id="role-form-{{ $user->id }}"
-                                            action="{{ route('users.update-role', $user->id) }}" method="POST"
-                                            class="m-0 flex items-center">
-                                            @csrf @method('PATCH')
-                                            <select name="role"
-                                                @change="openConfirm('Change Role', 'Are you sure you want to change the role for {{ $user->name }}?', 'role-form-{{ $user->id }}', 'bg-blue-600')"
-                                                {{ !$user->is_active ? 'disabled' : '' }}
-                                                class="h-8 min-w-[110px] text-[11px] font-bold uppercase rounded-md ps-2 pe-7 border-gray-200 dark:border-gray-600 focus:ring-1 transition-all py-0 leading-none
+                                            <!-- Update Role -->
+                                            <form dir="ltr" id="role-form-{{ $user->id }}"
+                                                action="{{ route('users.update-role', $user->id) }}" method="POST"
+                                                class="m-0 flex items-center">
+                                                @csrf @method('PATCH')
+                                                <select name="role"
+                                                    @change="openConfirm('Change Role', 'Are you sure you want to change the role for {{ $user->name }}?', 'role-form-{{ $user->id }}', 'bg-blue-600')"
+                                                    {{ !$user->is_active ? 'disabled' : '' }}
+                                                    class="h-8 min-w-[110px] text-[11px] font-bold uppercase rounded-md ps-2 pe-7 border-gray-200 dark:border-gray-600 focus:ring-1 transition-all py-0 leading-none
                                                      {{ !$user->is_active ? 'bg-gray-100 text-gray-400' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 cursor-pointer hover:border-blue-400' }}">
 
-                                                <option value="" disabled selected>
-                                                    {{ $user->role->name ?? 'SELECT' }}
-                                                </option>
+                                                    <option value="" disabled selected>
+                                                        {{ $user->role->name ?? 'SELECT' }}
+                                                    </option>
 
-                                                @foreach (App\Enums\UserRole::cases() as $roleOption)
-                                                    @if ($user->role?->value !== $roleOption->value)
-                                                        <option value="{{ $roleOption->value }}">
-                                                            {{ $roleOption->name }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </form>
+                                                    @foreach (App\Enums\UserRole::cases() as $roleOption)
+                                                        @if ($user->role?->value !== $roleOption->value)
+                                                            <option value="{{ $roleOption->value }}">
+                                                                {{ $roleOption->name }}
+                                                            </option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                            </form>
 
-                                        <!-- Toggle Status -->
-                                        <form id="status-form-{{ $user->id }}"
-                                            action="{{ route('users.toggle-status', $user->id) }}" method="POST"
-                                            class="m-0 flex items-center">
-                                            @csrf @method('PATCH')
-                                            <button type="button"
-                                                @click="openConfirm('{{ $user->is_active ? 'Deactivate' : 'Activate' }} User', 'Do you want to change status for {{ $user->name }}?', 'status-form-{{ $user->id }}', '{{ $user->is_active ? 'bg-amber-500' : 'bg-emerald-600' }}')"
-                                                class="h-8 px-3 text-[10px] sm:text-[11px] font-extrabold uppercase text-white rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center leading-none inline-flex
+                                            <!-- Toggle Status -->
+                                            <form id="status-form-{{ $user->id }}"
+                                                action="{{ route('users.toggle-status', $user->id) }}" method="POST"
+                                                class="m-0 flex items-center">
+                                                @csrf @method('PATCH')
+                                                <button type="button"
+                                                    @click="openConfirm('{{ $user->is_active ? 'Deactivate' : 'Activate' }} User', 'Do you want to change status for {{ $user->name }}?', 'status-form-{{ $user->id }}', '{{ $user->is_active ? 'bg-amber-500' : 'bg-emerald-600' }}')"
+                                                    class="h-8 px-3 text-[10px] sm:text-[11px] font-extrabold uppercase text-white rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center leading-none inline-flex
                                                 {{ $user->is_active ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700' }}">
-                                                {{ $user->is_active ? 'Deactivate' : 'Activate' }}
-                                            </button>
-                                        </form>
+                                                    {{ $user->is_active ? 'Deactivate' : 'Activate' }}
+                                                </button>
+                                            </form>
 
-                                        <!-- Delete -->
-                                        <form id="delete-form-{{ $user->id }}"
-                                            action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                            class="m-0 flex items-center">
-                                            @csrf @method('DELETE')
-                                            <button type="button"
-                                                @click="openConfirm('Delete User', 'This action is permanent. Are you sure you want to delete {{ $user->name }}?', 'delete-form-{{ $user->id }}', 'bg-rose-600')"
-                                                class="h-8 px-3 text-[10px] sm:text-[11px] font-extrabold uppercase text-white bg-rose-600 hover:bg-rose-700 rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center leading-none inline-flex {{ !$user->is_active ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                            <!-- Delete -->
+                                            <form id="delete-form-{{ $user->id }}"
+                                                action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                                class="m-0 flex items-center">
+                                                @csrf @method('DELETE')
+                                                <button type="button"
+                                                    @click="openConfirm('Delete User', 'This action is permanent. Are you sure you want to delete {{ $user->name }}?', 'delete-form-{{ $user->id }}', 'bg-rose-600')"
+                                                    class="h-8 px-3 text-[10px] sm:text-[11px] font-extrabold uppercase text-white bg-rose-600 hover:bg-rose-700 rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center leading-none inline-flex {{ !$user->is_active ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>

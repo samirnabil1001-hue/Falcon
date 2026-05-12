@@ -24,6 +24,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'role',
+        'is_active',
     ];
     protected $dates = ['deleted_at'];
     /**
@@ -49,7 +51,16 @@ class User extends Authenticatable implements MustVerifyEmail
             'role' => UserRole::class,
             'is_active' => 'boolean',
 
+
         ];
     }
+    public function isCEO(): bool
+    {
+        return $this->role === UserRole::CEO;
+    }
 
+    public function isTeamLead(): bool
+    {
+        return $this->role === UserRole::TEAM_LEAD;
+    }
 }
