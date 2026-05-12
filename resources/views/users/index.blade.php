@@ -85,16 +85,21 @@
                                 </td>
 
                                 <td class="p-3 text-center">
-                                    @php $role = $user->role?->value ?? 'normal'; @endphp
+                                    @php
+                                        $role = $user->role?->value ?? 'normal';
+                                        $roleClasses = !$user->is_active
+                                            ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                                            : match ($role) {
+                                                'CEO' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                                'TeamLead'
+                                                    => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                                default
+                                                    => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                            };
+                                    @endphp
+
                                     <span
-                                        class="px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm
-                                        {{ !$user->is_active
-                                            ? 'bg-gray-300 text-gray-600 dark:bg-gray-700'
-                                            : ($role === 'CEO'
-                                                ? 'bg-red-500 text-white'
-                                                : ($role === 'TeamLead'
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-500 text-white')) }}">
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide shadow-sm border border-transparent {{ $roleClasses }}">
                                         {{ $role }}
                                     </span>
                                 </td>
@@ -102,14 +107,14 @@
                                 <td class="p-3 text-center">
                                     @if ($user->is_active)
                                         <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800">
                                             <span
-                                                class="w-1.5 h-1.5 me-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                                class="w-1.5 h-1.5 me-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                                             Active
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-200 text-gray-500 border border-gray-300">
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700">
                                             Inactive
                                         </span>
                                     @endif
@@ -118,23 +123,24 @@
                                 <td class="p-3 text-center">
                                     @if ($user->hasVerifiedEmail())
                                         <span
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border 
-            {{ $user->is_active
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                : 'bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700' }}">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm 
+                                            {{ $user->is_active
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800'
+                                                : 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-500 dark:border-gray-700' }}">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M5 13l4 4L19 7" />
                                             </svg>
                                             Verified
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm
+                                            bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Pending
