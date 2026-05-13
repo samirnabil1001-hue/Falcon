@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PotentialClient;
+use App\Models\PotentialCustomer;
 use Illuminate\Http\Request;
 
-class PotentialClientController extends Controller
+class PotentialCustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $customers = PotentialCustomer::with('creator')
+            ->latest()
+            ->paginate(10);
+
+        return view('potential_customers.index', compact('customers'));
     }
 
     /**
@@ -34,7 +38,7 @@ class PotentialClientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PotuntialClient $PotuntialClient)
+    public function show(PotentialCustomer $potentialCustomer)
     {
         //
     }
@@ -42,7 +46,7 @@ class PotentialClientController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(PotuntialClient $PotuntialClient)
+    public function edit(PotentialCustomer $potentialCustomer)
     {
         //
     }
@@ -50,7 +54,7 @@ class PotentialClientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, PotuntialClient $PotuntialClient)
+    public function update(Request $request, PotentialCustomer $potentialCustomer)
     {
         //
     }
@@ -58,7 +62,7 @@ class PotentialClientController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PotuntialClient $PotuntialClient)
+    public function destroy(PotentialCustomer $potentialCustomer)
     {
         //
     }

@@ -16,12 +16,14 @@
         <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="home">
             Dashboard
         </x-sidebar-link>
-        
+
         <x-sidebar-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="users">
             Users
         </x-sidebar-link>
 
-        <x-sidebar-link href="#" icon="briefcase"> Clients </x-sidebar-link>
-        <x-sidebar-link href="#" icon="settings"> Settings </x-sidebar-link>
+        <x-sidebar-link :href="route('potential-customers.index')" :active="request()->routeIs('potential-customers.*')" icon="users">
+            Potential Customers
+        </x-sidebar-link>
+         <x-sidebar-link href="#" icon="settings"> Settings </x-sidebar-link>
     </nav>
 </aside>

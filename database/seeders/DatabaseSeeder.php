@@ -11,9 +11,10 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // استدعاء الـ UserSeeder لتنفيذ عملية الإضافة
         $this->call([
             UserSeeder::class,
+            PotentialCustomerSeeder::class,
+
         ]);
     }
 }
