@@ -21,7 +21,6 @@ class CheckRole
                 abort(403, 'Unauthorized.');
             }
 
-            // العودة للصفحة السابقة مع إرسال رسالة الخطأ للـ Snackbar
             return redirect()->back()->with('error', 'عذراً، لا تملك صلاحية الوصول لهذه الصفحة.');
         }
 
