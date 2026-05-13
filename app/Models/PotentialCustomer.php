@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class PotentialCustomer extends Model
 {
-    use HasFactory;
+    use HasFactory; // 2. تأكد من كتابة هذا السطر داخل الكلاس
+
     protected $fillable = [
         'name',
         'phone',
@@ -17,6 +18,7 @@ class PotentialCustomer extends Model
         'added_by',
     ];
 
+    // علاقة المستخدم الذي أضاف العميل
     public function creator()
     {
         return $this->belongsTo(User::class, 'added_by');

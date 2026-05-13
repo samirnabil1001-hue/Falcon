@@ -1,27 +1,92 @@
 <?php
 
-namespace App\Policies;
+namespace App\Http\Controllers;
 
 use App\Models\PotentialCustomer;
-use App\Models\User;
-use App\Enums\UserRole;
+use App\Services\PotentialCustomerService;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // ضروري لاستخدام authorize
 
-class PotentialCustomerPolicy
+class PotentialCustomerController extends Controller
 {
-  
-    public function view(User $user, PotentialCustomer $potentialCustomer): bool
+    use AuthorizesRequests;
+
+    /**
+     * حقن الخدمة عبر الـ Constructor
+     */
+    public function __construct(
+        protected PotentialCustomerService $customerService
+    ) {}
+
+    /**
+     * عرض القائمة (تتم الفلترة داخل السيرفس)
+     */
+    public function index()
     {
-        return $user->role === UserRole::CEO || $user->id === $potentialCustomer->added_by;
+        $customers = $this->customerService->getPaginatedCustomers(auth()->user());
+
+        return view('potential_customers.index', compact('customers'));
     }
 
-    public function update(User $user, PotentialCustomer $potentialCustomer): bool
+    /**
+     * حفظ عميل جديد
+     */
+    public function store(Request $request)
     {
-        return $user->role === UserRole::CEO || $user->id === $potentialCustomer->added_by;
+        $validated = $request->validate([
+            'name'   => 'required|string|max:255',
+            'phone'  => 'required|string|max:20',
+            'source' => 'nullable|string|max:100',
+            'status' => 'required|string',
+        ]);
+
+        $this->customerService->createCustomer($validated, auth()->id());
+
+        return redirect()->route('potential-customers.index')
+            ->with('success', 'Customer added successfully!');
     }
 
-    public function delete(User $user, PotentialCustomer $potentialCustomer): bool
+    /**
+     * صفحة التعديل (محمية بالبوليسي)
+     */
+    public function edit(PotentialCustomer $potentialCustomer)
     {
-        // ربما نريد أن الحذف يكون للـ CEO فقط أو صاحب السجل
-        return $user->role === UserRole::CEO || $user->id === $potentialCustomer->added_by;
+        // استخدام دالة update المعرفة في PotentialCustomerPolicy
+        $this->authorize('update', $potentialCustomer);
+
+        return view('potential_customers.edit', compact('potentialCustomer'));
+    }
+
+    /**
+     * تحديث البيانات (محمية بالبوليسي)
+     */
+    public function update(Request $request, PotentialCustomer $potentialCustomer)
+    {
+        $this->authorize('update', $potentialCustomer);
+
+        $validated = $request->validate([
+            'name'   => 'required|string|max:255',
+            'phone'  => 'required|string|max:20',
+            'source' => 'nullable|string|max:100',
+            'status' => 'required|string',
+        ]);
+
+        $potentialCustomer->update($validated);
+
+        return redirect()->route('potential-customers.index')
+            ->with('success', 'Customer updated successfully!');
+    }
+
+    /**
+     * حذف العميل (محمية بالبوليسي)
+     */
+    public function destroy(PotentialCustomer $potentialCustomer)
+    {
+        $this->authorize('delete', $potentialCustomer);
+
+        $potentialCustomer->delete();
+
+        return redirect()->route('potential-customers.index')
+            ->with('success', 'Customer deleted successfully!');
     }
 }

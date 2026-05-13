@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PotentialClientStatus: string
+enum PotentialCustomerStatus: string
 {
     case NEW = 'new';
     case CONTACTED = 'contacted';

@@ -20,9 +20,7 @@ class PotentialCustomerService
         return $query->latest()->paginate($perPage);
     }
 
-    /**
-     * منطق إنشاء عميل جديد
-     */
+
     public function createCustomer(array $data, int $userId): PotentialCustomer
     {
         return PotentialCustomer::create(array_merge($data, [

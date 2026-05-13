@@ -3,67 +3,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\PotentialCustomer;
+use App\Services\PotentialCustomerService;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PotentialCustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use AuthorizesRequests;
+
+   
+    public function __construct(
+        protected PotentialCustomerService $customerService
+    ) {}
+
+ 
     public function index()
     {
-        $customers = PotentialCustomer::with('creator')
-            ->latest()
-            ->paginate(10);
+        $customers = $this->customerService->list(auth()->user());
 
         return view('potential_customers.index', compact('customers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        return view('potential_customers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $this->customerService->store($request->all(), auth()->id());
+
+        return redirect()
+            ->route('potential-customers.index')
+            ->with('success', 'Customer created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(PotentialCustomer $potentialCustomer)
     {
-        //
+        $this->authorize('view', $potentialCustomer);
+
+        return view('potential_customers.show', compact('potentialCustomer'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    
     public function edit(PotentialCustomer $potentialCustomer)
     {
-        //
+        $this->authorize('update', $potentialCustomer);
+
+        return view('potential_customers.edit', compact('potentialCustomer'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+  
     public function update(Request $request, PotentialCustomer $potentialCustomer)
     {
-        //
+        $this->authorize('update', $potentialCustomer);
+
+        $this->customerService->update($potentialCustomer, $request->all());
+
+        return redirect()
+            ->route('potential-customers.index')
+            ->with('success', 'Customer updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+ 
     public function destroy(PotentialCustomer $potentialCustomer)
     {
-        //
+        $this->authorize('delete', $potentialCustomer);
+
+        $this->customerService->delete($potentialCustomer);
+
+        return redirect()
+            ->route('potential-customers.index')
+            ->with('success', 'Customer deleted successfully.');
     }
 }
