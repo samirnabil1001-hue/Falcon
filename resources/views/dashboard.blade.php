@@ -150,7 +150,7 @@
         <!-- الصف الثاني -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( 70% )</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartExecutionTotal"></canvas>
                 </div>
