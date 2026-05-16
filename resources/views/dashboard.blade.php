@@ -7,7 +7,7 @@
 
             <div class="flex items-center gap-3">
                 <!-- زر عرض العملاء -->
-                <a href="#"
+                <a href="{{ route('potential-customers.index') }}"
                     class="flex items-center px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                     <svg class="w-4 h-4 ml-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
@@ -16,13 +16,13 @@
                 </a>
 
                 <!-- زر إضافة عميل جديد -->
-                <button
+                <a  href="{{ route('potential-customers.create') }}"
                     class="flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-slate-800 shadow-sm rounded-xl dark:bg-indigo-600 border border-transparent">
                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     إضافة عميل جديد
-                </button>
+                </a>
             </div>
         </div>
     </x-slot>

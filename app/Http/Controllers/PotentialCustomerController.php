@@ -13,16 +13,15 @@ class PotentialCustomerController extends Controller
 
     public function __construct(
         protected PotentialCustomerService $customerService
-    ) {}
+    ) {
+    }
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        // تم الإصلاح هنا لاستدعاء getPaginated بدلاً من list
-        $customers = $this->customerService->getPaginated(auth()->user());
+        $customers = $this->customerService->getPaginated(auth()->user(), $request->all());
 
         return view('potential_customers.index', compact('customers'));
     }
-
     public function create()
     {
         return view('potential_customers.create');
