@@ -42,15 +42,17 @@
 
         <!-- Filter & Search Panel -->
         <form action="{{ url()->current() }}" method="GET"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-5 shrink-0 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
+
             <input type="hidden" name="sort_by" value="{{ request('sort_by', 'added_at') }}">
             <input type="hidden" name="sort_order" value="{{ request('sort_order', 'desc') }}">
 
             <!-- Search Field -->
-            <div class="relative">
+            <div class="relative sm:col-span-2 lg:col-span-1">
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Search by name or phone..."
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 pl-9 pr-4 py-2.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+
                 <div
                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-slate-500">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,73 +62,113 @@
                 </div>
             </div>
 
-            <!-- Date Range Selectors -->
-            <!-- Date Range Selectors -->
+            <!-- Date Range -->
             <div
-                class="flex items-center gap-2 md:col-span-2 bg-white dark:bg-slate-800 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
-                <!-- From Date -->
+                class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:col-span-2 bg-white dark:bg-slate-800 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
+
+                <!-- From -->
                 <div class="flex items-center gap-2 flex-1 cursor-pointer"
                     onclick="this.querySelector('input').showPicker()">
                     <span
-                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">From</span>
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">
+                        From
+                    </span>
+
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
                         max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
 
-                <div class="h-4 w-[1px] bg-gray-200 dark:bg-slate-700 mx-1"></div>
+                <div class="hidden sm:block h-4 w-[1px] bg-gray-200 dark:bg-slate-700 mx-1"></div>
 
-                <!-- To Date -->
+                <!-- To -->
                 <div class="flex items-center gap-2 flex-1 cursor-pointer"
                     onclick="this.querySelector('input').showPicker()">
                     <span
-                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">To</span>
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">
+                        To
+                    </span>
+
                     <input type="date" name="date_to" value="{{ request('date_to') }}"
                         max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
             </div>
 
-            <!-- Dropdown Matrix Filters -->
-            <div class="grid grid-cols-2 gap-2">
+            <!-- Filters -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
                 <select name="source" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
+
                     <option value="">All Sources</option>
-                    <option value="Facebook" {{ request('source') == 'Facebook' ? 'selected' : '' }}>Facebook</option>
-                    <option value="Instagram" {{ request('source') == 'Instagram' ? 'selected' : '' }}>Instagram
+
+                    <option value="Facebook" {{ request('source') == 'Facebook' ? 'selected' : '' }}>
+                        Facebook
                     </option>
-                    <option value="Website" {{ request('source') == 'Website' ? 'selected' : '' }}>Website</option>
-                    <option value="WhatsApp" {{ request('source') == 'WhatsApp' ? 'selected' : '' }}>WhatsApp</option>
-                    <option value="Referral" {{ request('source') == 'Referral' ? 'selected' : '' }}>Referral</option>
-                    <option value="Other" {{ request('source') == 'Other' ? 'selected' : '' }}>Other</option>
+
+                    <option value="Instagram" {{ request('source') == 'Instagram' ? 'selected' : '' }}>
+                        Instagram
+                    </option>
+
+                    <option value="Website" {{ request('source') == 'Website' ? 'selected' : '' }}>
+                        Website
+                    </option>
+
+                    <option value="WhatsApp" {{ request('source') == 'WhatsApp' ? 'selected' : '' }}>
+                        WhatsApp
+                    </option>
+
+                    <option value="Referral" {{ request('source') == 'Referral' ? 'selected' : '' }}>
+                        Referral
+                    </option>
+
+                    <option value="Other" {{ request('source') == 'Other' ? 'selected' : '' }}>
+                        Other
+                    </option>
                 </select>
 
                 <select name="status" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
+
                     <option value="">All Statuses</option>
-                    <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>New</option>
-                    <option value="contacted" {{ request('status') == 'contacted' ? 'selected' : '' }}>Contacted
+
+                    <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>
+                        New
                     </option>
-                    <option value="converted" {{ request('status') == 'converted' ? 'selected' : '' }}>Converted
+
+                    <option value="contacted" {{ request('status') == 'contacted' ? 'selected' : '' }}>
+                        Contacted
                     </option>
-                    <option value="lost" {{ request('status') == 'lost' ? 'selected' : '' }}>Lost</option>
+
+                    <option value="converted" {{ request('status') == 'converted' ? 'selected' : '' }}>
+                        Converted
+                    </option>
+
+                    <option value="lost" {{ request('status') == 'lost' ? 'selected' : '' }}>
+                        Lost
+                    </option>
                 </select>
             </div>
 
-            <!-- Context Control Triggers -->
-            <div class="flex gap-2 sm:col-span-2 md:col-span-4 justify-end mt-1">
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-2 sm:col-span-2 lg:col-span-4 justify-end mt-1">
+
                 @if (request()->has('search') ||
                         request()->has('source') ||
                         request()->has('status') ||
                         request()->has('date_from') ||
                         request()->has('date_to'))
                     <a href="{{ route('potential-customers.index') }}"
-                        class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2 px-4 rounded-xl flex items-center justify-center transition-colors">
+                        class="w-full sm:w-auto bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2 px-4 rounded-xl flex items-center justify-center transition-colors">
+
                         Clear Filters
                     </a>
                 @endif
+
                 <button type="submit"
-                    class="bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2 px-5 rounded-xl transition-all shadow-sm">
+                    class="w-full sm:w-auto bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2 px-5 rounded-xl transition-all shadow-sm">
+
                     Apply Layout Filters
                 </button>
             </div>
