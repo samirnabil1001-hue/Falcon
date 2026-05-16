@@ -6,12 +6,43 @@
         modalMessage: '',
         formToSubmit: null,
         confirmColor: 'bg-indigo-600',
+        pendingStatusValue: null,
         openConfirm(title, message, formId, color = 'bg-indigo-600') {
             this.modalTitle = title;
             this.modalMessage = message;
             this.formToSubmit = formId;
             this.confirmColor = color;
             this.confirmModal = true;
+        },
+        handleStatusChange(event, formId) {
+            let select = event.target;
+            let originalValue = select.getAttribute('data-original-value');
+    
+            if (select.value === originalValue) {
+                return;
+            }
+    
+            this.pendingStatusValue = select.value;
+    
+            let statusLabel = select.options[select.selectedIndex].text;
+    
+            // فتح مودال التأكيد لـ Alpine
+            this.openConfirm(
+                'تغيير حالة العميل',
+                `هل أنت متأكد من تغيير حالة هذا العميل إلى (${statusLabel})؟`,
+                formId,
+                'bg-amber-600'
+            );
+    
+            // إرجاع قيمة الـ select مؤقتاً لشكلها الأصلي حتى يضغط المستخدم على زر 'تأكيد'
+            select.value = originalValue;
+        },
+        submitPendingForm() {
+            let form = document.getElementById(this.formToSubmit);
+            // إرسال القيمة الجديدة المختارة مع الفورم عند التأكيد
+            let select = form.querySelector('select[name=&quot;status&quot;]');
+            select.value = this.pendingStatusValue;
+            form.submit();
         }
     }"
         class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
@@ -65,15 +96,11 @@
             <!-- Date Range -->
             <div
                 class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:col-span-2 bg-white dark:bg-slate-800 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
-
                 <!-- From -->
                 <div class="flex items-center gap-2 flex-1 cursor-pointer"
                     onclick="this.querySelector('input').showPicker()">
                     <span
-                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">
-                        From
-                    </span>
-
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">From</span>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
                         max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
@@ -85,10 +112,7 @@
                 <div class="flex items-center gap-2 flex-1 cursor-pointer"
                     onclick="this.querySelector('input').showPicker()">
                     <span
-                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">
-                        To
-                    </span>
-
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">To</span>
                     <input type="date" name="date_to" value="{{ request('date_to') }}"
                         max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
@@ -96,30 +120,24 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
                 <select name="source" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
-
                     <option value="">All Sources</option>
-
                     @foreach (App\Enums\PotentialCustomerSource::cases() as $source)
                         <option value="{{ $source->value }}"
                             {{ request('source') == $source->value ? 'selected' : '' }}>
                             {{ $source->value }}
-
                         </option>
                     @endforeach
                 </select>
+
                 <select name="status" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
-
                     <option value="">All Statuses</option>
-
                     @foreach (App\Enums\PotentialCustomerStatus::cases() as $status)
                         <option value="{{ $status->value }}"
                             {{ request('status') == $status->value ? 'selected' : '' }}>
                             {{ ucfirst($status->value) }}
-
                         </option>
                     @endforeach
                 </select>
@@ -127,7 +145,6 @@
 
             <!-- Actions -->
             <div class="flex flex-col sm:flex-row gap-2 sm:col-span-2 lg:col-span-4 justify-end mt-1">
-
                 @if (request()->has('search') ||
                         request()->has('source') ||
                         request()->has('status') ||
@@ -135,14 +152,12 @@
                         request()->has('date_to'))
                     <a href="{{ route('potential-customers.index') }}"
                         class="w-full sm:w-auto bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2 px-4 rounded-xl flex items-center justify-center transition-colors">
-
                         Clear Filters
                     </a>
                 @endif
 
                 <button type="submit"
                     class="w-full sm:w-auto bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2 px-5 rounded-xl transition-all shadow-sm">
-
                     Apply Layout Filters
                 </button>
             </div>
@@ -186,8 +201,7 @@
                                 </a>
                             </th>
                             @if (auth()->user()->isCEO())
-                                <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added By
-                                </th>
+                                <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added By</th>
                             @endif
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'added_at', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'added_at' ? 'desc' : 'asc']) }}"
@@ -220,13 +234,11 @@
                                 <td class="p-4 text-center whitespace-nowrap">
                                     @if ($customer->source)
                                         @php
-                                            // جلب الـ Enum case للتأكد من استخدام الخصائص ديناميكيًا
                                             $sourceEnum =
                                                 $customer->source instanceof \App\Enums\PotentialCustomerSource
                                                     ? $customer->source
                                                     : \App\Enums\PotentialCustomerSource::tryFrom($customer->source);
 
-                                            // تحديد كلاسات الألوان بناءً على المصدر
                                             $colorClass = match ($sourceEnum) {
                                                 \App\Enums\PotentialCustomerSource::FACEBOOK
                                                     => 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30',
@@ -282,15 +294,24 @@
                                             \App\Enums\PotentialCustomerStatus::CANCELLED => 'bg-rose-500',
                                             default => 'bg-gray-400',
                                         };
+
+                                        $currentStatusValue = is_object($customer->status)
+                                            ? $customer->status->value
+                                            : $customer->status;
+
+                                        $isLocked = in_array($currentStatusValue, [
+                                            \App\Enums\PotentialCustomerStatus::CONFIRMED->value,
+                                            \App\Enums\PotentialCustomerStatus::CANCELLED->value,
+                                        ]);
                                     @endphp
 
                                     <span dir="rtl"
                                         class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border shadow-sm {{ $statusClasses }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ $dotClasses }}"></span>
-
                                         {{ $statusEnum?->label() ?? ($customer->status ?? 'غير محدد') }}
                                     </span>
                                 </td>
+
                                 @if (auth()->user()->isCEO())
                                     <td
                                         class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
@@ -306,40 +327,83 @@
                                 <td class="p-4 text-center whitespace-nowrap align-middle">
                                     <div class="flex items-center justify-center gap-2">
 
-                                        <form action="{{ route('potential-customers.update-status', $customer->id) }}"
+                                        <!-- Form Block per Row -->
+                                        <!-- Form Block per Row -->
+                                        <form id="status-form-{{ $customer->id }}"
+                                            action="{{ route('potential-customers.update-status', $customer->id) }}"
                                             method="POST">
                                             @csrf
                                             @method('PATCH')
 
-                                            <select name="status" onchange="this.form.submit()" dir="rtl"
-                                                class="text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1
-               bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200
-               text-right focus:ring-2 focus:ring-indigo-500
-               appearance-none bg-no-repeat bg-[left_0.75rem_center] 
-               bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]"
+                                            <select name="status" x-data="{
+                                                showCurrentLabel(e) {
+                                                        // عند فتح القائمة: نضيف كلمة (الحالية) للخيار المحدّد المفرمل
+                                                        let opt = e.target.querySelector('option[disabled]:checked');
+                                                        if (opt && !opt.text.includes('(الحالية)')) {
+                                                            opt.text = opt.text + ' (الحالية)';
+                                                        }
+                                                    },
+                                                    hideCurrentLabel(e) {
+                                                        // عند إغلاق القائمة: نحذف كلمة (الحالية) ليبقى المظهر نظيفاً في الـ displayed value
+                                                        let opt = e.target.querySelector('option[disabled]:checked');
+                                                        if (opt) {
+                                                            opt.text = opt.text.replace(' (الحالية)', '').trim();
+                                                        }
+                                                    }
+                                            }"
+                                                x-on:focus="showCurrentLabel($event)"
+                                                x-on:blur="hideCurrentLabel($event)"
+                                                x-on:change="hideCurrentLabel($event); handleStatusChange($event, 'status-form-{{ $customer->id }}')"
+                                                data-original-value="{{ $currentStatusValue }}" dir="rtl"
+                                                {{ $isLocked ? 'disabled' : '' }}
+                                                class="text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 text-right focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.75rem_center] disabled:opacity-60 disabled:cursor-not-allowed"
                                                 style="background-size: 0.65em auto;">
 
-                                                @foreach (App\Enums\PotentialCustomerStatus::cases() as $status)
-                                                    <option value="{{ $status->value }}"
-                                                        {{ $customer->status == $status->value || (is_object($customer->status) && $customer->status->value == $status->value) ? 'selected' : '' }}>
-                                                        {{ $status->label() }}
+                                                @if ($currentStatusValue == \App\Enums\PotentialCustomerStatus::NEW->value)
+                                                    <!-- النص هنا يبدأ بدون الكلمة، و Alpine سيتكفل بإظهارها وإخفائها ديناميكياً -->
+                                                    <option
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::NEW->value }}"
+                                                        selected disabled class="text-gray-400 font-normal">
+                                                        {{ \App\Enums\PotentialCustomerStatus::NEW->label() }}
                                                     </option>
-                                                @endforeach
+                                                    <option
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}">
+                                                        {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
+                                                    </option>
+                                                @elseif($currentStatusValue == \App\Enums\PotentialCustomerStatus::CONTACTED->value)
+                                                    <option
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}"
+                                                        selected disabled class="text-gray-400 font-normal">
+                                                        {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
+                                                    </option>
+                                                    <option
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}">
+                                                        {{ \App\Enums\PotentialCustomerStatus::CONFIRMED->label() }}
+                                                    </option>
+                                                    <option
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}">
+                                                        {{ \App\Enums\PotentialCustomerStatus::CANCELLED->label() }}
+                                                    </option>
+                                                @else
+                                                    <!-- الحالات المغلقة والنهائية -->
+                                                    <option value="{{ $currentStatusValue }}" selected disabled>
+                                                        {{ $statusEnum?->label() ?? $currentStatusValue }}
+                                                    </option>
+                                                @endif
 
                                             </select>
                                         </form>
-                                        <!-- Edit -->
+
+                                        <!-- Edit Action Button -->
                                         <a href="{{ route('potential-customers.edit', $customer->id) }}"
                                             class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                                             title="Edit Customer">
-
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
-
 
                                     </div>
                                 </td>
@@ -364,13 +428,13 @@
             </div>
         </div>
 
-        <!-- Custom Document Pagination Wrapper -->
+        <!-- Custom Pagination Links Component -->
         <div
             class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
             {{ $customers->appends(request()->query())->links() }}
         </div>
 
-        <!-- Alpine.js Modals Framework Integration -->
+        <!-- Alpine.js Confirmation Modal Layout -->
         <div x-show="confirmModal"
             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
@@ -396,7 +460,7 @@
                         class="flex-1 px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 rounded-xl transition-colors">
                         Cancel Action
                     </button>
-                    <button @click="document.getElementById(formToSubmit).submit()" :class="confirmColor"
+                    <button @click="submitPendingForm()" :class="confirmColor"
                         class="flex-1 px-4 py-2 text-xs font-semibold text-white rounded-xl shadow-sm hover:opacity-95 transition-colors">
                         Confirm Action
                     </button>
