@@ -1,12 +1,12 @@
 <x-app-layout>
-    <!-- الحاوية الرئيسية -->
+    <!-- Main Wrapper Component -->
     <div x-data="{
         confirmModal: false,
         modalTitle: '',
         modalMessage: '',
         formToSubmit: null,
-        confirmColor: 'bg-blue-600',
-        openConfirm(title, message, formId, color = 'bg-blue-600') {
+        confirmColor: 'bg-indigo-600',
+        openConfirm(title, message, formId, color = 'bg-indigo-600') {
             this.modalTitle = title;
             this.modalMessage = message;
             this.formToSubmit = formId;
@@ -14,66 +14,83 @@
             this.confirmModal = true;
         }
     }"
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden">
+        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
 
         <!-- Header Section -->
-        <div class="flex items-center justify-between mb-4 shrink-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 shrink-0">
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
                     Potential Customers Management
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Manage and track your potential leads</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Seamlessly manage, route, and convert your
+                    incoming leads</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('potential-customers.create') }}"
-                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors">
-                    + Add New Customer
-                </a>
+            <div class="flex items-center gap-3 self-end sm:self-auto">
                 <div
-                    class="text-sm font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full">
-                    Total: {{ $customers->total() }}
+                    class="text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-3 py-2 rounded-xl border border-indigo-100 dark:border-indigo-900/30">
+                    Total Leads: <span class="font-bold">{{ $customers->total() }}</span>
                 </div>
+                <a href="{{ route('potential-customers.create') }}"
+                    class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-sm shadow-indigo-100 dark:shadow-none transition-all hover:-translate-y-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Customer
+                </a>
             </div>
         </div>
 
-        <!-- 🛠️ شريط الفلترة والبحث (مربوط بالـ Controller) -->
+        <!-- Filter & Search Panel -->
         <form action="{{ url()->current() }}" method="GET"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4 shrink-0 bg-gray-50 dark:bg-gray-900/40 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-            <!-- احتفاظ بقيم الترتيب الحالية عند البحث أو الفلترة -->
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-5 shrink-0 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
             <input type="hidden" name="sort_by" value="{{ request('sort_by', 'added_at') }}">
             <input type="hidden" name="sort_order" value="{{ request('sort_order', 'desc') }}">
 
-            <!-- البحث بالاسم أو الهاتف -->
+            <!-- Search Field -->
             <div class="relative">
                 <input type="text" name="search" value="{{ request('search') }}"
                     placeholder="Search by name or phone..."
-                    class="w-full text-xs rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white pl-8 focus:ring-blue-500 focus:border-blue-500">
-                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
+                    class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 pl-9 pr-4 py-2.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-slate-500">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </div>
+
+            <!-- Date Range Selectors -->
+            <!-- Date Range Selectors -->
             <div
-                class="flex items-center gap-2 md:col-span-2 bg-white dark:bg-gray-850 p-2 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-1 flex-1">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase shrink-0">From:</label>
+                class="flex items-center gap-2 md:col-span-2 bg-white dark:bg-slate-800 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all">
+                <!-- From Date -->
+                <div class="flex items-center gap-2 flex-1 cursor-pointer"
+                    onclick="this.querySelector('input').showPicker()">
+                    <span
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">From</span>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        onchange="this.form.submit()"
-                        class="w-full text-xs rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white p-1 focus:ring-blue-500 focus:border-blue-500">
+                        max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
+                        class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
 
-                <div class="flex items-center gap-1 flex-1">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase shrink-0">To:</label>
-                    <input type="date" name="date_to" value="{{ request('date_to') }}" onchange="this.form.submit()"
-                        class="w-full text-xs rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white p-1 focus:ring-blue-500 focus:border-blue-500">
+                <div class="h-4 w-[1px] bg-gray-200 dark:bg-slate-700 mx-1"></div>
+
+                <!-- To Date -->
+                <div class="flex items-center gap-2 flex-1 cursor-pointer"
+                    onclick="this.querySelector('input').showPicker()">
+                    <span
+                        class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">To</span>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}"
+                        max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
+                        class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
             </div>
-            <!-- فلتر المصدر -->
-            <div>
+
+            <!-- Dropdown Matrix Filters -->
+            <div class="grid grid-cols-2 gap-2">
                 <select name="source" onchange="this.form.submit()"
-                    class="w-full text-xs rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
                     <option value="">All Sources</option>
                     <option value="Facebook" {{ request('source') == 'Facebook' ? 'selected' : '' }}>Facebook</option>
                     <option value="Instagram" {{ request('source') == 'Instagram' ? 'selected' : '' }}>Instagram
@@ -83,12 +100,9 @@
                     <option value="Referral" {{ request('source') == 'Referral' ? 'selected' : '' }}>Referral</option>
                     <option value="Other" {{ request('source') == 'Other' ? 'selected' : '' }}>Other</option>
                 </select>
-            </div>
 
-            <!-- فلتر الحالة -->
-            <div>
                 <select name="status" onchange="this.form.submit()"
-                    class="w-full text-xs rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
                     <option value="">All Statuses</option>
                     <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>New</option>
                     <option value="contacted" {{ request('status') == 'contacted' ? 'selected' : '' }}>Contacted
@@ -99,148 +113,185 @@
                 </select>
             </div>
 
-            <!-- أزرار التحكم -->
-            <div class="flex gap-2">
-                <button type="submit"
-                    class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-gray-700 dark:text-gray-200 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                    Apply Filter
-                </button>
-                @if (request()->has('search') || request()->has('source') || request()->has('status'))
+            <!-- Context Control Triggers -->
+            <div class="flex gap-2 sm:col-span-2 md:col-span-4 justify-end mt-1">
+                @if (request()->has('search') ||
+                        request()->has('source') ||
+                        request()->has('status') ||
+                        request()->has('date_from') ||
+                        request()->has('date_to'))
                     <a href="{{ route('potential-customers.index') }}"
-                        class="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-100 text-xs font-semibold py-2 px-3 rounded-lg flex items-center justify-center transition-colors">
-                        Clear
+                        class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2 px-4 rounded-xl flex items-center justify-center transition-colors">
+                        Clear Filters
                     </a>
                 @endif
+                <button type="submit"
+                    class="bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2 px-5 rounded-xl transition-all shadow-sm">
+                    Apply Layout Filters
+                </button>
             </div>
         </form>
 
-        <!-- Table Container -->
+        <!-- Dynamic Responsive Table Data Layer -->
         <div
-            class="flex-1 h-0 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-            <div class="h-full overflow-auto">
-                <table class="w-full min-w-[1000px] border-collapse">
-                    <!-- Sticky Header -->
-                    <thead class="sticky top-0 z-20 bg-gray-100 dark:bg-gray-700 shadow-sm">
+            class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <div class="h-full overflow-auto custom-scrollbar">
+                <table class="w-full min-w-[1000px] border-collapse text-left">
+                    <!-- Table Head Elements -->
+                    <thead
+                        class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
                         <tr>
-                            <!-- ترتيب بالاسم -->
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'name', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'name' ? 'desc' : 'asc']) }}"
-                                    class="flex items-center justify-center gap-1 hover:text-blue-500">
+                                    class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Customer Name
                                     @if (request('sort_by') === 'name')
-                                        <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        <span class="text-xs">{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
-                                Phone
-                            </th>
-                            <!-- ترتيب بالمصدر -->
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Phone</th>
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'source', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'source' ? 'desc' : 'asc']) }}"
-                                    class="flex items-center justify-center gap-1 hover:text-blue-500">
+                                    class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Source
                                     @if (request('sort_by') === 'source')
-                                        <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        <span class="text-xs">{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <!-- ترتيب بالحالة -->
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'status', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'status' ? 'desc' : 'asc']) }}"
-                                    class="flex items-center justify-center gap-1 hover:text-blue-500">
+                                    class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Status
                                     @if (request('sort_by') === 'status')
-                                        <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        <span class="text-xs">{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
                             @if (auth()->user()->isCEO())
-                                <th
-                                    class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
-                                    Added By
+                                <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added By
                                 </th>
                             @endif
-                            <!-- ترتيب بالتاريخ -->
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'added_at', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'added_at' ? 'desc' : 'asc']) }}"
-                                    class="flex items-center justify-center gap-1 hover:text-blue-500">
+                                    class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Added At
                                     @if (request('sort_by', 'added_at') === 'added_at')
-                                        <span>{{ request('sort_order', 'desc') === 'asc' ? '▲' : '▼' }}</span>
+                                        <span
+                                            class="text-xs">{{ request('sort_order', 'desc') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <th
-                                class="p-3 text-center text-gray-700 dark:text-gray-200 uppercase text-[11px] font-bold tracking-wider">
-                                Actions
-                            </th>
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Actions</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <!-- Data Body Elements -->
+                    <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
                         @forelse($customers as $customer)
-                            <tr
-                                class="bg-white dark:bg-gray-800 hover:bg-blue-50/30 dark:hover:bg-gray-700/50 transition-colors">
-                                <td class="p-3 text-center">
+                            <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors group">
+                                <td class="p-4 text-center whitespace-nowrap">
                                     <span
-                                        class="font-bold text-sm text-gray-900 dark:text-white">{{ $customer->name }}</span>
+                                        class="font-semibold text-sm text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $customer->name }}</span>
                                 </td>
 
-                                <td class="p-3 text-center text-sm text-gray-600 dark:text-gray-300">
+                                <td
+                                    class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
                                     {{ $customer->phone }}
                                 </td>
 
-                                <td class="p-3 text-center">
+                                <td class="p-4 text-center whitespace-nowrap">
                                     <span
-                                        class="px-2 py-1 rounded text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                        class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
                                         {{ $customer->source ?? 'N/A' }}
                                     </span>
                                 </td>
 
-                                <td class="p-3 text-center">
+                                <td class="p-4 text-center whitespace-nowrap">
                                     @php
                                         $statusClasses = match ($customer->status) {
-                                            'new' => 'bg-blue-50 text-blue-700 border-blue-100',
-                                            'contacted' => 'bg-amber-50 text-amber-700 border-amber-100',
-                                            'converted' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
-                                            'lost' => 'bg-rose-50 text-rose-700 border-rose-100',
-                                            default => 'bg-gray-50 text-gray-700 border-gray-100',
+                                            'new'
+                                                => 'bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40',
+                                            'contacted'
+                                                => 'bg-amber-50 text-amber-700 border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/40',
+                                            'converted'
+                                                => 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40',
+                                            'lost'
+                                                => 'bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/40',
+                                            default
+                                                => 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+                                        };
+                                        $dotClasses = match ($customer->status) {
+                                            'new' => 'bg-blue-500',
+                                            'contacted' => 'bg-amber-500',
+                                            'converted' => 'bg-emerald-500',
+                                            'lost' => 'bg-rose-500',
+                                            default => 'bg-gray-400',
                                         };
                                     @endphp
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm {{ $statusClasses }}">
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm {{ $statusClasses }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $dotClasses }}"></span>
                                         {{ $customer->status }}
                                     </span>
                                 </td>
 
                                 @if (auth()->user()->isCEO())
-                                    <td class="p-3 text-center text-sm text-gray-600 dark:text-gray-400">
+                                    <td
+                                        class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
                                         {{ $customer->creator->name ?? 'System' }}
                                     </td>
                                 @endif
 
-                                <td class="p-3 text-center text-gray-400 text-xs">
-                                    {{ \Carbon\Carbon::parse($customer->added_at)->format('M d, Y H:i') }}
+                                <td
+                                    class="p-4 text-center whitespace-nowrap text-gray-500 dark:text-slate-400 text-xs">
+                                    {{ \Carbon\Carbon::parse($customer->added_at)->format('M d, Y • H:i') }}
                                 </td>
 
-                                <td class="p-3 text-center align-middle">
+                                <td class="p-4 text-center whitespace-nowrap align-middle">
                                     <div class="flex items-center justify-center gap-2">
-                                        <!-- Actions placeholder -->
-                                        <span class="text-xs text-gray-400">Edit / Delete</span>
+                                        <!-- Interactive Action Icons -->
+                                        <a href="{{ route('potential-customers.edit', $customer->id) }}"
+                                            class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                                            title="Edit Customer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </a>
+                                        <form id="delete-form-{{ $customer->id }}"
+                                            action="{{ route('potential-customers.destroy', $customer->id) }}"
+                                            method="POST" class="inline-block">
+                                            @csrf @method('DELETE')
+                                            <button type="button"
+                                                @click="openConfirm('Delete Customer?', 'Are you sure you want to permanently delete this customer context file?', 'delete-form-{{ $customer->id }}', 'bg-rose-600')"
+                                                class="p-1.5 text-gray-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                                                title="Delete File">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="{{ auth()->user()->isCEO() ? '7' : '6' }}"
-                                    class="p-10 text-center text-gray-400 italic">
-                                    No potential customers found.
+                                    class="p-12 text-center text-gray-400 dark:text-slate-500 italic text-sm">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg class="w-8 h-8 text-gray-300 dark:text-slate-700" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                        </svg>
+                                        No potential lead logs matching filter arrays were found.
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -249,40 +300,69 @@
             </div>
         </div>
 
-        <!-- Pagination Section -->
-        <div class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <!-- استخدام appends للحفاظ على فلاتر البحث عند التنقل بين الصفحات -->
+        <!-- Custom Document Pagination Wrapper -->
+        <div
+            class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
             {{ $customers->appends(request()->query())->links() }}
         </div>
 
-        <!-- Custom Confirmation Modal (UI) -->
-        <div x-show="confirmModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
-            x-cloak x-transition>
+        <!-- Alpine.js Modals Framework Integration -->
+        <div x-show="confirmModal"
+            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak
+            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+
             <div @click.away="confirmModal = false"
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full p-6">
+                class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-slate-700 transform transition-all">
                 <div
-                    class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full">
-                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
+                    class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-rose-50 dark:bg-rose-950/30 rounded-full">
+                    <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <h4 class="text-lg font-bold text-center text-gray-900 dark:text-white" x-text="modalTitle"></h4>
-                <p class="mt-2 text-sm text-center text-gray-500 dark:text-gray-400" x-text="modalMessage"></p>
-                <div class="flex gap-3 mt-6">
+                <h4 class="text-base font-bold text-center text-gray-900 dark:text-white" x-text="modalTitle"></h4>
+                <p class="mt-2 text-xs text-center text-gray-500 dark:text-slate-400 leading-relaxed"
+                    x-text="modalMessage"></p>
+
+                <div class="flex gap-3 mt-5">
                     <button @click="confirmModal = false"
-                        class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 transition-colors">Cancel</button>
+                        class="flex-1 px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 rounded-xl transition-colors">
+                        Cancel Action
+                    </button>
                     <button @click="document.getElementById(formToSubmit).submit()" :class="confirmColor"
-                        class="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm hover:opacity-90 transition-colors">Confirm</button>
+                        class="flex-1 px-4 py-2 text-xs font-semibold text-white rounded-xl shadow-sm hover:opacity-95 transition-colors">
+                        Confirm Action
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Supplementary Structural Utilities CSS -->
     <style>
         [x-cloak] {
             display: none !important;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
         }
     </style>
 </x-app-layout>
