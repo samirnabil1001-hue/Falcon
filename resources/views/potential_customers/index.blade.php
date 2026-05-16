@@ -213,7 +213,10 @@
                                     @endif
                                 </a>
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Actions</th>
+                            <!-- تحديث رأس عمود الأكشن بعرض ثابت وضخم -->
+                            <th
+                                class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">
+                                Actions</th>
                         </tr>
                     </thead>
 
@@ -324,86 +327,86 @@
                                     {{ \Carbon\Carbon::parse($customer->added_at)->format('M d, Y • H:i') }}
                                 </td>
 
-                                <td class="p-4 text-center whitespace-nowrap align-middle">
-                                    <div class="flex items-center justify-center gap-2">
+                                <!-- تحديث خلية الـ Actions لتكون بنظام Grid مفرمل المساحات -->
+                                <td class="p-4 text-center whitespace-nowrap align-middle w-48 min-w-[190px]">
+                                    <div class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[170px] mx-auto">
 
-                                        <!-- Form Block per Row -->
-                                        <!-- Form Block per Row -->
-                                        <form id="status-form-{{ $customer->id }}"
-                                            action="{{ route('potential-customers.update-status', $customer->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('PATCH')
+                                        <!-- حاوية السلكت المفرملة -->
+                                        <div class="w-full">
+                                            <form id="status-form-{{ $customer->id }}"
+                                                action="{{ route('potential-customers.update-status', $customer->id) }}"
+                                                method="POST" class="m-0">
+                                                @csrf
+                                                @method('PATCH')
 
-                                            <select name="status" x-data="{
-                                                showCurrentLabel(e) {
-                                                        // عند فتح القائمة: نضيف كلمة (الحالية) للخيار المحدّد المفرمل
-                                                        let opt = e.target.querySelector('option[disabled]:checked');
-                                                        if (opt && !opt.text.includes('(الحالية)')) {
-                                                            opt.text = opt.text + ' (الحالية)';
+                                                <select name="status" x-data="{
+                                                    showCurrentLabel(e) {
+                                                            let opt = e.target.querySelector('option[disabled]:checked');
+                                                            if (opt && !opt.text.includes('(الحالية)')) {
+                                                                opt.text = opt.text + ' (الحالية)';
+                                                            }
+                                                        },
+                                                        hideCurrentLabel(e) {
+                                                            let opt = e.target.querySelector('option[disabled]:checked');
+                                                            if (opt) {
+                                                                opt.text = opt.text.replace(' (الحالية)', '').trim();
+                                                            }
                                                         }
-                                                    },
-                                                    hideCurrentLabel(e) {
-                                                        // عند إغلاق القائمة: نحذف كلمة (الحالية) ليبقى المظهر نظيفاً في الـ displayed value
-                                                        let opt = e.target.querySelector('option[disabled]:checked');
-                                                        if (opt) {
-                                                            opt.text = opt.text.replace(' (الحالية)', '').trim();
-                                                        }
-                                                    }
-                                            }"
-                                                x-on:focus="showCurrentLabel($event)"
-                                                x-on:blur="hideCurrentLabel($event)"
-                                                x-on:change="hideCurrentLabel($event); handleStatusChange($event, 'status-form-{{ $customer->id }}')"
-                                                data-original-value="{{ $currentStatusValue }}" dir="rtl"
-                                                {{ $isLocked ? 'disabled' : '' }}
-                                                class="text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 text-right focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.75rem_center] disabled:opacity-60 disabled:cursor-not-allowed"
-                                                style="background-size: 0.65em auto;">
+                                                }"
+                                                    x-on:focus="showCurrentLabel($event)"
+                                                    x-on:blur="hideCurrentLabel($event)"
+                                                    x-on:change="hideCurrentLabel($event); handleStatusChange($event, 'status-form-{{ $customer->id }}')"
+                                                    data-original-value="{{ $currentStatusValue }}" dir="rtl"
+                                                    {{ $isLocked ? 'disabled' : '' }}
+                                                    class="w-full text-xs border border-gray-300 dark:border-slate-600 rounded-lg pl-7 pr-2 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 text-right focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.5rem_center] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                                    style="background-size: 0.65em auto; height: 30px;">
 
-                                                @if ($currentStatusValue == \App\Enums\PotentialCustomerStatus::NEW->value)
-                                                    <!-- النص هنا يبدأ بدون الكلمة، و Alpine سيتكفل بإظهارها وإخفائها ديناميكياً -->
-                                                    <option
-                                                        value="{{ \App\Enums\PotentialCustomerStatus::NEW->value }}"
-                                                        selected disabled class="text-gray-400 font-normal">
-                                                        {{ \App\Enums\PotentialCustomerStatus::NEW->label() }}
-                                                    </option>
-                                                    <option
-                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}">
-                                                        {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
-                                                    </option>
-                                                @elseif($currentStatusValue == \App\Enums\PotentialCustomerStatus::CONTACTED->value)
-                                                    <option
-                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}"
-                                                        selected disabled class="text-gray-400 font-normal">
-                                                        {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
-                                                    </option>
-                                                    <option
-                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}">
-                                                        {{ \App\Enums\PotentialCustomerStatus::CONFIRMED->label() }}
-                                                    </option>
-                                                    <option
-                                                        value="{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}">
-                                                        {{ \App\Enums\PotentialCustomerStatus::CANCELLED->label() }}
-                                                    </option>
-                                                @else
-                                                    <!-- الحالات المغلقة والنهائية -->
-                                                    <option value="{{ $currentStatusValue }}" selected disabled>
-                                                        {{ $statusEnum?->label() ?? $currentStatusValue }}
-                                                    </option>
-                                                @endif
+                                                    @if ($currentStatusValue == \App\Enums\PotentialCustomerStatus::NEW->value)
+                                                        <option
+                                                            value="{{ \App\Enums\PotentialCustomerStatus::NEW->value }}"
+                                                            selected disabled class="text-gray-400 font-normal">
+                                                            {{ \App\Enums\PotentialCustomerStatus::NEW->label() }}
+                                                        </option>
+                                                        <option
+                                                            value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}">
+                                                            {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
+                                                        </option>
+                                                    @elseif($currentStatusValue == \App\Enums\PotentialCustomerStatus::CONTACTED->value)
+                                                        <option
+                                                            value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}"
+                                                            selected disabled class="text-gray-400 font-normal">
+                                                            {{ \App\Enums\PotentialCustomerStatus::CONTACTED->label() }}
+                                                        </option>
+                                                        <option
+                                                            value="{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}">
+                                                            {{ \App\Enums\PotentialCustomerStatus::CONFIRMED->label() }}
+                                                        </option>
+                                                        <option
+                                                            value="{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}">
+                                                            {{ \App\Enums\PotentialCustomerStatus::CANCELLED->label() }}
+                                                        </option>
+                                                    @else
+                                                        <option value="{{ $currentStatusValue }}" selected disabled>
+                                                            {{ $statusEnum?->label() ?? $currentStatusValue }}
+                                                        </option>
+                                                    @endif
+                                                </select>
+                                            </form>
+                                        </div>
 
-                                            </select>
-                                        </form>
-
-                                        <!-- Edit Action Button -->
-                                        <a href="{{ route('potential-customers.edit', $customer->id) }}"
-                                            class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-                                            title="Edit Customer">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </a>
+                                        <!-- زر التعديل بأبعاد مفرملة مسبقاً لمنع الاهتزاز -->
+                                        <div class="flex items-center justify-center w-[30px] h-[30px]">
+                                            <a href="{{ route('potential-customers.edit', $customer->id) }}"
+                                                class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
+                                                title="Edit Customer">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </a>
+                                        </div>
 
                                     </div>
                                 </td>
@@ -437,12 +440,13 @@
         <!-- Alpine.js Confirmation Modal Layout -->
         <div x-show="confirmModal"
             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak
-            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
             <div @click.away="confirmModal = false"
                 class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-slate-700 transform transition-all">
+
                 <div
                     class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-rose-50 dark:bg-rose-950/30 rounded-full">
                     <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor"
@@ -451,6 +455,7 @@
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
+
                 <h4 class="text-base font-bold text-center text-gray-900 dark:text-white" x-text="modalTitle"></h4>
                 <p class="mt-2 text-xs text-center text-gray-500 dark:text-slate-400 leading-relaxed"
                     x-text="modalMessage"></p>

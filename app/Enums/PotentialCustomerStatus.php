@@ -13,9 +13,9 @@ enum PotentialCustomerStatus: string
     {
         return match($this) {
             self::NEW => 'جديد',
-            self::CONTACTED => 'تم التواصل',
+            self::CONTACTED => 'قيد المتابعة',
             self::CANCELLED => 'ملغي',
-            self::CONFIRMED => 'مؤكد',
+            self::CONFIRMED => 'تم التفيذ',
         };
     }
 }
