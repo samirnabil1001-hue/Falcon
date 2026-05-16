@@ -6,7 +6,16 @@ enum PotentialCustomerStatus: string
 {
     case NEW = 'new';
     case CONTACTED = 'contacted';
-    case PENDING = 'pending';
-    case WAITING = 'waiting';
-    case CONVERTED = 'converted';
+    case CANCELLED = 'cancelled';
+    case CONFIRMED = 'confirmed';
+
+    public function label(): string
+    {
+        return match($this) {
+            self::NEW => 'جديد',
+            self::CONTACTED => 'تم التواصل',
+            self::CANCELLED => 'ملغي',
+            self::CONFIRMED => 'مؤكد',
+        };
+    }
 }

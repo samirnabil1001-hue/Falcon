@@ -30,6 +30,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('potential-customers', PotentialCustomerController::class);
+    Route::patch(
+        '/potential-customers/{potentialCustomer}/status',
+        [PotentialCustomerController::class, 'updateStatus']
+    )->name('potential-customers.update-status');
 
 
     Route::middleware(['role:CEO,TeamLead'])->group(function () {

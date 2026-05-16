@@ -95,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- Filters -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
                 <select name="source" onchange="this.form.submit()"
@@ -103,51 +102,26 @@
 
                     <option value="">All Sources</option>
 
-                    <option value="Facebook" {{ request('source') == 'Facebook' ? 'selected' : '' }}>
-                        Facebook
-                    </option>
+                    @foreach (App\Enums\PotentialCustomerSource::cases() as $source)
+                        <option value="{{ $source->value }}"
+                            {{ request('source') == $source->value ? 'selected' : '' }}>
+                            {{ $source->value }}
 
-                    <option value="Instagram" {{ request('source') == 'Instagram' ? 'selected' : '' }}>
-                        Instagram
-                    </option>
-
-                    <option value="Website" {{ request('source') == 'Website' ? 'selected' : '' }}>
-                        Website
-                    </option>
-
-                    <option value="WhatsApp" {{ request('source') == 'WhatsApp' ? 'selected' : '' }}>
-                        WhatsApp
-                    </option>
-
-                    <option value="Referral" {{ request('source') == 'Referral' ? 'selected' : '' }}>
-                        Referral
-                    </option>
-
-                    <option value="Other" {{ request('source') == 'Other' ? 'selected' : '' }}>
-                        Other
-                    </option>
+                        </option>
+                    @endforeach
                 </select>
-
                 <select name="status" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
 
                     <option value="">All Statuses</option>
 
-                    <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>
-                        New
-                    </option>
+                    @foreach (App\Enums\PotentialCustomerStatus::cases() as $status)
+                        <option value="{{ $status->value }}"
+                            {{ request('status') == $status->value ? 'selected' : '' }}>
+                            {{ ucfirst($status->value) }}
 
-                    <option value="contacted" {{ request('status') == 'contacted' ? 'selected' : '' }}>
-                        Contacted
-                    </option>
-
-                    <option value="converted" {{ request('status') == 'converted' ? 'selected' : '' }}>
-                        Converted
-                    </option>
-
-                    <option value="lost" {{ request('status') == 'lost' ? 'selected' : '' }}>
-                        Lost
-                    </option>
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -244,41 +218,79 @@
                                 </td>
 
                                 <td class="p-4 text-center whitespace-nowrap">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
-                                        {{ $customer->source ?? 'N/A' }}
-                                    </span>
+                                    @if ($customer->source)
+                                        @php
+                                            // جلب الـ Enum case للتأكد من استخدام الخصائص ديناميكيًا
+                                            $sourceEnum =
+                                                $customer->source instanceof \App\Enums\PotentialCustomerSource
+                                                    ? $customer->source
+                                                    : \App\Enums\PotentialCustomerSource::tryFrom($customer->source);
+
+                                            // تحديد كلاسات الألوان بناءً على المصدر
+                                            $colorClass = match ($sourceEnum) {
+                                                \App\Enums\PotentialCustomerSource::FACEBOOK
+                                                    => 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30',
+                                                \App\Enums\PotentialCustomerSource::INSTAGRAM
+                                                    => 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800/30',
+                                                \App\Enums\PotentialCustomerSource::WHATSAPP
+                                                    => 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30',
+                                                \App\Enums\PotentialCustomerSource::WEBSITE
+                                                    => 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/30',
+                                                \App\Enums\PotentialCustomerSource::REFERRAL
+                                                    => 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800/30',
+                                                default
+                                                    => 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+                                            };
+                                        @endphp
+
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium border {{ $colorClass }}">
+                                            {{ $sourceEnum?->label() ?? $customer->source }}
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 border border-transparent">
+                                            غير محدد
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="p-4 text-center whitespace-nowrap">
                                     @php
-                                        $statusClasses = match ($customer->status) {
-                                            'new'
+                                        $statusEnum =
+                                            $customer->status instanceof \App\Enums\PotentialCustomerStatus
+                                                ? $customer->status
+                                                : \App\Enums\PotentialCustomerStatus::tryFrom($customer->status);
+
+                                        $statusClasses = match ($statusEnum) {
+                                            \App\Enums\PotentialCustomerStatus::NEW
                                                 => 'bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40',
-                                            'contacted'
+                                            \App\Enums\PotentialCustomerStatus::CONTACTED
                                                 => 'bg-amber-50 text-amber-700 border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/40',
-                                            'converted'
+                                            \App\Enums\PotentialCustomerStatus::CONFIRMED
                                                 => 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40',
-                                            'lost'
+                                            \App\Enums\PotentialCustomerStatus::CANCELLED
                                                 => 'bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/40',
                                             default
                                                 => 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
                                         };
-                                        $dotClasses = match ($customer->status) {
-                                            'new' => 'bg-blue-500',
-                                            'contacted' => 'bg-amber-500',
-                                            'converted' => 'bg-emerald-500',
-                                            'lost' => 'bg-rose-500',
+
+                                        $dotClasses = match ($statusEnum) {
+                                            \App\Enums\PotentialCustomerStatus::NEW => 'bg-blue-500',
+                                            \App\Enums\PotentialCustomerStatus::CONTACTED => 'bg-amber-500',
+                                            \App\Enums\PotentialCustomerStatus::CONFIRMED => 'bg-emerald-500',
+                                            \App\Enums\PotentialCustomerStatus::CANCELLED => 'bg-rose-500',
                                             default => 'bg-gray-400',
                                         };
                                     @endphp
-                                    <span
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm {{ $statusClasses }}">
+
+                                    <span dir="rtl"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border shadow-sm {{ $statusClasses }}">
                                         <span class="w-1.5 h-1.5 rounded-full {{ $dotClasses }}"></span>
-                                        {{ $customer->status }}
+
+                                        {{ $statusEnum?->label() ?? ($customer->status ?? 'غير محدد') }}
                                     </span>
                                 </td>
-
                                 @if (auth()->user()->isCEO())
                                     <td
                                         class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
@@ -293,32 +305,42 @@
 
                                 <td class="p-4 text-center whitespace-nowrap align-middle">
                                     <div class="flex items-center justify-center gap-2">
-                                        <!-- Interactive Action Icons -->
+
+                                        <form action="{{ route('potential-customers.update-status', $customer->id) }}"
+                                            method="POST">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <select name="status" onchange="this.form.submit()" dir="rtl"
+                                                class="text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-8 pr-3 py-1
+               bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200
+               text-right focus:ring-2 focus:ring-indigo-500
+               appearance-none bg-no-repeat bg-[left_0.75rem_center] 
+               bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]"
+                                                style="background-size: 0.65em auto;">
+
+                                                @foreach (App\Enums\PotentialCustomerStatus::cases() as $status)
+                                                    <option value="{{ $status->value }}"
+                                                        {{ $customer->status == $status->value || (is_object($customer->status) && $customer->status->value == $status->value) ? 'selected' : '' }}>
+                                                        {{ $status->label() }}
+                                                    </option>
+                                                @endforeach
+
+                                            </select>
+                                        </form>
+                                        <!-- Edit -->
                                         <a href="{{ route('potential-customers.edit', $customer->id) }}"
                                             class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                                             title="Edit Customer">
+
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
-                                        <form id="delete-form-{{ $customer->id }}"
-                                            action="{{ route('potential-customers.destroy', $customer->id) }}"
-                                            method="POST" class="inline-block">
-                                            @csrf @method('DELETE')
-                                            <button type="button"
-                                                @click="openConfirm('Delete Customer?', 'Are you sure you want to permanently delete this customer context file?', 'delete-form-{{ $customer->id }}', 'bg-rose-600')"
-                                                class="p-1.5 text-gray-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-                                                title="Delete File">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </form>
+
+
                                     </div>
                                 </td>
                             </tr>

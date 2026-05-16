@@ -6,7 +6,8 @@ use App\Models\PotentialCustomer;
 use App\Services\PotentialCustomerService;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use App\Enums\PotentialCustomerStatus;
+use Illuminate\Validation\Rule;
 class PotentialCustomerController extends Controller
 {
     use AuthorizesRequests;
@@ -60,7 +61,20 @@ class PotentialCustomerController extends Controller
             ->route('potential-customers.index')
             ->with('success', 'Customer updated successfully.');
     }
+    public function updateStatus(Request $request, PotentialCustomer $potentialCustomer)
+    {
+        $this->authorize('update', $potentialCustomer);
 
+        $request->validate([
+            'status' => ['required', Rule::enum(PotentialCustomerStatus::class)],
+        ]);
+
+        $this->customerService->update($potentialCustomer, [
+            'status' => $request->status, 
+        ]);
+
+        return back()->with('success', 'تم تحديث الحالة بنجاح.');
+    }
     public function destroy(PotentialCustomer $potentialCustomer)
     {
         $this->authorize('delete', $potentialCustomer);

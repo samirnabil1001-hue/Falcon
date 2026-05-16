@@ -14,10 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('phone');
-            $table->string('status')->default('new'); // حالة العميل
-            $table->string('source')->nullable(); // مصدر العميل
-            $table->timestamp('added_at')->nullable(); // تاريخ الإضافة
-            $table->foreignId('added_by')->constrained('users'); // الشخص الذي أضاف العميل (ربط بجدول المستخدمين)
+            $table->string('status')->default('new');
+            $table->string('source')->nullable(); 
+            $table->timestamp('added_at')->nullable(); 
+            $table->foreignId('added_by')->constrained('users'); 
             $table->timestamps();
         });
     }

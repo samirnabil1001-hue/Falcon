@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PotentialCustomer extends Model
@@ -22,4 +22,8 @@ class PotentialCustomer extends Model
     {
         return $this->belongsTo(User::class, 'added_by');
     }
+    protected $casts = [
+        'status' => \App\Enums\PotentialCustomerStatus::class,
+        'source' => \App\Enums\PotentialCustomerSource::class,
+    ];
 }

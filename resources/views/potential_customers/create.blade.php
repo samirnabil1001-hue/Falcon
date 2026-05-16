@@ -67,7 +67,7 @@
                           this.phoneError = '';
                       }
                   }"
-                  @submit="if(phoneError) { $event.preventDefault(); } else { isSubmitting = true; }"
+                  @submit="validateAndFormatPhone(); if(phoneError) { $event.preventDefault(); } else { isSubmitting = true; }"
                   class="p-6 space-y-6">
                 @csrf
 
@@ -150,7 +150,7 @@
                     @enderror
                 </div>
 
-                <!-- مصدر العميل -->
+                <!-- مصدر العميل (تم التعديل ليعمل بالـ Enum ديناميكيًا) -->
                 <div>
                     <label for="source" class="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
                         مصدر العميل
@@ -161,13 +161,12 @@
                                 style="background-image: none;"
                                 class="w-full appearance-none rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150 @error('source') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror">
                             
-                            <option value="">اختر المصدر</option>
-                            <option value="Facebook" {{ old('source') == 'Facebook' ? 'selected' : '' }}>Facebook</option>
-                            <option value="Instagram" {{ old('source') == 'Instagram' ? 'selected' : '' }}>Instagram</option>
-                            <option value="Website" {{ old('source') == 'Website' ? 'selected' : '' }}>Website</option>
-                            <option value="Referral" {{ old('source') == 'Referral' ? 'selected' : '' }}>Referral</option>
-                            <option value="WhatsApp" {{ old('source') == 'WhatsApp' ? 'selected' : '' }}>WhatsApp</option>
-                            <option value="Other" {{ old('source') == 'Other' ? 'selected' : '' }}>Other</option>
+                            <option value="" disabled selected>اختر المصدر</option>
+                            @foreach(\App\Enums\PotentialCustomerSource::cases() as $source)
+                                <option value="{{ $source->value }}" {{ old('source') == $source->value ? 'selected' : '' }}>
+                                    {{ $source->label() }} ({{ $source->value }})
+                                </option>
+                            @endforeach
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
