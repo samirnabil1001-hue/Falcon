@@ -4,14 +4,14 @@ namespace App\Services;
 
 use App\Models\PotentialCustomer;
 use App\Enums\UserRole;
+use App\Enums\PotentialCustomerStatus;
+use App\Enums\PotentialCustomerSource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Enum;
 
 class PotentialCustomerService
 {
-    /**
-     * جلب البيانات - تدعم الفلترة، البحث، والترتيب الديناميكي مع الـ Pagination
-     */
     /**
      * جلب البيانات - تدعم الفلترة، البحث، النطاق الزمني، والترتيب الديناميكي
      */
@@ -35,15 +35,21 @@ class PotentialCustomerService
 
         // 3. الفلترة حسب مصدر العميل
         if (!empty($filters['source'])) {
-            $query->where('source', $filters['source']);
+            $source = $filters['source'] instanceof PotentialCustomerSource 
+                ? $filters['source']->value 
+                : $filters['source'];
+            $query->where('source', $source);
         }
 
         // 4. الفلترة حسب حالة العميل
         if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
+            $status = $filters['status'] instanceof PotentialCustomerStatus 
+                ? $filters['status']->value 
+                : $filters['status'];
+            $query->where('status', $status);
         }
 
-        // 5. 📅 الفلترة بالنطاق الزمني لتاريخ الإضافة (Added At)
+        // 5. الفلترة بالنطاق الزمني لتاريخ الإضافة
         if (!empty($filters['date_from'])) {
             $query->whereDate('added_at', '>=', $filters['date_from']);
         }
@@ -69,25 +75,24 @@ class PotentialCustomerService
     }
 
     /**
-     * إنشاء عميل - مع التحقق وإسناد الحالة تلقائياً
+     * إنشاء عميل - مع التحقق وإسناد الحالة تلقائياً كـ Enum
      */
     public function store(array $data, int $userId)
     {
-        $validated = $this->validateData($data);
+        $validated = $this->validateData($data, true);
 
         return PotentialCustomer::create(array_merge($validated, [
-            'status' => 'New', 
+            'status' => PotentialCustomerStatus::NEW, 
             'added_by' => $userId,
             'added_at' => now(),
         ]));
     }
 
     /**
-     * تحديث عميل
+     * تحديث عميل (شامل تحديث الحالة المنفصل)
      */
     public function update(PotentialCustomer $customer, array $data)
     {
-        // عند التحديث نقوم بالتحقق من البيانات القادمة فقط دون إجبارية الحالة إلا لو تم إرسالها
         $validated = $this->validateData($data, false);
         $customer->update($validated);
         return $customer;
@@ -102,19 +107,25 @@ class PotentialCustomerService
     }
 
     /**
-     * قواعد التحقق
+     * قواعد التحقق الذكية والمرنة
      */
     protected function validateData(array $data, bool $isStore = true)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'source' => 'nullable|string|max:100',
-        ];
-
-        // لو كود التحديث يدعم إرسال الحالة، أضفها لقواعد التحقق
-        if (!$isStore) {
-            $rules['status'] = 'sometimes|required|string';
+        if ($isStore) {
+            // شروط صارمة عند الإدخال الجديد
+            $rules = [
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|max:20',
+                'source' => ['required', new Enum(PotentialCustomerSource::class)],
+            ];
+        } else {
+            // 👈 تم الإصلاح هنا: الحقول تصبح اختيارية التمرير بـ sometimes عند التحديث لتقبل تغيير الحالة بمفردها
+            $rules = [
+                'name' => 'sometimes|required|string|max:255',
+                'phone' => 'sometimes|required|string|max:20',
+                'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+            ];
         }
 
         $validator = Validator::make($data, $rules);
