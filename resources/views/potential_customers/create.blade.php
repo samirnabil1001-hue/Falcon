@@ -156,7 +156,7 @@
                         مصدر العميل
                     </label>
                     <div class="relative">
-                        <select name="source"
+                        <select name="source" required
                                 id="source"
                                 style="background-image: none;"
                                 class="w-full appearance-none rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150 @error('source') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror">
