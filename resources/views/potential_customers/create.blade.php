@@ -100,10 +100,15 @@
                         رقم الهاتف <span class="text-red-500">*</span>
                     </label>
                     
-                    <div class="flex rounded-xl shadow-sm border bg-white dark:bg-gray-800 focus-within:ring-2 transition-all duration-150 overflow-hidden"
+                    <div dir="ltr" class="flex rounded-xl shadow-sm border bg-white dark:bg-gray-800 focus-within:ring-2 transition-all duration-150 overflow-hidden"
                          :class="phoneError ? 'border-red-500 focus-within:ring-red-500/20 focus-within:border-red-500' : 'border-gray-300 dark:border-gray-700 focus-within:ring-blue-500/20 focus-within:border-blue-500'">
                         
                         <div class="relative flex-shrink-0 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                            <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
                             <select name="country_code"
                                     id="country_code"
                                     x-model="selectedCountry"
@@ -114,11 +119,6 @@
                                     <option :value="code" x-text="info.name + ' (' + code + ')'"></option>
                                 </template>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 left-2 flex items-center text-gray-400">
-                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
                         </div>
 
                         <input type="text"
