@@ -1,75 +1,32 @@
 <?php
 
-namespace App\Services;
+namespace App\Providers;
 
 use App\Models\PotentialCustomer;
-use App\Enums\UserRole;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use App\Policies\PotentialCustomerPolicy;
+use App\Services\PotentialCustomerService;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
-class PotentialCustomerService
+class AppServiceProvider extends ServiceProvider
 {
     /**
-     * جلب البيانات - تدعم الفلترة والـ Pagination
+     * Register any application services.
      */
-    public function list($user, $perPage = 10)
+    public function register(): void
     {
-        $query = PotentialCustomer::with('creator');
-
-        if ($user->role !== UserRole::CEO) {
-            $query->where('added_by', $user->id);
-        }
-
-        return $query->latest()->paginate($perPage);
+        // تسجيل الـ Service كـ Singleton لضمان استهلاك أمثل للذاكرة وكفاءة الأداء
+        $this->app->singleton(PotentialCustomerService::class, function ($app) {
+            return new PotentialCustomerService();
+        });
     }
 
     /**
-     * إنشاء عميل - مع التحقق
+     * Bootstrap any application services.
      */
-    public function store(array $data, int $userId)
+    public function boot(): void
     {
-        $validated = $this->validateData($data);
-
-        return PotentialCustomer::create(array_merge($validated, [
-            'added_by' => $userId,
-            'added_at' => now(),
-        ]));
-    }
-
-    /**
-     * تحديث عميل
-     */
-    public function update(PotentialCustomer $customer, array $data)
-    {
-        $validated = $this->validateData($data);
-        $customer->update($validated);
-        return $customer;
-    }
-
-    /**
-     * حذف عميل
-     */
-    public function delete(PotentialCustomer $customer)
-    {
-        return $customer->delete();
-    }
-
-    /**
-     * قواعد التحقق - موحدة للـ Web والـ API
-     */
-    protected function validateData(array $data)
-    {
-        $validator = Validator::make($data, [
-            'name'   => 'required|string|max:255',
-            'phone'  => 'required|string|max:20',
-            'source' => 'nullable|string|max:100',
-            'status' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
-
-        return $validator->validated();
+        // ربط الـ Model بالـ Policy الخاصة به بشكل صريح
+        Gate::policy(PotentialCustomer::class, PotentialCustomerPolicy::class);
     }
 }

@@ -11,19 +11,17 @@ class PotentialCustomerController extends Controller
 {
     use AuthorizesRequests;
 
-   
     public function __construct(
         protected PotentialCustomerService $customerService
     ) {}
 
- 
     public function index()
     {
-        $customers = $this->customerService->list(auth()->user());
+        // تم الإصلاح هنا لاستدعاء getPaginated بدلاً من list
+        $customers = $this->customerService->getPaginated(auth()->user());
 
         return view('potential_customers.index', compact('customers'));
     }
-
 
     public function create()
     {
@@ -46,7 +44,6 @@ class PotentialCustomerController extends Controller
         return view('potential_customers.show', compact('potentialCustomer'));
     }
 
-    
     public function edit(PotentialCustomer $potentialCustomer)
     {
         $this->authorize('update', $potentialCustomer);
@@ -54,7 +51,6 @@ class PotentialCustomerController extends Controller
         return view('potential_customers.edit', compact('potentialCustomer'));
     }
 
-  
     public function update(Request $request, PotentialCustomer $potentialCustomer)
     {
         $this->authorize('update', $potentialCustomer);
@@ -66,7 +62,6 @@ class PotentialCustomerController extends Controller
             ->with('success', 'Customer updated successfully.');
     }
 
- 
     public function destroy(PotentialCustomer $potentialCustomer)
     {
         $this->authorize('delete', $potentialCustomer);
