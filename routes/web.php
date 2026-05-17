@@ -8,6 +8,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\PotentialCustomerController;
 use App\Http\Controllers\CustomerFollowUpController;
 use App\Http\Controllers\DashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,55 +19,47 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// تجميع كل المسارات المحمية بـ auth و verified في مكان واحد لمنع التشتيت
+// مجموعة المسارات المحمية بتسجيل الدخول والتحقق من البريد
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard & Logs
+    // 1. لوحة التحكم والعمليات العامة
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
 
-    // Profile Management
+    // 2. إدارة حساب المستخدم الحالي (Profile)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // -------------------------------------------------------------------
-    // مجموعات مسارات العملاء والمتابعات (الترتيب هنا هو السر لحل الـ 404)
-    // -------------------------------------------------------------------
-    Route::middleware(['auth', 'verified'])->group(function () {
+    // 3. مسارات المتابعات والعمليات المتقدمة للعملاء (مرتبة بدقة لمنع تداخل المعرفات {id})
+    Route::prefix('potential-customers')->group(function () {
+        
+        // مسار العرض الرئيسي لجدول المتابعات
+        Route::get('/follow-ups', [CustomerFollowUpController::class, 'index'])
+            ->name('customer-follow-ups.index');
 
-        Route::prefix('potential-customers')->group(function () {
+        // جلب سجل متابعات عميل محدد (AJAX)
+        Route::get('/{customer}/follow-ups-history', [CustomerFollowUpController::class, 'show'])
+            ->name('customer-follow-ups.show');
 
-            // مسار العرض الرئيسي للمتابعات
-            Route::get('/follow-ups', [CustomerFollowUpController::class, 'index'])
-                ->name('customer-follow-ups.index');
+        // حفظ متابعة جديدة لعميل محدد من الـ Modal
+        Route::post('/{customer}/follow-ups', [CustomerFollowUpController::class, 'store'])
+            ->name('customer-follow-ups.store');
 
-            // 👈 المسار الجديد: جلب سجل متابعات عميل محدد (AJAX)
-            Route::get('/{customer}/follow-ups-history', [CustomerFollowUpController::class, 'show'])
-                ->name('customer-follow-ups.show');
-
-            // مسار الحفظ والتحديث الخاص بالمتابعات من الـ Modal
-            Route::post('/{customer}/follow-ups', [CustomerFollowUpController::class, 'store'])
-                ->name('customer-follow-ups.store');
-
-            Route::patch('/{potentialCustomer}/status', [PotentialCustomerController::class, 'updateStatus'])
-                ->name('potential-customers.update-status');
-        });
-
-        Route::resource('potential-customers', PotentialCustomerController::class);
+        // تحديث حالة العميل السريعة (تغيير الـ Status بنقرة زر)
+        Route::patch('/{potentialCustomer}/status', [PotentialCustomerController::class, 'updateStatus'])
+            ->name('potential-customers.update-status');
     });
 
-    // 4. مسارات الـ CRUD للعملاء (وضعناه بالأسفل لكي لا يلتهم الروابط الثابتة)
+    // 4. مسارات الـ CRUD القياسية للعملاء المحتملين (تحتوي على index, create, store, edit, update, destroy)
     Route::resource('potential-customers', PotentialCustomerController::class);
 
-
-    // -------------------------------------------------------------------
-    // صلاحيات المستخدمين والـ Roles
-    // -------------------------------------------------------------------
+    // 5. صلاحيات الإدارة للمستخدمين والـ Roles (CEO & TeamLead)
     Route::middleware(['role:CEO,TeamLead'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
     });
 
+    // 6. صلاحيات التحكم الكاملة والخاصة بالـ CEO فقط
     Route::middleware(['role:CEO'])->group(function () {
         Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
