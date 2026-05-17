@@ -50,16 +50,23 @@ class PotentialCustomerController extends Controller
 
         return view('potential_customers.edit', compact('potentialCustomer'));
     }
-
     public function update(Request $request, PotentialCustomer $potentialCustomer)
     {
         $this->authorize('update', $potentialCustomer);
 
-        $this->customerService->update($potentialCustomer, $request->all());
+        // 1. التحقق من البيانات أثناء التعديل
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:50',
+            'source' => 'required|string|max:100',
+        ]);
+
+        // 2. تمرير الموديل والبيانات المعدلة
+        $this->customerService->update($potentialCustomer, $validated);
 
         return redirect()
             ->route('potential-customers.index')
-            ->with('success', 'Customer updated successfully.');
+            ->with('success', 'تم تحديث بيانات العميل بنجاح.');
     }
     public function updateStatus(Request $request, PotentialCustomer $potentialCustomer)
     {

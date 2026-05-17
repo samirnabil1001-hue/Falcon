@@ -21,9 +21,17 @@
             Users
         </x-sidebar-link>
 
-        <x-sidebar-link :href="route('potential-customers.index')" :active="request()->routeIs('potential-customers.*')" icon="users">
+        <x-sidebar-link :href="route('potential-customers.index')" :active="request()->routeIs('potential-customers.index')" icon="users">
             Potential Customers
         </x-sidebar-link>
-         <x-sidebar-link href="#" icon="settings"> Settings </x-sidebar-link>
+
+        <!-- 👈 الرابط الجديد لإدارة المتابعات والـ Log -->
+        <x-sidebar-link :href="route('customer-follow-ups.index')" :active="request()->routeIs('customer-follow-ups.*')" icon="clock">
+            Follow-ups Log
+        </x-sidebar-link>
+
+        <x-sidebar-link href="#" icon="settings"> 
+            Settings 
+        </x-sidebar-link>
     </nav>
 </aside>

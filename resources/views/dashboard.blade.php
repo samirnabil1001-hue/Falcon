@@ -35,7 +35,7 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">إجمالي العملاء</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">2,784</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($totalCustomers) }}</p>
                 </div>
                 <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-blue-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,10 +46,10 @@
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>النسبة التشغيلية</span>
-                    <span class="font-bold text-blue-500">89%</span>
+                    <span class="font-bold text-blue-500">{{ $opRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
-                    <div class="bg-blue-500 h-1.5 rounded-full" style="width: 89%"></div>
+                    <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $opRatio }}%"></div>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">قيد المتابعة</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">186</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}</p>
                 </div>
                 <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,10 +70,10 @@
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>معدل الانتظار</span>
-                    <span class="font-bold text-amber-600">7.4%</span>
+                    <span class="font-bold text-amber-600">{{ $waitRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
-                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: 7.4%"></div>
+                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: {{ $waitRatio }}%"></div>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">تم التنفيذ</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">1,965</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($confirmedCount) }}</p>
                 </div>
                 <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,10 +94,10 @@
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>معدل الإغلاق</span>
-                    <span class="font-bold text-emerald-600">79.2%</span>
+                    <span class="font-bold text-emerald-600">{{ $closeRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
-                    <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 79.2%"></div>
+                    <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ $closeRatio }}%"></div>
                 </div>
             </div>
         </div>
@@ -107,7 +107,7 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">غير مهتم</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">329</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($cancelledCount) }}</p>
                 </div>
                 <div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-rose-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,10 +118,10 @@
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>نسبة الرفض</span>
-                    <span class="font-bold text-rose-600">13.3%</span>
+                    <span class="font-bold text-rose-600">{{ $rejectRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
-                    <div class="bg-rose-500 h-1.5 rounded-full" style="width: 13.3%"></div>
+                    <div class="bg-rose-500 h-1.5 rounded-full" style="width: {{ $rejectRatio }}%"></div>
                 </div>
             </div>
         </div>
@@ -133,14 +133,14 @@
         <!-- الصف الأول -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية (89%)</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية ({{ $opRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartOpRatio"></canvas>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">معدل الانتظار (7.4%)</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">معدل الانتظار ({{ $waitRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartWaitRatio"></canvas>
                 </div>
@@ -150,14 +150,14 @@
         <!-- الصف الثاني -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( 70% )</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( {{ $closeRatio }}% )</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartExecutionTotal"></canvas>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض (13.3%)</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض ({{ $rejectRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartRejectRatio"></canvas>
                 </div>
@@ -180,7 +180,7 @@
         const isDark = document.documentElement.classList.contains('dark');
         const textColor = isDark ? '#94a3b8' : '#64748b';
 
-        // إيقاف جميع أنواع الأنميشن في Chart.js
+        // إيقاف جميع أنواع الأنميشن في Chart.js لقراءة أسرع واستقرار الأداء
         Chart.defaults.animation = false;
 
         const donutOptions = {
@@ -191,13 +191,23 @@
             maintainAspectRatio: false
         };
 
+        // حقن البيانات الحقيقية من السيرفر مباشرة داخل السكريبت
+        const totalCustomers = {{ $totalCustomers }};
+        const pendingCount   = {{ $pendingCount }};
+        const confirmedCount = {{ $confirmedCount }};
+        const cancelledCount = {{ $cancelledCount }};
+        
+        const opRatio     = {{ $opRatio }};
+        const waitRatio   = {{ $waitRatio }};
+        const rejectRatio = {{ $rejectRatio }};
+
         // 1. نسبة التشغيل
         new Chart(document.getElementById('chartOpRatio'), {
             type: 'doughnut',
             data: {
                 labels: ['تشغيل', 'غير نشط'],
                 datasets: [{
-                    data: [89, 11],
+                    data: [opRatio, 100 - opRatio],
                     backgroundColor: ['#3b82f6', 'rgba(226, 232, 240, 0.5)'],
                     borderWidth: 0
                 }]
@@ -211,7 +221,7 @@
             data: {
                 labels: ['انتظار', 'مكتمل'],
                 datasets: [{
-                    data: [7.4, 92.6],
+                    data: [waitRatio, 100 - waitRatio],
                     backgroundColor: ['#f59e0b', 'rgba(226, 232, 240, 0.5)'],
                     borderWidth: 0
                 }]
@@ -225,7 +235,7 @@
             data: {
                 labels: ['إجمالي العملاء', 'تم التنفيذ'],
                 datasets: [{
-                    data: [2784, 1965],
+                    data: [totalCustomers, confirmedCount],
                     backgroundColor: ['#e2e8f0', '#10b981'],
                     borderRadius: 10
                 }]
@@ -235,6 +245,10 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: textColor } },
+                    y: { ticks: { color: textColor } }
                 }
             }
         });
@@ -245,7 +259,7 @@
             data: {
                 labels: ['رفض', 'أخرى'],
                 datasets: [{
-                    data: [329, 2455],
+                    data: [cancelledCount, totalCustomers - cancelledCount],
                     backgroundColor: ['#f43f5e', 'rgba(226, 232, 240, 0.5)'],
                     borderWidth: 0
                 }]
@@ -264,9 +278,9 @@
             data: {
                 labels: ['توزيع الإجمالي'],
                 datasets: [
-                    { label: 'تم التنفيذ', data: [1965], backgroundColor: '#10b981', borderRadius: 5 },
-                    { label: 'غير مهتم', data: [329], backgroundColor: '#f43f5e', borderRadius: 5 },
-                    { label: 'قيد المتابعة', data: [186], backgroundColor: '#f59e0b', borderRadius: 5 }
+                    { label: 'تم التنفيذ', data: [confirmedCount], backgroundColor: '#10b981', borderRadius: 5 },
+                    { label: 'غير مهتم', data: [cancelledCount], backgroundColor: '#f43f5e', borderRadius: 5 },
+                    { label: 'قيد المتابعة', data: [pendingCount], backgroundColor: '#f59e0b', borderRadius: 5 }
                 ]
             },
             options: {
