@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // 👈 1. استدعاء الـ Trait هنا
 
 class CustomerFollowUp extends Model
 {
+    use HasFactory; // 👈 2. استخدام الـ Trait داخل الكلاس هنا
+
     protected $fillable = [
         'potential_customer_id',
         'user_id',
@@ -23,6 +26,8 @@ class CustomerFollowUp extends Model
     {
         return [
             'next_follow_up_at' => 'datetime',
+            'reason' => \App\Enums\PotentialCustomerReason::class,
+            'status' => \App\Enums\PotentialCustomerStatus::class,
         ];
     }
 
@@ -35,7 +40,7 @@ class CustomerFollowUp extends Model
     }
 
     /**
-     * علاقة المتابعة مع الموظف الذي قام بالإجراء (إذا احتجت عرض اسم الموظف في الـ Log)
+     * علاقة المتابعة مع الموظف الذي قام بالإجراء
      */
     public function user(): BelongsTo
     {
