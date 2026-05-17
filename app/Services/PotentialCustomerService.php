@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Models\PotentialCustomer;
+use App\Models\CustomerFollowUp; // 👈 تم الاستيراد هنا
 use App\Enums\UserRole;
 use App\Enums\PotentialCustomerStatus;
 use App\Enums\PotentialCustomerSource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\DB;     // 👈 تم الاستيراد هنا
+use Illuminate\Support\Facades\Auth;   // 👈 تم الاستيراد هنا
 
 class PotentialCustomerService
 {
@@ -89,13 +92,41 @@ class PotentialCustomerService
     }
 
     /**
-     * تحديث عميل (شامل تحديث الحالة المنفصل)
+     * تحديث عميل العام (بيانات شخصية أو تعديل عادي)
      */
     public function update(PotentialCustomer $customer, array $data)
     {
         $validated = $this->validateData($data, false);
         $customer->update($validated);
         return $customer;
+    }
+
+    /**
+     * 👈 دالة تحديث الحالة المتقدمة مع تسجيل المتابعة (Log)
+     */
+    public function updateStatusAndLogFollowUp(PotentialCustomer $customer, array $data, int $userId): PotentialCustomer
+    {
+        // التحقق من صحة البيانات المرسلة من المودال أو من السلكت المباشر
+        $validated = $this->validateData($data, false);
+
+        return DB::transaction(function () use ($customer, $validated, $userId) {
+            // 1. تحديث حالة العميل الحالية
+            $customer->update([
+                'status' => $validated['status']
+            ]);
+
+            // 2. تسجيل السجل في جدول المتابعات التاريخي (Log)
+            CustomerFollowUp::create([
+                'potential_customer_id' => $customer->id,
+                'user_id'               => $userId, 
+                'status'                => $validated['status'],
+                'reason'                => $validated['reason'] ?? null,
+                'next_follow_up_at'     => $validated['next_follow_up_date'] ?? null,
+                'notes'                 => $validated['notes'] ?? null,
+            ]);
+
+            return $customer;
+        });
     }
 
     /**
@@ -112,19 +143,21 @@ class PotentialCustomerService
     protected function validateData(array $data, bool $isStore = true)
     {
         if ($isStore) {
-            // شروط صارمة عند الإدخال الجديد
             $rules = [
                 'name' => 'required|string|max:255',
                 'phone' => 'required|string|max:20',
                 'source' => ['required', new Enum(PotentialCustomerSource::class)],
             ];
         } else {
-            // 👈 تم الإصلاح هنا: الحقول تصبح اختيارية التمرير بـ sometimes عند التحديث لتقبل تغيير الحالة بمفردها
+            // إضافة الحقول الإضافية القادمة من مودال المتابعة لتتم فلترتها والتحقق منها بأمان
             $rules = [
-                'name' => 'sometimes|required|string|max:255',
-                'phone' => 'sometimes|required|string|max:20',
-                'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
-                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'name'                => 'sometimes|required|string|max:255',
+                'phone'               => 'sometimes|required|string|max:20',
+                'source'              => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+                'status'              => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'reason'              => 'nullable|string', // يمكن تخصيصها بـ Enum الخاص بك إن أردت
+                'next_follow_up_date' => 'nullable|date',
+                'notes'               => 'nullable|string',
             ];
         }
 

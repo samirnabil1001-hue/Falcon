@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\PotentialCustomer;
+    use App\Enums\PotentialCustomerStatus;
+    use Illuminate\Auth\Access\Response;
 
 class PotentialCustomerPolicy
 {
@@ -19,8 +21,6 @@ class PotentialCustomerPolicy
     /**
      * التحقق من صلاحية تحديث الحالة فقط
      */
-    use App\Enums\PotentialCustomerStatus;
-    use Illuminate\Auth\Access\Response;
 
     public function updateStatus(User $user, PotentialCustomer $potentialCustomer): Response
     {

@@ -538,24 +538,16 @@
                                                                     <div>
                                                                         <label
                                                                             class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">السبب
-                                                                            (Reason)
-                                                                        </label>
-                                                                        <div class="relative">
-                                                                            <select name="reason" required
-                                                                                class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-10 pr-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.75rem_center]"
-                                                                                style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"%236b7280\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 9l-7 7-7-7\"/></svg>'); background-size: 1.25em;">
-
-                                                                                <option value="" disabled
-                                                                                    selected>اختر السبب...</option>
-
-                                                                                @foreach (\App\Enums\PotentialCustomerReason::cases() as $reason)
-                                                                                    <option
-                                                                                        value="{{ $reason->value }}">
-                                                                                        {{ $reason->label() }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                        </div>
+                                                                            (Reason)</label>
+                                                                        <select name="reason" required
+                                                                            class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500">
+                                                                            <option value="" disabled selected>
+                                                                                اختر السبب...</option>
+                                                                            @foreach (\App\Enums\PotentialCustomerReason::cases() as $reason)
+                                                                                <option value="{{ $reason->value }}">
+                                                                                    {{ $reason->label() }}</option>
+                                                                            @endforeach
+                                                                        </select>
                                                                     </div>
 
                                                                     <!-- 2. حقل تاريخ ووقت المتابعة (يفتح عند الضغط في أي مكان) -->

@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\PotentialCustomerController;
+use App\Http\Controllers\CustomerFollowUpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
     });
 
+});
+
+Route::middleware(['auth'])->group(function () {
+    // مسار تحديث الحالة وتسجيل المتابعة عبر الـ Controller الجديد
+    Route::patch('/potential-customers/{customerId}/follow-up', [CustomerFollowUpController::class, 'store'])
+        ->name('potential-customers.update-status');
+    // تركنا الـ name كما هو "potential-customers.update-status" حتى لا تضطر لتعديل الـ action في ملفات الـ Blade القديمة.
 });
 
 require __DIR__ . '/auth.php';

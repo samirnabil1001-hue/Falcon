@@ -65,15 +65,13 @@ class PotentialCustomerController extends Controller
     {
         $this->authorize('update', $potentialCustomer);
 
-        $request->validate([
-            'status' => ['required', Rule::enum(PotentialCustomerStatus::class)],
-        ]);
+        $this->customerService->updateStatusAndLogFollowUp(
+            $potentialCustomer,
+            $request->all(),
+            auth()->id()
+        );
 
-        $this->customerService->update($potentialCustomer, [
-            'status' => $request->status, 
-        ]);
-
-        return back()->with('success', 'تم تحديث الحالة بنجاح.');
+        return back()->with('success', 'تم تحديث حالة العميل وتسجيل المتابعة بنجاح.');
     }
     public function destroy(PotentialCustomer $potentialCustomer)
     {
