@@ -101,8 +101,8 @@
                     onclick="this.querySelector('input').showPicker()">
                     <span
                         class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">From</span>
-                    <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
+                    <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}"
+                        max="{{ now()->format('Y-m-d') }}" onchange="handleDateFromChange(this)"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
 
@@ -113,12 +113,55 @@
                     onclick="this.querySelector('input').showPicker()">
                     <span
                         class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">To</span>
-                    <input type="date" name="date_to" value="{{ request('date_to') }}"
-                        max="{{ now()->format('Y-m-d') }}" onchange="this.form.submit()"
+                    <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}"
+                        max="{{ now()->format('Y-m-d') }}" onchange="handleDateToChange(this)"
                         class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
                 </div>
             </div>
 
+            <script>
+                // عند تحميل الصفحة، نضبط القيود بناءً على القيم الحالية لو موجودة
+                window.addEventListener('DOMContentLoaded', () => {
+                    const fromInput = document.getElementById('date_from');
+                    const toInput = document.getElementById('date_to');
+
+                    if (fromInput.value) {
+                        toInput.min = fromInput.value;
+                    }
+                    if (toInput.value) {
+                        fromInput.max = toInput.value;
+                    }
+                });
+
+                function handleDateFromChange(input) {
+                    const toInput = document.getElementById('date_to');
+
+                    if (input.value) {
+                        // تاريخ "إلى" لا يمكن أن يكون قبل تاريخ "من"
+                        toInput.min = input.value;
+                    } else {
+                        toInput.removeAttribute('min');
+                    }
+
+                    // إرسال الفورم تلقائياً كما كان في كودك الأصلي
+                    input.form.submit();
+                }
+
+                function handleDateToChange(input) {
+                    const fromInput = document.getElementById('date_from');
+
+                    if (input.value) {
+                        // تاريخ "من" لا يمكن أن يكون بعد تاريخ "إلى"
+                        fromInput.max = input.value;
+                    } else {
+                        // إذا مسح تاريخ "إلى"، أقصى حد يرجع لتاريخ اليوم (كما في Laravel)
+                        fromInput.max = "{{ now()->format('Y-m-d') }}";
+                    }
+
+                    // إرسال الفورم تلقائياً كما كان في كودك الأصلي
+                    input.form.submit();
+                }
+            </script>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <select name="source" onchange="this.form.submit()"
                     class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
@@ -327,11 +370,35 @@
                                     {{ \Carbon\Carbon::parse($customer->added_at)->format('M d, Y • H:i') }}
                                 </td>
 
-                                <!-- تحديث خلية الـ Actions لتكون بنظام Grid مفرمل المساحات -->
-                                <td class="p-4 text-center whitespace-nowrap align-middle w-48 min-w-[190px]">
-                                    <div class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[170px] mx-auto">
+                                <td class="p-4 text-center whitespace-nowrap align-middle w-56 min-w-[220px]"
+                                    x-data="{
+                                        showModal: false,
+                                        currentStatus: '{{ $currentStatusValue }}',
+                                        showCurrentLabel(e) {
+                                            let opt = e.target.querySelector('option[disabled]:checked');
+                                            if (opt && !opt.text.includes('(الحالية)')) {
+                                                opt.text = opt.text + ' (الحالية)';
+                                            }
+                                        },
+                                        hideCurrentLabel(e) {
+                                            let opt = e.target.querySelector('option[disabled]:checked');
+                                            if (opt) {
+                                                opt.text = opt.text.replace(' (الحالية)', '').trim();
+                                            }
+                                        },
+                                        checkStatus(e) {
+                                            this.hideCurrentLabel(e);
+                                            if (e.target.value === '{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}') {
+                                                this.showModal = true;
+                                                e.target.value = e.target.getAttribute('data-original-value');
+                                            } else {
+                                                handleStatusChange(e, 'status-form-{{ $customer->id }}');
+                                            }
+                                        }
+                                    }">
 
-                                        <!-- حاوية السلكت المفرملة -->
+                                    <div class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[200px] mx-auto">
+                                        <!-- حاوية السلكت المفرملة والسهم على اليسار -->
                                         <div class="w-full">
                                             <form id="status-form-{{ $customer->id }}"
                                                 action="{{ route('potential-customers.update-status', $customer->id) }}"
@@ -339,26 +406,12 @@
                                                 @csrf
                                                 @method('PATCH')
 
-                                                <select name="status" x-data="{
-                                                    showCurrentLabel(e) {
-                                                            let opt = e.target.querySelector('option[disabled]:checked');
-                                                            if (opt && !opt.text.includes('(الحالية)')) {
-                                                                opt.text = opt.text + ' (الحالية)';
-                                                            }
-                                                        },
-                                                        hideCurrentLabel(e) {
-                                                            let opt = e.target.querySelector('option[disabled]:checked');
-                                                            if (opt) {
-                                                                opt.text = opt.text.replace(' (الحالية)', '').trim();
-                                                            }
-                                                        }
-                                                }"
-                                                    x-on:focus="showCurrentLabel($event)"
+                                                <select name="status" x-on:focus="showCurrentLabel($event)"
                                                     x-on:blur="hideCurrentLabel($event)"
-                                                    x-on:change="hideCurrentLabel($event); handleStatusChange($event, 'status-form-{{ $customer->id }}')"
+                                                    x-on:change="checkStatus($event)"
                                                     data-original-value="{{ $currentStatusValue }}" dir="rtl"
                                                     {{ $isLocked ? 'disabled' : '' }}
-                                                    class="w-full text-xs border border-gray-300 dark:border-slate-600 rounded-lg pl-7 pr-2 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 text-right focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.5rem_center] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                                    class="w-full text-xs border border-gray-300 dark:border-slate-600 rounded-lg pl-8 pr-2 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 text-right focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.5rem_center] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                                                     style="background-size: 0.65em auto; height: 30px;">
 
                                                     @if ($currentStatusValue == \App\Enums\PotentialCustomerStatus::NEW->value)
@@ -394,20 +447,156 @@
                                             </form>
                                         </div>
 
-                                        <!-- زر التعديل بأبعاد مفرملة مسبقاً لمنع الاهتزاز -->
-                                        <div class="flex items-center justify-center w-[30px] h-[30px]">
+                                        <!-- أزرار التحكم الجانبية -->
+                                        <div class="flex items-center gap-1 w-[65px] h-[30px] justify-center">
+                                            @if ($currentStatusValue == \App\Enums\PotentialCustomerStatus::CONTACTED->value)
+                                                <button type="button" @click="showModal = true"
+                                                    class="p-1.5 text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center"
+                                                    title="إضافة تفاصيل التواصل">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                    </svg>
+                                                </button>
+                                            @endif
+
                                             <a href="{{ route('potential-customers.edit', $customer->id) }}"
                                                 class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center"
                                                 title="Edit Customer">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
+                                                    stroke-width="2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </a>
                                         </div>
+                                    </div>
 
+                                    <!-- نافذة البوب أب (Pop-up Modal) -->
+                                    <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto"
+                                        style="display: none;" aria-labelledby="modal-title" role="dialog"
+                                        aria-modal="true">
+
+                                        <div
+                                            class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                            <!-- غطاء الخلفية الشفاف الخلفي (تم إزالة حدث الإغلاق عند الضغط هنا لحمايته) -->
+                                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                                x-transition:enter-start="opacity-0"
+                                                x-transition:enter-end="opacity-100"
+                                                x-transition:leave="ease-in duration-200"
+                                                x-transition:leave-start="opacity-100"
+                                                x-transition:leave-end="opacity-0"
+                                                class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-slate-900 dark:bg-opacity-80 transition-opacity"
+                                                aria-hidden="true"></div>
+
+                                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                                aria-hidden="true">&#8203;</span>
+
+                                            <!-- محتوى الـ Pop-up الداخلي -->
+                                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                                x-transition:leave="ease-in duration-200"
+                                                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-lg text-right overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full w-full relative"
+                                                dir="rtl">
+
+                                                <!-- زر الـ X للإغلاق في أعلى اليسار -->
+                                                <button type="button" @click="showModal = false"
+                                                    class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+
+                                                <form
+                                                    action="{{ route('potential-customers.update-status', $customer->id) }}"
+                                                    method="POST" class="m-0">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <input type="hidden" name="status"
+                                                        value="{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}">
+
+                                                    <div
+                                                        class="bg-white dark:bg-slate-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                        <div class="sm:flex sm:items-start">
+                                                            <div class="mt-3 text-center sm:mt-0 sm:text-right w-full">
+                                                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-slate-100"
+                                                                    id="modal-title">
+                                                                    تحديث حالة العميل وتفاصيل التواصل
+                                                                </h3>
+
+                                                                <div
+                                                                    class="mt-4 space-y-4 text-sm text-gray-500 dark:text-slate-400">
+
+                                                                    <!-- 1. حقل السبب (Reason) -->
+                                                                    <div>
+                                                                        <label
+                                                                            class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">السبب
+                                                                            (Reason)
+                                                                        </label>
+                                                                        <div class="relative">
+                                                                            <select name="reason" required
+                                                                                class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg pl-10 pr-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 appearance-none bg-no-repeat bg-[left_0.75rem_center]"
+                                                                                style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"%236b7280\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 9l-7 7-7-7\"/></svg>'); background-size: 1.25em;">
+
+                                                                                <option value="" disabled
+                                                                                    selected>اختر السبب...</option>
+
+                                                                                @foreach (\App\Enums\PotentialCustomerReason::cases() as $reason)
+                                                                                    <option
+                                                                                        value="{{ $reason->value }}">
+                                                                                        {{ $reason->label() }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- 2. حقل تاريخ ووقت المتابعة (يفتح عند الضغط في أي مكان) -->
+                                                                    <div>
+                                                                        <label
+                                                                            class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">تاريخ
+                                                                            ووقت المتابعة القادم</label>
+                                                                        <input type="datetime-local"
+                                                                            name="next_follow_up_date"
+                                                                            onclick="this.showPicker()"
+                                                                            class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 text-right cursor-pointer">
+                                                                    </div>
+
+                                                                    <!-- 3. حقل الملاحظات -->
+                                                                    <div>
+                                                                        <label
+                                                                            class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ملاحظات</label>
+                                                                        <textarea name="notes" rows="3" placeholder="أضف أي تفاصيل أخرى هنا..."
+                                                                            class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"></textarea>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- أزرار التحكم بأسفل المودال -->
+                                                    <div
+                                                        class="bg-gray-50 dark:bg-slate-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                                                        <button type="submit"
+                                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm transition-colors">
+                                                            حفظ وتحديث
+                                                        </button>
+                                                        <button type="button" @click="showModal = false"
+                                                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-800 text-base font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                                                            إلغاء
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
