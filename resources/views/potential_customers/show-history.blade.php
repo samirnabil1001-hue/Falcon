@@ -34,7 +34,7 @@
                             <div @click="selectedLog = {{ json_encode([
                                      'status' => $log->status->value, 
                                      'status_label' => $log->status->label(),
-                                     'reason' => $log->reason?->label() ?? 'بدون سبب محدد', 
+                                     'reason' => is_object($log->reason) ? $log->reason->label() : ($log->reason ?? 'بدون سبب محدد'), 
                                      'notes' => $log->notes,
                                      'created_at' => $log->created_at,
                                      'next_follow_up_at' => $log->next_follow_up_at
@@ -67,15 +67,15 @@
                                                 {{ $log->status->value === 'confirmed' ? 'text-emerald-900 dark:text-emerald-200' : 
                                                    ($log->status->value === 'cancelled' ? 'text-rose-900 dark:text-rose-200' : 
                                                     'text-amber-900 dark:text-amber-200') }}">
-                                                {{ $log->reason?->label() ?? 'بدون سبب محدد' }}
+                                                {{ is_object($log->reason) ? $log->reason->label() : ($log->reason ?? 'بدون سبب محدد') }}
                                             </h3>
                                         </div>
                                         
                                         <!-- التوقيت والتاريخ مفرود على اليسار في الشاشات الكبيرة -->
                                         <div class="text-xs font-medium flex items-center gap-1
                                             {{ $log->status->value === 'confirmed' ? 'text-emerald-600 dark:text-emerald-400/70' : 
-                                               ($log->status->value === 'cancelled' ? 'text-rose-600 dark:text-rose-400/70' : 
-                                                'text-amber-600 dark:text-amber-400/70') }}">
+                                                ($log->status->value === 'cancelled' ? 'text-rose-600 dark:text-rose-400/70' : 
+                                                 'text-amber-600 dark:text-amber-400/70') }}">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
