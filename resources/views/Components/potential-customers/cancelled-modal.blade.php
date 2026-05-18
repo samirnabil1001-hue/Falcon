@@ -46,7 +46,8 @@
                                     <select name="reason" required
                                         class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500">
                                         <option value="" disabled selected>اختر سبب الإلغاء...</option>
-                                        @foreach (\App\Enums\PotentialCustomerReason::cases() as $reason)
+                                        {{-- تم التحديث هنا لاستدعاء الـ Enum الجديد الخاص بالرفض --}}
+                                        @foreach (\App\Enums\RejectionReason::cases() as $reason)
                                             <option value="{{ $reason->value }}">{{ $reason->label() }}</option>
                                         @endforeach
                                     </select>
@@ -65,7 +66,7 @@
                 <div class="bg-gray-50 dark:bg-slate-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
                     <button type="submit"
                         class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-rose-600 hover:bg-rose-700 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 sm:w-auto sm:text-sm transition-colors">
-                    تأكيد الإلغاء
+                        تأكيد الإلغاء
                     </button>
                     <button type="button" @click="showCancelledModal = false"
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-800 text-base font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">

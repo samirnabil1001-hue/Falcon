@@ -46,7 +46,8 @@
                                     <select name="reason" required
                                         class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500">
                                         <option value="" disabled selected>اختر السبب...</option>
-                                        @foreach (\App\Enums\PotentialCustomerReason::cases() as $reason)
+                                        {{-- تم التحديث هنا لاستدعاء الـ Enum الجديد الخاص بالمتابعة --}}
+                                        @foreach (\App\Enums\FollowUpReason::cases() as $reason)
                                             <option value="{{ $reason->value }}">{{ $reason->label() }}</option>
                                         @endforeach
                                     </select>
