@@ -1,4 +1,5 @@
 <x-app-layout>
+    <!-- المكون الأب الرئيسي: أضفنا إليه مستمع الحدث @change-status.window -->
     <div x-data="{
         confirmModal: false,
         modalTitle: '',
@@ -35,12 +36,13 @@
         },
         submitPendingForm() {
             let form = document.getElementById(this.formToSubmit);
-            let select = form.querySelector('select[name=\"status\"]');
+            let select = form.querySelector('select[name=\'status\']');
             select.value = this.pendingStatusValue;
             form.submit();
         }
     }"
-        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
+    @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
+    class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
 
         <x-potential-customers.header :totalCount="$customers->total()" />
 
@@ -159,7 +161,8 @@
                                                 this.showCancelledModal = true;
                                                 e.target.value = e.target.getAttribute('data-original-value');
                                             } else {
-                                                handleStatusChange(e, 'status-form-{{ $customer->id }}');
+                                                // هنا تم استبدال الاستدعاء المباشر القديم بـ $dispatch لإرسال الحدث للأب بنجاح
+                                                $dispatch('change-status', { event: e, formId: 'status-form-{{ $customer->id }}' });
                                             }
                                         }
                                     }">

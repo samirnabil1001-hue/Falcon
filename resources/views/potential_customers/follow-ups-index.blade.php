@@ -32,7 +32,7 @@
                             </th>
                             <th scope="col" class="px-6 py-4 font-semibold">رقم الهاتف</th>
                             <th scope="col" class="px-6 py-4 font-semibold text-center">
-                                <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'status', 'sort_order' => request('sort_by') === 'status' && request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" 
+                                <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'status', 'sort_order' => request()->status === 'status' && request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" 
                                    class="inline-flex items-center gap-1 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                                     الحالة الحالية
                                     @if (request('sort_by') === 'status')
@@ -54,7 +54,7 @@
                                    class="inline-flex items-center gap-1 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                                     آخر إجراء مسجل
                                     @if (request('sort_by', 'created_at') === 'created_at')
-                                        <span class="text-xs">{{ request('sort_order', 'desc') === 'asc' ? '↑' : '↓' }}</span>
+                                        <span class="text-xs">{{ request('sort_order') === 'desc' ? '↑' : '↓' }}</span>
                                     @endif
                                 </a>
                             </th>
@@ -110,7 +110,7 @@
                                 </td>
 
                                 <!-- الإجراءات -->
-                                <td class="px-6 py-4 text-center whitespace-nowrap" x-data="{ openModal: false }">
+                                <td class="px-6 py-4 text-center whitespace-nowrap" x-data="{ showModal: false }">
                                     @php
                                         $isContacted = $customer->status === \App\Enums\PotentialCustomerStatus::CONTACTED ||
                                                        $customer->status === 'contacted' ||
@@ -119,7 +119,8 @@
 
                                     <div class="inline-flex rounded-xl shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-0.5 gap-1">
                                         
-                                        <button @click="openModal = true"
+                                        <!-- زر فتح المودال تم ربطه بـ showModal الخاص بالـ contacted-modal -->
+                                        <button @click="showModal = true"
                                             @if(!$isContacted) disabled @endif
                                             class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 shadow-sm 
                                             {{ $isContacted 
@@ -142,8 +143,9 @@
                                         </a>
                                     </div>
 
+                                    <!-- استدعاء المودال المطلوب وتمرير المتغير البرمجي شو مودال المتوافق مع الكود الأساسي للـ Component لديك -->
                                     @if($isContacted)
-                                        <x-follow-ups.follow-up-modal :customer="$customer" />
+                                        <x-potential-customers.contacted-modal :customer="$customer" />
                                     @endif
                                 </td>
                             </tr>
