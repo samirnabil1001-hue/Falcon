@@ -7,22 +7,53 @@ use App\Models\CustomerFollowUp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 
 class CustomerFollowUpService
 {
     /**
      * جلب العملاء مع حساب عدد المتابعات وأحدث إجراء لكل عميل
-     * (يستثني تماماً العملاء الذين ليس لديهم أي سجلات متابعة)
+     * مع دعم البحث والفلترة والفرز
      */
-    public function getPaginatedCustomers(int $perPage = 10): LengthAwarePaginator
+    public function getPaginatedCustomers(Request $request, int $perPage = 10): LengthAwarePaginator
     {
-        return PotentialCustomer::has('followUps') 
+        $query = PotentialCustomer::has('followUps')
             ->withCount('followUps')
             ->with(['followUps' => function ($query) {
                 $query->latest()->limit(1);
-            }])
-            ->latest()
-            ->paginate($perPage);
+            }]);
+
+        // تطبيق البحث
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // تطبيق فلترة الحالة
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // تطبيق الفرز
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        // التحقق من صحة أعمدة الفرز
+        $allowedSorts = ['name', 'created_at', 'follow_ups_count', 'status'];
+        if (in_array($sortBy, $allowedSorts)) {
+            if ($sortBy === 'follow_ups_count') {
+                $query->orderBy('follow_ups_count', $sortOrder);
+            } else {
+                $query->orderBy($sortBy, $sortOrder);
+            }
+        } else {
+            $query->latest();
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CustomerFollowUpService;
+use App\Models\PotentialCustomer;
 use Illuminate\Http\Request;
 
 class CustomerFollowUpController extends Controller
@@ -15,13 +16,12 @@ class CustomerFollowUpController extends Controller
     }
 
     /**
-     * عرض الصفحة الرئيسية للمتابعات
+     * عرض الصفحة الرئيسية للمتابعات مع دعم الفلترة والبحث والفرز
      */
-    public function index()
+    public function index(Request $request)
     {
-        // تم نقل الـ Logic بالكامل إلى الـ Service هنا 👇
-        $customers = $this->followUpService->getPaginatedCustomers(10);
-
+        $customers = $this->followUpService->getPaginatedCustomers($request, 10);
+        
         return view('potential_customers.follow-ups-index', compact('customers'));
     }
 
@@ -45,16 +45,18 @@ class CustomerFollowUpController extends Controller
             return redirect()->back()->withErrors(['error' => 'عذراً، حدث خطأ أثناء تحديث البيانات.']);
         }
     }
+    
+    /**
+     * عرض سجل متابعات العميل
+     */
     public function show($customerId)
     {
-        // جلب العميل مع المتابعات الخاصة به مرتبة من الأحدث للأقدم
-        $customer = \App\Models\PotentialCustomer::with([
+        $customer = PotentialCustomer::with([
             'followUps' => function ($query) {
                 $query->latest();
             }
         ])->findOrFail($customerId);
 
-        // 👈 التعديل هنا: المسار المضمون والمشترك في مشروعك حالياً
         return view('potential_customers.show-history', compact('customer'));
     }
 }
