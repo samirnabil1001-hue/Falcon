@@ -9,8 +9,8 @@ enum PotentialCustomerSource: string
     case WEBSITE = 'Website';
     case WHATSAPP = 'WhatsApp';
     case REFERRAL = 'Referral';
-    case OTHER = 'Other';
     case GOOGLE_ADS = 'Google Ads'; 
+    case OTHER = 'Other';
 
     public function label(): string
     {
@@ -20,8 +20,8 @@ enum PotentialCustomerSource: string
             self::WEBSITE => 'الموقع الإلكتروني',
             self::WHATSAPP => 'واتساب',
             self::REFERRAL => 'ترشيح / عميل سابق',
-            self::OTHER => 'أخرى',
             self::GOOGLE_ADS => 'إعلانات جوجل',
+            self::OTHER => 'أخرى',
         };
     }
 }
