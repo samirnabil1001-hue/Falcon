@@ -14,7 +14,7 @@
                 </svg>
                 عملاء يتطلبون اتصالاً عاجلاً
             </h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">أحدث 5 عملاء بحسب الحالة المحددة لمتابعتهم وتحديث موقفهم فوراً
+            <p class="text-[11px] text-slate-400 mt-0.5">أحدث 7 عملاء بحسب الحالة المحددة لمتابعتهم وتحديث موقفهم فوراً
             </p>
         </div>
 
@@ -45,7 +45,6 @@
                         d="M9.813 15.904L9 21l8.954-8.955M21 12h0M12 21h0M21 3H9m0 0L3 9m6-6v6" />
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M11.48 3.499c-.105-.347-.492-.546-.86-.444L3.433 5.084c-.406.113-.64.53-.522.928l1.415 4.79c.117.397.548.613.948.474l2.428-.843a.475.475 0 01.374.032l2.308 1.25c.34.184.757.08 1.026-.226l3.415-3.89a.573.573 0 00-.022-.816l-3.322-3.084z" />
-                    <!-- مسار بديل أبسط لأيقونة النجمين/البريق (Sparkles) لتناسب الحجم الصغير -->
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M9.813 15.904L9 21l8.954-8.955M21 12h0M12 21h0M21 3H9m0 0L3 9m6-6v6" class="hidden" />
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -70,7 +69,6 @@
                 </tr>
             </thead>
 
-            <!-- تبويب قيد المتابعة (يعرض 5 كحد أقصى) -->
             <tbody x-show="activeTab === 'contacted'" class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
                 @forelse($contactedCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">

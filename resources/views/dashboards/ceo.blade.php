@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 py-2">
             <h2 class="font-extrabold text-2xl tracking-tight text-slate-800 dark:text-slate-100">
-                لوحة التحكم
+                لوحة التحكم - المدير التنفيذي
             </h2>
 
             <div class="flex items-center gap-3">
@@ -45,8 +45,10 @@
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>النسبة التشغيلية</span>
-                    <span class="font-bold text-blue-500">{{ $opRatio }}%</span>
+                    <span> {{ $opRatio }}% النسبة التشغيلية</span>
+                    
+                                            <span>الجدد:{{ number_format($newCount) }}</span>
+
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                     <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $opRatio }}%"></div>
@@ -102,26 +104,26 @@
             </div>
         </div>
 
-        <!-- كرت: غير مهتم -->
+        <!-- كرت: نسبة نجاح الإغلاق الكلية -->
         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
-                    <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">غير مهتم</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($cancelledCount) }}</p>
+                    <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">معدل نجاح الصفقات (Win Rate)</h3>
+                    <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">{{ $winRate }}%</p>
                 </div>
-                <div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
-                    <svg class="w-8 h-8 text-rose-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                    <svg class="w-8 h-8 text-indigo-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
                 </div>
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>نسبة الرفض</span>
-                    <span class="font-bold text-rose-600">{{ $rejectRatio }}%</span>
+                    <span>الملغية: {{ number_format($cancelledCount) }}</span>
+                    <span class="font-bold text-rose-500">المؤكدة: {{ number_format($confirmedCount) }}</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
-                    <div class="bg-rose-500 h-1.5 rounded-full" style="width: {{ $rejectRatio }}%"></div>
+                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: {{ $winRate }}%"></div>
                 </div>
             </div>
         </div>
@@ -130,8 +132,8 @@
     <!-- Content -->
     <div class="space-y-6 font-sans text-right p-4" dir="rtl">
 
-        <!-- الصف الأول -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- الصف الأول: الرسوم البيانية الدائرية الصغيرة -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
                 <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية ({{ $opRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
@@ -145,9 +147,16 @@
                     <canvas id="chartWaitRatio"></canvas>
                 </div>
             </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل مصادر العملاء</h3>
+                <div class="relative" style="height: 200px;">
+                    <canvas id="chartSources"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- الصف الثاني -->
+        <!-- الصف الثاني: المقارنات الأفقية والعمودية -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
                 <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( {{ $closeRatio }}% )</h3>
@@ -157,20 +166,55 @@
             </div>
 
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض ({{ $rejectRatio }}%)</h3>
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض والعملاء غير المهتمين ({{ $rejectRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartRejectRatio"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- الصف الأخير -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-            <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل النتائج النهائية (التنفيذ مقابل الرفض)</h3>
-            <div class="relative" style="height: 300px;">
-                <canvas id="chartFinalComparison"></canvas>
+        <!-- الصف الثالث: المقارنة المركبة وجدول أفضل الموظفين -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- مخطط التوزيع النهائي -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل النتائج النهائية (التنفيذ مقابل الرفض والمتابعة)</h3>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="chartFinalComparison"></canvas>
+                </div>
+            </div>
+
+            <!-- جدول أفضل 5 موظفين مبيعاً -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">أفضل 5 موظفين (المبيعات المؤكدة)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 text-xs">
+                                    <th class="pb-2 font-medium">الموظف</th>
+                                    <th class="pb-2 font-medium text-left">المبيعات الناجحة</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 dark:divide-slate-700/50 text-sm">
+                                @forelse($topAgents as $agent)
+                                    <tr class="text-slate-700 dark:text-slate-300">
+                                        <td class="py-3 font-medium">{{ $agent->name }}</td>
+                                        <td class="py-3 text-left font-bold text-emerald-600 dark:text-emerald-400">
+                                            {{ number_format($agent->total_sales) }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="py-4 text-center text-slate-400 text-xs">لا توجد بيانات مبيعات مؤكدة بعد</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 </x-app-layout>
 
@@ -201,6 +245,10 @@
         const waitRatio   = {{ $waitRatio }};
         const rejectRatio = {{ $rejectRatio }};
 
+        // مصفوفات مصادر العملاء القادمة من الـ Controller عبر الـ with()
+        const sourceLabels = {!! json_encode($sourceLabels) !!};
+        const sourceData   = {!! json_encode($sourceData) !!};
+
         // 1. نسبة التشغيل
         new Chart(document.getElementById('chartOpRatio'), {
             type: 'doughnut',
@@ -229,7 +277,32 @@
             options: donutOptions
         });
 
-        // 3. نسبة التنفيذ
+        // 3. مخطط مصادر العملاء
+        new Chart(document.getElementById('chartSources'), {
+            type: 'pie',
+            data: {
+                labels: sourceLabels,
+                datasets: [{
+                    data: sourceData,
+                    backgroundColor: [
+                        '#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { boxWidth: 12, color: textColor, font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // 4. نسبة التنفيذ
         new Chart(document.getElementById('chartExecutionTotal'), {
             type: 'bar',
             data: {
@@ -253,7 +326,7 @@
             }
         });
 
-        // 4. نسبة الرفض
+        // 5. نسبة الرفض
         new Chart(document.getElementById('chartRejectRatio'), {
             type: 'pie',
             data: {
@@ -272,7 +345,7 @@
             }
         });
 
-        // 5. المقارنة النهائية
+        // 6. المقارنة النهائية
         new Chart(document.getElementById('chartFinalComparison'), {
             type: 'bar',
             data: {

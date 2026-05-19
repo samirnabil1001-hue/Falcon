@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PotentialCustomer;
 use App\Enums\PotentialCustomerStatus;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -13,36 +12,39 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // 🟢 حالة الـ CEO: صلاحيات استعراض شامل لكافة بيانات الشركة
+        // ==========================================
+        // 1. لوحة تحكم المدير التنفيذي (CEO)
+        // ==========================================
         if ($user->isCEO()) {
 
-            // 1. جلب الأعداد الإجمالية للشركة بالكامل
+            // حساب أعداد الحالات الكلية
             $totalCustomers = PotentialCustomer::count();
-            $newCount       = PotentialCustomer::where('status', PotentialCustomerStatus::NEW)->count();
+            $newCount       = PotentialCustomer::where('status', PotentialCustomerStatus::NEW)->count(); // عملاء جدد (غير فعالين)
             $pendingCount   = PotentialCustomer::where('status', PotentialCustomerStatus::CONTACTED)->count();
             $confirmedCount = PotentialCustomer::where('status', PotentialCustomerStatus::CONFIRMED)->count();
             $cancelledCount = PotentialCustomer::where('status', PotentialCustomerStatus::CANCELLED)->count();
 
-            // 2. الحسابات والنسب المئوية الإجمالية
+            // حساب النسب المئوية مع تفادي خطأ القسمة على صفر
             $safeTotal   = $totalCustomers > 0 ? $totalCustomers : 1;
             $opRatio     = round((($totalCustomers - $newCount) / $safeTotal) * 100, 1);
             $waitRatio   = round(($pendingCount / $safeTotal) * 100, 1);
             $closeRatio  = round(($confirmedCount / $safeTotal) * 100, 1);
             $rejectRatio = round(($cancelledCount / $safeTotal) * 100, 1);
 
+            // حساب معدل النجاح (Win Rate) بناءً على الصفقات المحسومة فقط
             $decidedTotal = $confirmedCount + $cancelledCount;
             $winRate      = $decidedTotal > 0 ? round(($confirmedCount / $decidedTotal) * 100, 1) : 0;
 
-            // 3. تحليل مصادر الجلب للشركة كاملة
+            // إحصائيات مصادر العملاء
             $sourceStats = PotentialCustomer::select('source', DB::raw('count(*) as total'))
                 ->groupBy('source')
                 ->get()
                 ->map(fn($item) => [
-                    'label' => method_exists($item->source, 'label') ? $item->source->label() : $item->source->value,
+                    'label' => method_exists($item->source, 'label') ? $item->source->label() : ($item->source->value ?? $item->source),
                     'total' => $item->total
                 ]);
 
-            // 4. قائمة أعلى 5 موظفين إغلاقاً للصفقات ناجحة
+            // أعلى 5 موظفين مبيعاً (الطلبات المؤكدة فقط)
             $topAgents = DB::table('potential_customers')
                 ->join('users', 'potential_customers.added_by', '=', 'users.id')
                 ->select('users.name', DB::raw('count(*) as total_sales'))
@@ -54,7 +56,7 @@ class DashboardController extends Controller
 
             return view('dashboards.ceo', compact(
                 'totalCustomers',
-                'newCount',
+                'newCount', // سيتم استخدامه في الكرت لعرض "العملاء غير الفعالين"
                 'pendingCount',
                 'confirmedCount',
                 'cancelledCount',
@@ -70,34 +72,33 @@ class DashboardController extends Controller
             ]);
         }
 
-        // 🔵 حالة الـ Agent: صلاحيات مقتصرة فقط على العملاء المسجلين بواسطته
+        // ==========================================
+        // 2. لوحة تحكم المندوب / العميل العادي (Agent)
+        // ==========================================
         $myCustomersQuery = PotentialCustomer::where('added_by', $user->id);
 
-        // 1. جلب الأعداد الخاصة بالموظف نفسه
         $totalCustomers = (clone $myCustomersQuery)->count();
         $newCount       = (clone $myCustomersQuery)->where('status', PotentialCustomerStatus::NEW)->count();
         $pendingCount   = (clone $myCustomersQuery)->where('status', PotentialCustomerStatus::CONTACTED)->count();
         $confirmedCount = (clone $myCustomersQuery)->where('status', PotentialCustomerStatus::CONFIRMED)->count();
         $cancelledCount = (clone $myCustomersQuery)->where('status', PotentialCustomerStatus::CANCELLED)->count();
 
-        // 2. الحسابات والنسب المئوية الخاصة بأداء الموظف الشخصي
         $safeAgentTotal = $totalCustomers > 0 ? $totalCustomers : 1;
         $opRatio        = round((($totalCustomers - $newCount) / $safeAgentTotal) * 100, 1);
         $waitRatio      = round(($pendingCount / $safeAgentTotal) * 100, 1);
         $closeRatio     = round(($confirmedCount / $safeAgentTotal) * 100, 1);
         $rejectRatio    = round(($cancelledCount / $safeAgentTotal) * 100, 1);
 
-        // 3. تحليل مصادر قنوات الجلب الشخصية الخاصة بالموظف لاستعراضها في كرت الإحصائيات
         $sourceStats = (clone $myCustomersQuery)
             ->select('source', DB::raw('count(*) as total'))
             ->groupBy('source')
             ->get()
             ->map(fn($item) => [
-                'label' => method_exists($item->source, 'label') ? $item->source->label() : $item->source->value,
+                'label' => method_exists($item->source, 'label') ? $item->source->label() : ($item->source->value ?? $item->source),
                 'total' => $item->total
             ]);
 
-        // 4. جلب أحدث 5 عملاء معلقين يحتاجون تواصل ومتابعة فورية (حالتهم جديد أو قيد التواصل)
+        // جلب أحدث العملاء العاجلين للمندوب للمتابعة السريعة
         $recentUrgentCustomers = (clone $myCustomersQuery)
             ->whereIn('status', [PotentialCustomerStatus::NEW, PotentialCustomerStatus::CONTACTED])
             ->orderBy('updated_at', 'desc')
