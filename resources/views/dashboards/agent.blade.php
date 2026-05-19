@@ -2,22 +2,23 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 py-2">
             <h2 class="font-extrabold text-2xl tracking-tight text-slate-800 dark:text-slate-100">
-                لوحة التحكم
+                لوحة التحكم (متابعة الأداء الشخصي)
             </h2>
 
             <div class="flex items-center gap-3">
                 <!-- زر عرض العملاء -->
                 <a href="{{ route('potential-customers.index') }}"
-                    class="flex items-center px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+                    class="flex items-center px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 shadow-none">
                     <svg class="w-4 h-4 ml-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
                     عرض العملاء
                 </a>
 
                 <!-- زر إضافة عميل جديد -->
-                <a  href="{{ route('potential-customers.create') }}"
-                    class="flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-slate-800 shadow-sm rounded-xl dark:bg-indigo-600 border border-transparent">
+                <a href="{{ route('potential-customers.create') }}"
+                    class="flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-slate-800 rounded-xl dark:bg-indigo-600 border border-transparent shadow-none">
                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -27,19 +28,23 @@
         </div>
     </x-slot>
 
-    <!-- Top Cards -->
+    <!-- Top Cards (تم الإبقاء عليها تماماً كما هي) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 font-sans text-right" dir="rtl">
 
         <!-- كرت: إجمالي العملاء -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">إجمالي العملاء</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($totalCustomers) }}</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
+                        {{ number_format($totalCustomers) }}</p>
                 </div>
                 <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-blue-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
                     </svg>
                 </div>
             </div>
@@ -55,15 +60,18 @@
         </div>
 
         <!-- كرت: قيد المتابعة -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">قيد المتابعة</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}
+                    </p>
                 </div>
                 <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
             </div>
@@ -79,15 +87,18 @@
         </div>
 
         <!-- كرت: تم التنفيذ -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">تم التنفيذ</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($confirmedCount) }}</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
+                        {{ number_format($confirmedCount) }}</p>
                 </div>
                 <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
             </div>
@@ -103,15 +114,18 @@
         </div>
 
         <!-- كرت: غير مهتم -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">غير مهتم</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($cancelledCount) }}</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
+                        {{ number_format($cancelledCount) }}</p>
                 </div>
                 <div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-rose-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
             </div>
@@ -127,50 +141,175 @@
         </div>
     </div>
 
-    <!-- Content -->
-    <div class="space-y-6 font-sans text-right p-4" dir="rtl">
+    <!-- Content (جدول التقارير والمتابعات والمصادر) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans text-right p-1" dir="rtl">
 
-        <!-- الصف الأول -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية ({{ $opRatio }}%)</h3>
-                <div class="relative" style="height: 200px;">
-                    <canvas id="chartOpRatio"></canvas>
+        <!-- العمود الأيمن (2/3): جدول المتابعات الفورية والعاجلة للـ Agent -->
+        <div class="lg:col-span-2 space-y-6">
+            <div
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
+                <div class="flex justify-between items-center mb-5">
+                    <div>
+                        <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold">🚨 عملاء يتطلبون اتصالاً
+                            عاجلاً</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">أحدث 5 عملاء بحالة (جديد / قيد المتابعة) لمتابعتهم
+                            وتحديث موقفهم فوراً</p>
+                    </div>
+                    <span
+                        class="px-2.5 py-1 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 rounded-md text-[10px] font-bold">مهام
+                        يومية معلقة</span>
                 </div>
-            </div>
 
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">معدل الانتظار ({{ $waitRatio }}%)</h3>
-                <div class="relative" style="height: 200px;">
-                    <canvas id="chartWaitRatio"></canvas>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-right text-slate-600 dark:text-slate-300">
+                        <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-900/40 rounded-lg">
+                            <tr>
+                                <th class="px-4 py-2.5">اسم العميل</th>
+                                <th class="px-4 py-2.5">رقم الهاتف</th>
+                                <th class="px-4 py-2.5">المصدر</th>
+                                <th class="px-4 py-2.5">الحالة</th>
+                                <th class="px-4 py-2.5">تاريخ الإضافة</th>
+                                <th class="px-4 py-2.5 text-left">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
+                            @forelse($recentUrgentCustomers as $customer)
+                                <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">
+                                        {{ $customer->name }}
+                                    </td>
+                                    <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">
+                                        {{ $customer->phone }}
+                                    </td>
+                                    <td class="px-4 py-3 text-xs">
+                                        <span
+                                            class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
+                                            {{ method_exists($customer->source, 'label') ? $customer->source->label() : $customer->source }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs">
+                                        @if ($customer->status->value === 'new')
+                                            <span
+                                                class="px-2 py-0.5 bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 rounded text-[11px] font-semibold">جديد</span>
+                                        @else
+                                            <span
+                                                class="px-2 py-0.5 bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 rounded text-[11px] font-semibold">قيد
+                                                المتابعة</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-[11px] text-slate-400">
+                                        {{ $customer->created_at ? $customer->created_at->format('M d, Y • H:i') : 'غير محدد' }}
+                                    </td>
+                                    <td class="p-4 text-center whitespace-nowrap align-middle w-56 min-w-[220px]"
+                                        x-data="{
+                                            showModal: false,
+                                            showCancelledModal: false,
+                                            currentStatus: '{{ is_object($customer->status) ? $customer->status->value : $customer->status }}',
+                                            showCurrentLabel(e) {
+                                                let opt = e.target.querySelector('option[disabled]:checked');
+                                                if (opt && !opt.text.includes('(الحالية)')) {
+                                                    opt.text = opt.text + ' (الحالية)';
+                                                }
+                                            },
+                                            hideCurrentLabel(e) {
+                                                let opt = e.target.querySelector('option[disabled]:checked');
+                                                if (opt) {
+                                                    opt.text = opt.text.replace(' (الحالية)', '').trim();
+                                                }
+                                            },
+                                            checkStatus(e) {
+                                                this.hideCurrentLabel(e);
+                                                let selectedValue = e.target.value;
+                                        
+                                                if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value ?? 'contacted' }}') {
+                                                    this.showModal = true;
+                                                    e.target.value = e.target.getAttribute('data-original-value');
+                                                } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value ?? 'cancelled' }}') {
+                                                    this.showCancelledModal = true;
+                                                    e.target.value = e.target.getAttribute('data-original-value');
+                                                } else {
+                                                    // تحديث قيمة المدخل الخفي للحالة داخل الـ Form أولاً لضمان وصول القيمة المحددة (مثل تم التنفيذ)
+                                                    let form = document.getElementById('status-form-{{ $customer->id }}');
+                                                    if (form) {
+                                                        form.querySelector('input[name=&quot;status&quot;]').value = selectedValue;
+                                                    }
+                                        
+                                                    // بث الحدث للمكون الأب لفتح موديول التأكيد الموحد
+                                                    $dispatch('change-status', { event: e, formId: 'status-form-{{ $customer->id }}' });
+                                                }
+                                            }
+                                        }">
+
+                                        <!-- الـ Form الخفي المعدل بدقة لتلقي القيمة المختارة قبل التوجيه -->
+                                        <form id="status-form-{{ $customer->id }}"
+                                            action="{{ route('potential-customers.update-status', $customer->id) }}"
+                                            method="POST" class="hidden">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="">
+                                        </form>
+
+                                        <div
+                                            class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[200px] mx-auto">
+                                            <div class="w-full">
+                                                <x-potential-customers.status-select :customer="$customer" />
+                                            </div>
+                                            <x-potential-customers.action-buttons :customer="$customer" />
+                                        </div>
+
+                                        <x-potential-customers.contacted-modal :customer="$customer" />
+                                        <x-potential-customers.cancelled-modal :customer="$customer" />
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-4 py-8 text-center text-slate-400 text-xs">
+                                        🎉 ممتاز! لا يوجد عملاء معلقين حالياً بحاجة لاتصال فوري.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- الصف الثاني -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( {{ $closeRatio }}% )</h3>
-                <div class="relative" style="height: 200px;">
-                    <canvas id="chartExecutionTotal"></canvas>
+        <!-- العمود الأيسر (1/3): إحصائيات الأداء والمصادر المربحة للموظف -->
+        <div class="space-y-6">
+            <!-- كرت كفاءة الإغلاق الفردي الدائري -->
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
+                <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold mb-1">🎯 كفاءة الحسم والإغلاق</h3>
+                <p class="text-[11px] text-slate-400 mb-4">تحليل الصفقات الناجحة (تم التنفيذ) منسوبة لعملائك</p>
+
+                <div class="relative flex items-center justify-center mb-2" style="height: 140px;">
+                    <canvas id="agentCloseRateChart"></canvas>
+                    <div class="absolute text-center">
+                        <span
+                            class="text-2xl font-extrabold text-slate-700 dark:text-white">{{ $closeRatio }}%</span>
+                        <p class="text-[10px] text-slate-400">معدل الإغلاق</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض ({{ $rejectRatio }}%)</h3>
-                <div class="relative" style="height: 200px;">
-                    <canvas id="chartRejectRatio"></canvas>
+            <!-- تقرير إنتاجية مصادر الجلب الخاصة بالموظف نفسه -->
+            <div
+                class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
+                <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold mb-1">📊 قنوات الجلب الخاصة بك</h3>
+                <p class="text-[11px] text-slate-400 mb-3">توزيع إجمالي حجم عملائك الحاليين بحسب مصادرهم</p>
+
+                <div class="relative" style="height: 150px;">
+                    @if (count($sourceLabels) > 0)
+                        <canvas id="agentSourceChart"></canvas>
+                    @else
+                        <div class="flex items-center justify-center h-full text-slate-400 text-xs">
+                            لا توجد بيانات مصادر مسجلة لك بعد
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <!-- الصف الأخير -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-            <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل النتائج النهائية (التنفيذ مقابل الرفض)</h3>
-            <div class="relative" style="height: 300px;">
-                <canvas id="chartFinalComparison"></canvas>
-            </div>
-        </div>
     </div>
 </x-app-layout>
 
@@ -180,119 +319,79 @@
         const isDark = document.documentElement.classList.contains('dark');
         const textColor = isDark ? '#94a3b8' : '#64748b';
 
-        // إيقاف جميع أنواع الأنميشن في Chart.js لقراءة أسرع واستقرار الأداء
+        // إيقاف الأنميشن لاستقرار تام وسرعة استجابة فائقة
         Chart.defaults.animation = false;
 
-        const donutOptions = {
-            cutout: '75%',
-            plugins: {
-                legend: { display: false }
-            },
-            maintainAspectRatio: false
-        };
-
-        // حقن البيانات الحقيقية من السيرفر مباشرة داخل السكريبت
-        const totalCustomers = {{ $totalCustomers }};
-        const pendingCount   = {{ $pendingCount }};
-        const confirmedCount = {{ $confirmedCount }};
-        const cancelledCount = {{ $cancelledCount }};
-        
-        const opRatio     = {{ $opRatio }};
-        const waitRatio   = {{ $waitRatio }};
-        const rejectRatio = {{ $rejectRatio }};
-
-        // 1. نسبة التشغيل
-        new Chart(document.getElementById('chartOpRatio'), {
+        // 1. مؤشر كفاءة الإغلاق الدائري للـ Agent (Donut Chart)
+        const closeRatio = {{ $closeRatio }};
+        new Chart(document.getElementById('agentCloseRateChart'), {
             type: 'doughnut',
             data: {
-                labels: ['تشغيل', 'غير نشط'],
+                labels: ['تم التنفيذ', 'متبقي للهدف'],
                 datasets: [{
-                    data: [opRatio, 100 - opRatio],
-                    backgroundColor: ['#3b82f6', 'rgba(226, 232, 240, 0.5)'],
+                    data: [closeRatio, 100 - closeRatio],
+                    backgroundColor: ['#10b981', 'rgba(241, 245, 249, 0.9)'],
+                    hoverBackgroundColor: ['#10b981', 'rgba(241, 245, 249, 0.9)'],
                     borderWidth: 0
-                }]
-            },
-            options: donutOptions
-        });
-
-        // 2. نسبة الانتظار
-        new Chart(document.getElementById('chartWaitRatio'), {
-            type: 'doughnut',
-            data: {
-                labels: ['انتظار', 'مكتمل'],
-                datasets: [{
-                    data: [waitRatio, 100 - waitRatio],
-                    backgroundColor: ['#f59e0b', 'rgba(226, 232, 240, 0.5)'],
-                    borderWidth: 0
-                }]
-            },
-            options: donutOptions
-        });
-
-        // 3. نسبة التنفيذ
-        new Chart(document.getElementById('chartExecutionTotal'), {
-            type: 'bar',
-            data: {
-                labels: ['إجمالي العملاء', 'تم التنفيذ'],
-                datasets: [{
-                    data: [totalCustomers, confirmedCount],
-                    backgroundColor: ['#e2e8f0', '#10b981'],
-                    borderRadius: 10
                 }]
             },
             options: {
-                indexAxis: 'y',
-                maintainAspectRatio: false,
+                cutout: '80%',
                 plugins: {
-                    legend: { display: false }
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 },
-                scales: {
-                    x: { ticks: { color: textColor } },
-                    y: { ticks: { color: textColor } }
-                }
+                maintainAspectRatio: false
             }
         });
 
-        // 4. نسبة الرفض
-        new Chart(document.getElementById('chartRejectRatio'), {
-            type: 'pie',
-            data: {
-                labels: ['رفض', 'أخرى'],
-                datasets: [{
-                    data: [cancelledCount, totalCustomers - cancelledCount],
-                    backgroundColor: ['#f43f5e', 'rgba(226, 232, 240, 0.5)'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-
-        // 5. المقارنة النهائية
-        new Chart(document.getElementById('chartFinalComparison'), {
-            type: 'bar',
-            data: {
-                labels: ['توزيع الإجمالي'],
-                datasets: [
-                    { label: 'تم التنفيذ', data: [confirmedCount], backgroundColor: '#10b981', borderRadius: 5 },
-                    { label: 'غير مهتم', data: [cancelledCount], backgroundColor: '#f43f5e', borderRadius: 5 },
-                    { label: 'قيد المتابعة', data: [pendingCount], backgroundColor: '#f59e0b', borderRadius: 5 }
-                ]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true, ticks: { color: textColor } },
-                    y: { stacked: true, ticks: { color: textColor } }
+        // 2. الرسم البياني للمصادر (Horizontal Bar Chart)
+        @if (count($sourceLabels) > 0)
+            new Chart(document.getElementById('agentSourceChart'), {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($sourceLabels) !!},
+                    datasets: [{
+                        data: {!! json_encode($sourceData) !!},
+                        backgroundColor: 'rgba(99, 102, 241, 0.75)', // لون إنديغو ناعم ومريح
+                        borderRadius: 6,
+                        barThickness: 12
+                    }]
                 },
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor } }
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: textColor,
+                                stepSize: 1,
+                                precision: 0
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: textColor
+                            }
+                        }
+                    }
                 }
-            }
-        });
+            });
+        @endif
     });
 </script>
