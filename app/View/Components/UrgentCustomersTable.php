@@ -4,18 +4,22 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
-use App\Models\PotentialCustomer;
+use App\Services\PotentialCustomerService;
+use Illuminate\Support\Facades\Auth;
 
 class UrgentCustomersTable extends Component
 {
-    public $recentUrgentCustomers;
+    public $newCustomers;
+    public $contactedCustomers;
 
-    public function __construct()
+    // استخدام الـ Service مباشرة هنا عبر الـ Dependency Injection
+    public function __construct(PotentialCustomerService $customerService)
     {
-        $this->recentUrgentCustomers = PotentialCustomer::whereIn('status', ['new', 'pending'])
-            ->latest()
-            ->take(5)
-            ->get();
+        $user = Auth::user();
+
+        $this->newCustomers = $customerService->getLatestUrgentByStatus($user, 'new', 7);
+
+        $this->contactedCustomers = $customerService->getLatestUrgentByStatus($user, 'contacted', 7);
     }
 
     public function render()

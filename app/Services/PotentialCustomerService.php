@@ -38,16 +38,16 @@ class PotentialCustomerService
 
         // 3. الفلترة حسب مصدر العميل
         if (!empty($filters['source'])) {
-            $source = $filters['source'] instanceof PotentialCustomerSource 
-                ? $filters['source']->value 
+            $source = $filters['source'] instanceof PotentialCustomerSource
+                ? $filters['source']->value
                 : $filters['source'];
             $query->where('source', $source);
         }
 
         // 4. الفلترة حسب حالة العميل
         if (!empty($filters['status'])) {
-            $status = $filters['status'] instanceof PotentialCustomerStatus 
-                ? $filters['status']->value 
+            $status = $filters['status'] instanceof PotentialCustomerStatus
+                ? $filters['status']->value
                 : $filters['status'];
             $query->where('status', $status);
         }
@@ -85,7 +85,7 @@ class PotentialCustomerService
         $validated = $this->validateData($data, true);
 
         return PotentialCustomer::create(array_merge($validated, [
-            'status' => PotentialCustomerStatus::NEW, 
+            'status' => PotentialCustomerStatus::NEW ,
             'added_by' => $userId,
             'added_at' => now(),
         ]));
@@ -118,11 +118,11 @@ class PotentialCustomerService
             // 2. تسجيل السجل في جدول المتابعات التاريخي (Log)
             CustomerFollowUp::create([
                 'potential_customer_id' => $customer->id,
-                'user_id'               => $userId, 
-                'status'                => $validated['status'],
-                'reason'                => $validated['reason'] ?? null,
-                'next_follow_up_at'     => $validated['next_follow_up_date'] ?? null,
-                'notes'                 => $validated['notes'] ?? null,
+                'user_id' => $userId,
+                'status' => $validated['status'],
+                'reason' => $validated['reason'] ?? null,
+                'next_follow_up_at' => $validated['next_follow_up_date'] ?? null,
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             return $customer;
@@ -151,13 +151,13 @@ class PotentialCustomerService
         } else {
             // إضافة الحقول الإضافية القادمة من مودال المتابعة لتتم فلترتها والتحقق منها بأمان
             $rules = [
-                'name'                => 'sometimes|required|string|max:255',
-                'phone'               => 'sometimes|required|string|max:20',
-                'source'              => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
-                'status'              => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
-                'reason'              => 'nullable|string', // يمكن تخصيصها بـ Enum الخاص بك إن أردت
+                'name' => 'sometimes|required|string|max:255',
+                'phone' => 'sometimes|required|string|max:20',
+                'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'reason' => 'nullable|string', // يمكن تخصيصها بـ Enum الخاص بك إن أردت
                 'next_follow_up_date' => 'nullable|date',
-                'notes'               => 'nullable|string',
+                'notes' => 'nullable|string',
             ];
         }
 
@@ -168,5 +168,22 @@ class PotentialCustomerService
         }
 
         return $validator->validated();
+    }
+    /**
+     * جلب أحدث 5 عملاء فقط لحالة معينة بناءً على صلاحيات المستخدم المحددة
+     */
+    public function getLatestUrgentByStatus($user, string $status, $limit = 5)
+    {
+        $query = PotentialCustomer::where('status', $status);
+
+        // قيود الصلاحيات الخاصة بك
+        if ($user->role !== UserRole::CEO) {
+            $query->where('added_by', $user->id);
+        }
+
+        // 💡 التعديل هنا: استخدام oldest لترتيب المضاف أولاً (تاريخ أقدم) وتحديد العدد بـ 5
+        return $query->oldest('added_at')
+            ->take($limit)
+            ->get();
     }
 }
