@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\PotentialCustomer;
 use App\Enums\PotentialCustomerStatus;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -17,12 +19,25 @@ class DashboardController extends Controller
         // ==========================================
         if ($user->isCEO()) {
 
-            // حساب أعداد الحالات الكلية
-            $totalCustomers = PotentialCustomer::count();
-            $newCount       = PotentialCustomer::where('status', PotentialCustomerStatus::NEW)->count(); // عملاء جدد (غير فعالين)
-            $pendingCount   = PotentialCustomer::where('status', PotentialCustomerStatus::CONTACTED)->count();
-            $confirmedCount = PotentialCustomer::where('status', PotentialCustomerStatus::CONFIRMED)->count();
-            $cancelledCount = PotentialCustomer::where('status', PotentialCustomerStatus::CANCELLED)->count();
+            // جلب المستخدمين الذين أضافوا عملاء محتملين فعلياً لتغذية الـ Dropdown (حل آمن بدون العلاقات)
+            $usersWithCustomers = User::join('potential_customers', 'users.id', '=', 'potential_customers.added_by')
+                ->select('users.id', 'users.name', DB::raw('count(potential_customers.id) as customers_count'))
+                ->groupBy('users.id', 'users.name')
+                ->get();
+
+            // تجهيز الـ Query الأساسي للعملاء وقبول الفلترة بحسب المستخدم
+            $ceoQuery = PotentialCustomer::query();
+
+            if ($request->has('user_id') && $request->user_id != '') {
+                $ceoQuery->where('added_by', $request->user_id);
+            }
+
+            // حساب أعداد الحالات الكلية (تتأثر بالفلتر تلقائياً)
+            $totalCustomers = (clone $ceoQuery)->count();
+            $newCount       = (clone $ceoQuery)->where('status', PotentialCustomerStatus::NEW)->count();
+            $pendingCount   = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CONTACTED)->count();
+            $confirmedCount = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CONFIRMED)->count();
+            $cancelledCount = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CANCELLED)->count();
 
             // حساب النسب المئوية مع تفادي خطأ القسمة على صفر
             $safeTotal   = $totalCustomers > 0 ? $totalCustomers : 1;
@@ -35,8 +50,8 @@ class DashboardController extends Controller
             $decidedTotal = $confirmedCount + $cancelledCount;
             $winRate      = $decidedTotal > 0 ? round(($confirmedCount / $decidedTotal) * 100, 1) : 0;
 
-            // إحصائيات مصادر العملاء
-            $sourceStats = PotentialCustomer::select('source', DB::raw('count(*) as total'))
+            // إحصائيات مصادر العملاء (تتأثر بالفلتر أيضاً)
+            $sourceStats = (clone $ceoQuery)->select('source', DB::raw('count(*) as total'))
                 ->groupBy('source')
                 ->get()
                 ->map(fn($item) => [
@@ -44,7 +59,7 @@ class DashboardController extends Controller
                     'total' => $item->total
                 ]);
 
-            // أعلى 5 موظفين مبيعاً (الطلبات المؤكدة فقط)
+            // أعلى 5 موظفين مبيعاً (ثابت لعرض الأداء العام للموظفين في الشركة دائماً)
             $topAgents = DB::table('potential_customers')
                 ->join('users', 'potential_customers.added_by', '=', 'users.id')
                 ->select('users.name', DB::raw('count(*) as total_sales'))
@@ -55,8 +70,9 @@ class DashboardController extends Controller
                 ->get();
 
             return view('dashboards.ceo', compact(
+                'usersWithCustomers',
                 'totalCustomers',
-                'newCount', // سيتم استخدامه في الكرت لعرض "العملاء غير الفعالين"
+                'newCount', 
                 'pendingCount',
                 'confirmedCount',
                 'cancelledCount',

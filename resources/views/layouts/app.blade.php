@@ -43,7 +43,7 @@
                     </button>
 
                     @isset($header)
-                        <div class="font-medium text-lg text-gray-800 dark:text-white">
+                        <div class="font-medium text-lg text-gray-800 dark:text-white w-full">
                             {{ $header }}
                         </div>
                     @endisset
