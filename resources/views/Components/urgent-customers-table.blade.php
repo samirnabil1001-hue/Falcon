@@ -70,33 +70,39 @@
 
         <!-- أزرار التبديل بين التبويبات (Tabs) -->
         <div
-            class="flex p-1 bg-slate-100/80 dark:bg-slate-900/60 rounded-xl w-full sm:w-auto self-stretch sm:self-auto">
+            class="flex p-1 bg-slate-100/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl w-full sm:w-auto self-stretch sm:self-auto gap-1 border border-slate-200/40 dark:border-slate-800/40">
+
+            <!-- تبويب: قيد المتابعة -->
             <button @click="activeTab = 'contacted'"
                 :class="activeTab === 'contacted' ?
-                    'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm font-bold' :
-                    'text-slate-500 dark:text-slate-400'"
-                class="flex-1 sm:flex-initial px-4 py-1.5 text-xs rounded-lg transition-all duration-200 text-center flex items-center justify-center gap-1.5">
+                    'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm font-semibold' :
+                    'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:-translate-y-0.5'"
+                class="flex-1 sm:flex-initial px-4 py-2 text-xs rounded-lg transition-all duration-200 text-center flex items-center justify-center gap-2 transform">
+
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-3.5 h-3.5">
+                    stroke="currentColor" class="w-3.5 h-3.5 transition-transform duration-300"
+                    :class="activeTab === 'contacted' && 'rotate-180'">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
-                قيد المتابعة (Contacted)
+                <span>قيد المتابعة</span>
             </button>
 
+            <!-- تبويب: جديد -->
             <button @click="activeTab = 'new'"
                 :class="activeTab === 'new' ?
-                    'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm font-bold' :
-                    'text-slate-500 dark:text-slate-400'"
-                class="flex-1 sm:flex-initial px-4 py-1.5 text-xs rounded-lg transition-all duration-200 text-center flex items-center justify-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 -0.5 25 25"
-                    stroke="currentColor" >
-                    <path fill-rule="evenodd" clip-rule="evenodd"
-                        d="M5.5 5C10.3 10.871 7.419 16.471 5.5 19C11.371 14.2 16.971 17.081 19.5 19C17.581 16.471 14.7 10.871 19.5 5C16.971 6.919 11.371 9.8 5.5 5Z"
-                        stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm font-semibold' :
+                    'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:-translate-y-0.5'"
+                class="flex-1 sm:flex-initial px-4 py-2 text-xs rounded-lg transition-all duration-200 text-center flex items-center justify-center gap-2 transform">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-3.5 h-3.5" :class="activeTab === 'new' && 'animate-pulse'">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                جديد (New)
+                <span>جديد</span>
             </button>
+
         </div>
     </div>
 
