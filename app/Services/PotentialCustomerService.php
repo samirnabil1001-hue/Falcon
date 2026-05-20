@@ -106,16 +106,13 @@ class PotentialCustomerService
      */
     public function updateStatusAndLogFollowUp(PotentialCustomer $customer, array $data, int $userId): PotentialCustomer
     {
-        // التحقق من صحة البيانات المرسلة من المودال أو من السلكت المباشر
         $validated = $this->validateData($data, false);
 
         return DB::transaction(function () use ($customer, $validated, $userId) {
-            // 1. تحديث حالة العميل الحالية
             $customer->update([
                 'status' => $validated['status']
             ]);
 
-            // 2. تسجيل السجل في جدول المتابعات التاريخي (Log)
             CustomerFollowUp::create([
                 'potential_customer_id' => $customer->id,
                 'user_id' => $userId,
@@ -124,6 +121,16 @@ class PotentialCustomerService
                 'next_follow_up_at' => $validated['next_follow_up_date'] ?? null,
                 'notes' => $validated['notes'] ?? null,
             ]);
+
+            if ($validated['status'] === \App\Enums\PotentialCustomerStatus::CONFIRMED->value || $validated['status'] === \App\Enums\PotentialCustomerStatus::CONFIRMED) {
+
+                \App\Models\PotentialCustomerService::create([
+                    'potential_customer_id' => $customer->id,
+                    'user_id' => $userId,
+                    'service_type' => $validated['service_type'], // لازم تتبعت من الفورم (مثل: flights, tourist_visas)
+                    'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null, // ملاحظات الخدمة
+                ]);
+            }
 
             return $customer;
         });

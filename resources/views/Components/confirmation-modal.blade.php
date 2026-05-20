@@ -2,7 +2,7 @@
     class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak
     x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
 
     <div @click.away="confirmModal = false"
         class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 dark:border-slate-700 transform transition-all">
@@ -17,8 +17,7 @@
         </div>
 
         <h4 class="text-base font-bold text-center text-gray-900 dark:text-white" x-text="modalTitle"></h4>
-        <p class="mt-2 text-xs text-center text-gray-500 dark:text-slate-400 leading-relaxed"
-            x-text="modalMessage"></p>
+        <p class="mt-2 text-xs text-center text-gray-500 dark:text-slate-400 leading-relaxed" x-text="modalMessage"></p>
 
         <div class="flex gap-3 mt-5">
             <button @click="confirmModal = false"
@@ -32,3 +31,8 @@
         </div>
     </div>
 </div>
+<style>
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
