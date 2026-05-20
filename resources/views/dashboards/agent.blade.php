@@ -38,7 +38,8 @@
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">إجمالي العملاء</h3>
                     <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                        {{ number_format($totalCustomers) }}</p>
+                        {{ number_format($totalCustomers) }}
+                    </p>
                 </div>
                 <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-blue-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,8 +51,8 @@
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>النسبة التشغيلية</span>
-                    <span class="font-bold text-blue-500">{{ $opRatio }}%</span>
+                    <span class="text-slate-500 dark:text-slate-400">الجدد:{{ number_format($newCount) }}</span>
+                    <span class="font-bold text-blue-500">النشطة:{{ $opRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                     <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $opRatio }}%"></div>
@@ -65,7 +66,8 @@
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">قيد المتابعة</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
+                        {{ number_format($pendingCount) }}
                     </p>
                 </div>
                 <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
@@ -77,8 +79,8 @@
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>معدل الانتظار</span>
-                    <span class="font-bold text-amber-600">{{ $waitRatio }}%</span>
+                    <span>المتابعة:{{ number_format($pendingCount) }}</span>
+                    <span class="font-bold text-amber-600">الانتظار:{{ $waitRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                     <div class="bg-amber-500 h-1.5 rounded-full" style="width: {{ $waitRatio }}%"></div>
@@ -93,7 +95,8 @@
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">تم التنفيذ</h3>
                     <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                        {{ number_format($confirmedCount) }}</p>
+                        {{ number_format($confirmedCount) }}
+                    </p>
                 </div>
                 <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,8 +107,8 @@
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>معدل الإغلاق</span>
-                    <span class="font-bold text-emerald-600">{{ $closeRatio }}%</span>
+                    <span>المنفذة:{{ number_format($confirmedCount) }}</span>
+                    <span class="font-bold text-emerald-600">الإغلاق:{{ $closeRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                     <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ $closeRatio }}%"></div>
@@ -120,7 +123,8 @@
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">غير مهتم</h3>
                     <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                        {{ number_format($cancelledCount) }}</p>
+                        {{ number_format($cancelledCount) }}
+                    </p>
                 </div>
                 <div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-rose-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,8 +135,8 @@
             </div>
             <div class="mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
                 <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>نسبة الرفض</span>
-                    <span class="font-bold text-rose-600">{{ $rejectRatio }}%</span>
+                    <span class="text-rose-500">الملغية:{{ number_format($cancelledCount) }}</span>
+                    <span class="font-bold text-rose-600">الرفض:{{ $rejectRatio }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                     <div class="bg-rose-500 h-1.5 rounded-full" style="width: {{ $rejectRatio }}%"></div>
@@ -140,18 +144,13 @@
             </div>
         </div>
     </div>
-
-    <!-- Content (جدول التقارير والمتابعات والمصادر) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans text-right p-1" dir="rtl">
 
-        <!-- العمود الأيمن (2/3): جدول المتابعات الفورية والعاجلة للـ Agent -->
         <div class="lg:col-span-2 space-y-6">
             <x-urgent-customers-table :recentUrgentCustomers="$recentUrgentCustomers" />
         </div>
 
-        <!-- العمود الأيسر (1/3): إحصائيات الأداء والمصادر المربحة للموظف -->
         <div class="space-y-6">
-            <!-- كرت كفاءة الإغلاق الفردي الدائري -->
             <div
                 class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
                 <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold mb-1 flex items-center gap-2">
@@ -174,7 +173,6 @@
                 </div>
             </div>
 
-            <!-- تقرير إنتاجية مصادر الجلب الخاصة بالموظف نفسه -->
             <div
                 class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
                 <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold mb-1 flex items-center gap-2">
@@ -183,7 +181,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
                     </svg>
-                    قنوات الجلب الخاصة بك
                 </h3>
                 <p class="text-[11px] text-slate-400 mb-3">توزيع إجمالي حجم عملائك الحاليين بحسب مصادرهم</p>
 

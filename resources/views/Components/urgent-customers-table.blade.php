@@ -14,13 +14,11 @@
                 </svg>
                 عملاء يتطلبون اتصالاً عاجلاً
             </h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">أحدث 7 عملاء بحسب الحالة المحددة لمتابعتهم وتحديث موقفهم فوراً
-            </p>
+            <p class="text-[11px] text-slate-400 mt-0.5">أحدث 7 عملاء بحسب الحالة المحددة لمتابعتهم وتحديث موقفهم فوراً</p>
         </div>
 
         <!-- أزرار التبديل (Switch Tabs) الافتراضي هو contacted -->
-        <div
-            class="flex p-1 bg-slate-100/80 dark:bg-slate-900/60 rounded-xl w-full sm:w-auto self-stretch sm:self-auto">
+        <div class="flex p-1 bg-slate-100/80 dark:bg-slate-900/60 rounded-xl w-full sm:w-auto self-stretch sm:self-auto">
             <button @click="activeTab = 'contacted'"
                 :class="activeTab === 'contacted' ?
                     'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm font-bold' :
@@ -69,37 +67,65 @@
                 </tr>
             </thead>
 
+            <!-- تبويب قيد المتابعة -->
             <tbody x-show="activeTab === 'contacted'" class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
                 @forelse($contactedCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
                         <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}</td>
                         <td class="px-4 py-3 text-xs">
-                            <span
-                                class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
                                 {{ method_exists($customer->source, 'label') ? $customer->source->label() : $customer->source }}
                             </span>
                         </td>
                         <td class="px-4 py-3 text-xs">
-                            <span
-                                class="px-2 py-0.5 bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 rounded text-[11px] font-semibold">قيد
-                                المتابعة</span>
+                            <span class="px-2 py-0.5 bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 rounded text-[11px] font-semibold">
+                                قيد المتابعة
+                            </span>
                         </td>
                         <td class="px-4 py-3 text-[11px] text-slate-400">
                             {{ $customer->created_at ? $customer->created_at->format('M d, Y • H:i') : 'غير محدد' }}
                         </td>
                         <td class="p-4 text-center whitespace-nowrap align-middle w-56 min-w-[220px]"
-                            x-data="{ showModal: false, showCancelledModal: false, currentStatus: 'contacted', checkStatus(e) { /* نفس كود الـ Alpine القديم بالكامل */ } }">
-                            <!-- الـ Form والأزرار الخاصة بالإجراءات تترك كما هي دون تغيير -->
-                            <form id="status-form-{{ $customer->id }}"
+                            x-data="{ 
+                                showModal: false, 
+                                showCancelledModal: false, 
+                                checkStatus(e) { 
+                                    let selectedValue = e.target.value;
+                                    let originalValue = e.target.getAttribute('data-original-value');
+
+                                    if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}') {
+                                        this.showModal = true;
+                                        e.target.value = originalValue;
+                                    } 
+                                    else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
+                                        this.showCancelledModal = true;
+                                        e.target.value = originalValue;
+                                    } 
+                                    else if (selectedValue !== originalValue) {
+                                        let form = document.getElementById('status-form-urgent-contacted-{{ $customer->id }}');
+                                        if(form) {
+                                            form.querySelector('input[name=\'status\']').value = selectedValue;
+                                            form.submit();
+                                        }
+                                    }
+                                } 
+                            }">
+                            
+                            <form id="status-form-urgent-contacted-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
-                                @csrf @method('PATCH') <input type="hidden" name="status" value="">
+                                @csrf @method('PATCH') 
+                                <input type="hidden" name="status" value="">
                             </form>
+
                             <div class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[200px] mx-auto">
-                                <div class="w-full"><x-potential-customers.status-select :customer="$customer" /></div>
+                                <div class="w-full">
+                                    <x-potential-customers.status-select :customer="$customer" @change="checkStatus($event)" />
+                                </div>
                                 <x-potential-customers.action-buttons :customer="$customer" />
                             </div>
+
                             <x-potential-customers.contacted-modal :customer="$customer" />
                             <x-potential-customers.cancelled-modal :customer="$customer" />
                         </td>
@@ -113,36 +139,63 @@
                 @endforelse
             </tbody>
 
-            <!-- تبويب جديد (يعرض 5 كحد أقصى) -->
+            <!-- تبويب جديد -->
             <tbody x-show="activeTab === 'new'" class="divide-y divide-slate-100/70 dark:divide-slate-700/40" x-cloak>
                 @forelse($newCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
                         <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}</td>
                         <td class="px-4 py-3 text-xs">
-                            <span
-                                class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
                                 {{ method_exists($customer->source, 'label') ? $customer->source->label() : $customer->source }}
                             </span>
                         </td>
                         <td class="px-4 py-3 text-xs">
-                            <span
-                                class="px-2 py-0.5 bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 rounded text-[11px] font-semibold">جديد</span>
+                            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 rounded text-[11px] font-semibold">جديد</span>
                         </td>
                         <td class="px-4 py-3 text-[11px] text-slate-400">
                             {{ $customer->created_at ? $customer->created_at->format('M d, Y • H:i') : 'غير محدد' }}
                         </td>
                         <td class="p-4 text-center whitespace-nowrap align-middle w-56 min-w-[220px]"
-                            x-data="{ showModal: false, showCancelledModal: false, currentStatus: 'new', checkStatus(e) { /* نفس كود الـ Alpine القديم بالكامل */ } }">
-                            <form id="status-form-{{ $customer->id }}"
+                            x-data="{ 
+                                showModal: false, 
+                                showCancelledModal: false, 
+                                checkStatus(e) { 
+                                    let selectedValue = e.target.value;
+                                    let originalValue = e.target.getAttribute('data-original-value');
+
+                                    if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONTACTED->value }}') {
+                                        this.showModal = true;
+                                        e.target.value = originalValue;
+                                    } 
+                                    else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
+                                        this.showCancelledModal = true;
+                                        e.target.value = originalValue;
+                                    } 
+                                    else if (selectedValue !== originalValue) {
+                                        let form = document.getElementById('status-form-urgent-new-{{ $customer->id }}');
+                                        if(form) {
+                                            form.querySelector('input[name=\'status\']').value = selectedValue;
+                                            form.submit();
+                                        }
+                                    }
+                                } 
+                            }">
+                            
+                            <form id="status-form-urgent-new-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
-                                @csrf @method('PATCH') <input type="hidden" name="status" value="">
+                                @csrf @method('PATCH') 
+                                <input type="hidden" name="status" value="">
                             </form>
+
                             <div class="grid grid-cols-[1fr_auto] items-center gap-2 max-w-[200px] mx-auto">
-                                <div class="w-full"><x-potential-customers.status-select :customer="$customer" /></div>
+                                <div class="w-full">
+                                    <x-potential-customers.status-select :customer="$customer" @change="checkStatus($event)" />
+                                </div>
                                 <x-potential-customers.action-buttons :customer="$customer" />
                             </div>
+
                             <x-potential-customers.contacted-modal :customer="$customer" />
                             <x-potential-customers.cancelled-modal :customer="$customer" />
                         </td>
@@ -155,7 +208,6 @@
                     </tr>
                 @endforelse
             </tbody>
-
         </table>
     </div>
 </div>
