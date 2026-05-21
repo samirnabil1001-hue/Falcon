@@ -139,6 +139,7 @@
                                     x-data="{
                                         showModal: false,
                                         showCancelledModal: false,
+                                        showConfirmedModal: false,
                                         currentStatus: '{{ is_object($customer->status) ? $customer->status->value : $customer->status }}',
                                         showCurrentLabel(e) {
                                             let opt = e.target.querySelector('option[disabled]:checked');
@@ -160,8 +161,10 @@
                                             } else if (e.target.value === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
                                                 this.showCancelledModal = true;
                                                 e.target.value = e.target.getAttribute('data-original-value');
+                                            } else if (e.target.value === '{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}') {
+                                                this.showConfirmedModal = true;
+                                                e.target.value = e.target.getAttribute('data-original-value');
                                             } else {
-                                                // هنا تم استبدال الاستدعاء المباشر القديم بـ $dispatch لإرسال الحدث للأب بنجاح
                                                 $dispatch('change-status', { event: e, formId: 'status-form-{{ $customer->id }}' });
                                             }
                                         }
@@ -177,6 +180,7 @@
 
                                     <x-potential-customers.contacted-modal :customer="$customer" />
                                     <x-potential-customers.cancelled-modal :customer="$customer" />
+                                    <x-potential-customers.confirmed-modal :customer="$customer" />
                                 </td>
                             </tr>
                         @empty
@@ -202,8 +206,6 @@
         <div class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
             {{ $customers->appends(request()->query())->links() }}
         </div>
-
-        <x-confirmation-modal />
     </div>
 
     <style>
