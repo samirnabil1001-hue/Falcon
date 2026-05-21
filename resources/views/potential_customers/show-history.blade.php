@@ -18,6 +18,7 @@
                     عودة لقائمة العملاء
                 </a>
             </div>
+            
             <div class="bg-white dark:bg-slate-800 overflow-hidden shadow-sm sm:rounded-xl border border-gray-100 dark:border-slate-700 p-6 sm:p-8"
                 dir="rtl">
                 <div class="flex items-center mb-4">
@@ -43,23 +44,26 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- حاوية الـ Timeline الشاملة للشاشة -->
-
-
                 @if ($customer->followUps->isEmpty())
                     <div class="text-center py-12 text-gray-400 text-sm">
                         لا توجد أي سجلات متابعة مسجلة لهذا العميل حتى الآن.
                     </div>
                 @else
+                    <!-- احتساب عدد المتابعات المؤكدة مسبقاً لربطها بشكل صحيح تراتيبياً -->
+                    @php $confirmedCounter = 0; @endphp
+
                     <!-- الخط الرأسي تم نقله لأقصى اليمين تماماً (mr-2) ليبدأ من أول الشاشة -->
                     <div class="relative border-r-2 border-gray-200 dark:border-slate-700 mr-2 space-y-6 pb-4">
 
                         @foreach ($customer->followUps as $log)
                             @php
-                                // إذا كانت المتابعة مؤكدة، نقوم بجلب تفاصيل الخدمة المرتبطة بها (إن وجدت)
                                 $relatedService = null;
                                 if ($log->status->value === 'confirmed') {
-                                    $relatedService = $customer->services->first();
+                                    // جلب الخدمة المتطابقة مع ترتيب هذه المتابعة لعدم تكرار الخدمة الأولى دائماً
+                                    $relatedService = $customer->services->values()->get($confirmedCounter);
+                                    $confirmedCounter++;
                                 }
                             @endphp
 
@@ -95,7 +99,6 @@
                                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-3">
                                         <!-- بادج الحالة والسبب الرئيسي -->
                                         <div class="flex items-center gap-3">
-                                            <!-- بادج صلب ومتناسق مع لون الكارت الخلفي الجديد -->
                                             <span
                                                 class="px-2.5 py-1 rounded-md text-xs font-bold text-white shadow-sm whitespace-nowrap
                                                 {{ $log->status->value === 'confirmed'
@@ -191,12 +194,9 @@
                     <div class="inline-block rounded-xl text-right overflow-hidden shadow-2xl transform transition-all max-w-md w-full p-6 border relative"
                         dir="rtl"
                         :class="{
-                            'bg-emerald-50 dark:bg-slate-800 border-emerald-200 dark:border-emerald-500/30': selectedLog
-                                .status === 'confirmed',
-                            'bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-rose-500/30': selectedLog
-                                .status === 'cancelled',
-                            'bg-amber-50 dark:bg-slate-800 border-amber-200 dark:border-amber-500/20': selectedLog
-                                .status !== 'confirmed' && selectedLog.status !== 'cancelled'
+                            'bg-emerald-50 dark:bg-slate-800 border-emerald-200 dark:border-emerald-500/30': selectedLog.status === 'confirmed',
+                            'bg-rose-50 dark:bg-slate-800 border-rose-200 dark:border-rose-500/30': selectedLog.status === 'cancelled',
+                            'bg-amber-50 dark:bg-slate-800 border-amber-200 dark:border-amber-500/20': selectedLog.status !== 'confirmed' && selectedLog.status !== 'cancelled'
                         }">
 
                         <button type="button" @click="openDetailPopup = false"
@@ -209,12 +209,9 @@
 
                         <h4 class="text-base font-bold mb-4 pb-2 border-b dark:text-slate-100"
                             :class="{
-                                'text-emerald-900 border-emerald-200 dark:border-slate-700': selectedLog
-                                    .status === 'confirmed',
-                                'text-rose-900 border-rose-200 dark:border-slate-700': selectedLog
-                                    .status === 'cancelled',
-                                'text-amber-900 border-amber-200 dark:border-slate-700': selectedLog
-                                    .status !== 'confirmed' && selectedLog.status !== 'cancelled'
+                                'text-emerald-900 border-emerald-200 dark:border-slate-700': selectedLog.status === 'confirmed',
+                                'text-rose-900 border-rose-200 dark:border-slate-700': selectedLog.status === 'cancelled',
+                                'text-amber-900 border-amber-200 dark:border-slate-700': selectedLog.status !== 'confirmed' && selectedLog.status !== 'cancelled'
                             }">
                             تفاصيل سجل المتابعة الكاملة
                         </h4>
@@ -222,79 +219,68 @@
                         <div class="space-y-4 text-sm">
                             <div>
                                 <span class="text-xs block mb-1 opacity-70"
-                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-800 dark:text-slate-400' : (
-                                        selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' :
-                                        'text-amber-800 dark:text-slate-400')">الحالة:</span>
+                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-800 dark:text-slate-400' : (selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400')">الحالة:</span>
                                 <span class="text-xs font-bold px-3 py-1 rounded-md inline-block shadow-sm text-white"
                                     :class="{
                                         'bg-emerald-600 dark:bg-emerald-500': selectedLog.status === 'confirmed',
                                         'bg-rose-600 dark:bg-rose-500': selectedLog.status === 'cancelled',
-                                        'bg-amber-500 dark:bg-amber-600': selectedLog.status !== 'confirmed' &&
-                                            selectedLog.status !== 'cancelled'
+                                        'bg-amber-500 dark:bg-amber-600': selectedLog.status !== 'confirmed' && selectedLog.status !== 'cancelled'
                                     }"
                                     x-text="selectedLog.status_label">
                                 </span>
                             </div>
 
-                        <template x-if="selectedLog.status === 'confirmed' && selectedLog.has_service">
-                            <div class="bg-white/90 dark:bg-slate-900/60 p-3 rounded-lg border border-emerald-200/70">
-                                <span class="text-[11px] block font-bold text-emerald-800 dark:text-emerald-400 mb-1">الخدمة التي تم ربطها:</span>
-                                <p class="font-bold text-slate-800 dark:text-slate-100 text-sm" x-text="selectedLog.service_type"></p>
-                                <template x-if="selectedLog.service_notes">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 whitespace-pre-line" x-text="selectedLog.service_notes"></p>
-                                </template>
-                            </div>
-                        </template>
+                            <template x-if="selectedLog.status === 'confirmed' && selectedLog.has_service">
+                                <div class="bg-white/90 dark:bg-slate-900/60 p-3 rounded-lg border border-emerald-200/70">
+                                    <span class="text-[11px] block font-bold text-emerald-800 dark:text-emerald-400 mb-1">الخدمة التي تم ربطها:</span>
+                                    <p class="font-bold text-slate-800 dark:text-slate-100 text-sm" x-text="selectedLog.service_type"></p>
+                                    <template x-if="selectedLog.service_notes">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 whitespace-pre-line" x-text="selectedLog.service_notes"></p>
+                                    </template>
+                                </div>
+                            </template>
 
-                        <template x-if="selectedLog.status !== 'confirmed'">
+                            <template x-if="selectedLog.status !== 'confirmed'">
+                                <div>
+                                    <span class="block text-xs mb-1 opacity-70"
+                                        :class="selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400'">السبب أو نتيجة الإجراء:</span>
+                                    <p class="font-medium bg-white/80 dark:bg-slate-900/50 p-2.5 rounded-lg border text-gray-800 dark:text-slate-200"
+                                        :class="selectedLog.status === 'cancelled' ? 'border-rose-100 dark:border-slate-700' : 'border-amber-100 dark:border-slate-700'"
+                                        x-text="selectedLog.reason"></p>
+                                </div>
+                            </template>
+
                             <div>
                                 <span class="block text-xs mb-1 opacity-70"
-                                    :class="selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400'">السبب أو نتيجة الإجراء:</span>
-                                <p class="font-medium bg-white/80 dark:bg-slate-900/50 p-2.5 rounded-lg border text-gray-800 dark:text-slate-200"
-                                    :class="selectedLog.status === 'cancelled' ? 'border-rose-100 dark:border-slate-700' : 'border-amber-100 dark:border-slate-700'"
-                                    x-text="selectedLog.reason"></p>
-                            </div>
-                        </template>
-
-                            <div>
-                                <span class="block text-xs mb-1 opacity-70"
-                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-800 dark:text-slate-400' : (
-                                        selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' :
-                                        'text-amber-800 dark:text-slate-400')">الملاحظات الداخلية التفصيلية للـ Agent:</span>
+                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-800 dark:text-slate-400' : (selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400')">الملاحظات الداخلية التفصيلية للـ Agent:</span>
                                 <p class="text-xs whitespace-pre-line bg-white/80 dark:bg-slate-900/50 p-2.5 rounded-lg border max-h-[150px] overflow-y-auto text-gray-700 dark:text-slate-300"
-                                    :class="selectedLog.status === 'confirmed' ? 'border-emerald-100 dark:border-slate-700' : (
-                                        selectedLog.status === 'cancelled' ?
-                                        'border-rose-100 dark:border-slate-700' :
-                                        'border-amber-100 dark:border-slate-700')"
+                                    :class="selectedLog.status === 'confirmed' ? 'border-emerald-100 dark:border-slate-700' : (selectedLog.status === 'cancelled' ? 'border-rose-100 dark:border-slate-700' : 'border-amber-100 dark:border-slate-700')"
                                     x-text="selectedLog.notes || 'لا توجد ملاحظات إضافية مكتوبة لهذا السجل.'"></p>
                             </div>
 
-                        <div class="grid grid-cols-2 gap-2 text-[11px] pt-3 border-t dark:border-slate-700"
-                            :class="selectedLog.status === 'confirmed' ? 'border-emerald-200' : (selectedLog
-                                .status === 'cancelled' ? 'border-rose-200' : 'border-amber-200')">
-                            <div>
-                                <span class="text-gray-400 block">وقت وتاريخ الاتصال:</span>
-                                <span class="font-medium dark:text-slate-300"
-                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-900' : (selectedLog
-                                        .status === 'cancelled' ? 'text-rose-900' : 'text-amber-900')"
-                                    x-text="selectedLog.created_at ? new Date(selectedLog.created_at).toLocaleString('ar-EG') : ''"></span>
-                            </div>
-                            <div>
-                                <span class="text-gray-400 block">المتابعة التذكيرية القادمة:</span>
-                                <span class="font-bold dark:text-indigo-400"
-                                    :class="selectedLog.status === 'confirmed' ? 'text-emerald-700' : (selectedLog
-                                        .status === 'cancelled' ? 'text-rose-700' : 'text-amber-700')"
-                                    x-text="selectedLog.next_follow_up_at ? new Date(selectedLog.next_follow_up_at).toLocaleString('ar-EG') : 'لا يوجد موعد تذكيري'"></span>
+                            <div class="grid grid-cols-2 gap-2 text-[11px] pt-3 border-t dark:border-slate-700"
+                                :class="selectedLog.status === 'confirmed' ? 'border-emerald-200' : (selectedLog.status === 'cancelled' ? 'border-rose-200' : 'border-amber-200')">
+                                <div>
+                                    <span class="text-gray-400 block">وقت وتاريخ الاتصال:</span>
+                                    <span class="font-medium dark:text-slate-300"
+                                        :class="selectedLog.status === 'confirmed' ? 'text-emerald-900' : (selectedLog.status === 'cancelled' ? 'text-rose-900' : 'text-amber-900')"
+                                        x-text="selectedLog.created_at ? new Date(selectedLog.created_at).toLocaleString('ar-EG') : ''"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 block">المتابعة التذكيرية القادمة:</span>
+                                    <span class="font-bold dark:text-indigo-400"
+                                        :class="selectedLog.status === 'confirmed' ? 'text-emerald-700' : (selectedLog.status === 'cancelled' ? 'text-rose-700' : 'text-amber-700')"
+                                        x-text="selectedLog.next_follow_up_at ? new Date(selectedLog.next_follow_up_at).toLocaleString('ar-EG') : 'لا يوجد موعد تذكيري'"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mt-6">
-                        <button type="button" @click="openDetailPopup = false"
-                            class="px-4 py-2 w-full bg-white/80 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-gray-100 dark:hover:bg-slate-600 transition-all border dark:border-transparent">
-                            إغلاق تفاصيل السجل
-                        </button>
-                    </div>
+                        <div class="mt-6">
+                            <button type="button" @click="openDetailPopup = false"
+                                class="px-4 py-2 w-full bg-white/80 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-gray-100 dark:hover:bg-slate-600 transition-all border dark:border-transparent">
+                                إغلاق تفاصيل السجل
+                            </button>
+                        </div>
 
                     </div>
                 </div>

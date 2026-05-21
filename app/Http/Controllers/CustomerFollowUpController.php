@@ -24,7 +24,7 @@ class CustomerFollowUpController extends Controller
     public function index(Request $request)
     {
         $customers = $this->followUpService->getPaginatedCustomers($request, 10);
-        
+
         return view('potential_customers.follow-ups-index', compact('customers'));
     }
 
@@ -34,8 +34,8 @@ class CustomerFollowUpController extends Controller
     public function store(Request $request, $customerId)
     {
         // 1. تحديد قيم التأكيد للمقارنة (سواء كانت Enum أو String عادي)
-        $confirmedValue = defined('\App\Enums\PotentialCustomerStatus::CONFIRMED') 
-            ? PotentialCustomerStatus::CONFIRMED->value 
+        $confirmedValue = defined('\App\Enums\PotentialCustomerStatus::CONFIRMED')
+            ? PotentialCustomerStatus::CONFIRMED->value
             : 'confirmed';
 
         // 2. التحقق من البيانات مع إضافة شروط خاصة بحالة التثبيت (confirmed)
@@ -44,7 +44,7 @@ class CustomerFollowUpController extends Controller
             'reason' => 'nullable|string',
             'next_follow_up_date' => 'nullable|date',
             'notes' => 'nullable|string',
-            
+
             // إذا كانت الحالة confirmed، يصبح نوع الخدمة مطلوباً إجبارياً
             'service_type' => [
                 $request->status === $confirmedValue ? 'required' : 'nullable',
@@ -63,22 +63,25 @@ class CustomerFollowUpController extends Controller
             return redirect()->back()->withErrors(['error' => 'عذراً، حدث خطأ أثناء تحديث البيانات: ' . $e->getMessage()]);
         }
     }
-    
+
     /**
      * عرض سجل متابعات العميل
      */
     public function show($customerId)
     {
-        // قمنا بشحن علاقة الـ services أيضاً لنتمكن من عرض الخدمات المربوطة بالعميل في صفحة السجل
-        $customer = PotentialCustomer::with([
-            'followUps' => function ($query) {
-                $query->latest();
-            },
-            'services' => function ($query) {
-                $query->latest();
-            }
-        ])->findOrFail($customerId);
+        // جلب العميل مع علاقاته بشكل مباشر
+        $customer = PotentialCustomer::with(['followUps', 'services'])->findOrFail($customerId);
 
-        return view('potential_customers.show-history', compact('customer'));
+        /*
+        |--------------------------------------------------------------------------
+        | دمج المتابعات والخدمات في سجل تاريخي واحد (Timeline) بدون تكرار
+        |--------------------------------------------------------------------------
+        | نقوم بجمع الـ followUps والـ services في قائمة واحدة وترتيبهم من الأحدث إلى الأقدم
+        | بناءً على تاريخ الإنشاء (created_at).
+        */
+        $historyTimeline = $customer->followUps->concat($customer->services)
+            ->sortByDesc('created_at');
+
+        return view('potential_customers.show-history', compact('customer', 'historyTimeline'));
     }
 }
