@@ -69,19 +69,44 @@ class CustomerFollowUpController extends Controller
      */
     public function show($customerId)
     {
-        // جلب العميل مع علاقاته بشكل مباشر
         $customer = PotentialCustomer::with(['followUps', 'services'])->findOrFail($customerId);
 
-        /*
-        |--------------------------------------------------------------------------
-        | دمج المتابعات والخدمات في سجل تاريخي واحد (Timeline) بدون تكرار
-        |--------------------------------------------------------------------------
-        | نقوم بجمع الـ followUps والـ services في قائمة واحدة وترتيبهم من الأحدث إلى الأقدم
-        | بناءً على تاريخ الإنشاء (created_at).
-        */
-        $historyTimeline = $customer->followUps->concat($customer->services)
-            ->sortByDesc('created_at');
+        $unifiedTimeline = collect();
 
-        return view('potential_customers.show-history', compact('customer', 'historyTimeline'));
+        // 1. تحويل المتابعات لشكل موحد (مع استثناء الحالات المؤكدة منعاً للتكرار)
+        foreach ($customer->followUps as $log) {
+            // 🛑 السطر السحري: إذا كانت المتابعة مؤكدة تخطاها لأن الخدمة ستظهر بدلاً منها
+            if ($log->status->value === 'confirmed') {
+                continue;
+            }
+
+            $unifiedTimeline->push([
+                'type' => 'follow_up',
+                'status' => $log->status->value,
+                'status_label' => $log->status->label(),
+                'reason' => is_object($log->reason) ? $log->reason->label() : ($log->reason ?? 'بدون سبب محدد'),
+                'notes' => $log->notes,
+                'created_at' => $log->created_at,
+                'next_follow_up_at' => $log->next_follow_up_at,
+            ]);
+        }
+
+        // 2. تحويل الخدمات لشكل موحد (ستظهر هنا كعنصر المبيعات المؤكد الوحيد في هذا التوقيت)
+        foreach ($customer->services as $service) {
+            $unifiedTimeline->push([
+                'type' => 'service',
+                'status' => 'confirmed',
+                'status_label' => 'تنفيذ  ',
+                'reason' => is_object($service->service_type) ? $service->service_type->label() : $service->service_type,
+                'notes' => $service->notes,
+                'created_at' => $service->created_at,
+                'next_follow_up_at' => null,
+            ]);
+        }
+
+        // 3. الترتيب التنازلي النقي الآن بدون أي تكرار
+        $sortedTimeline = $unifiedTimeline->sortByDesc('created_at');
+
+        return view('potential_customers.show-history', compact('customer', 'sortedTimeline'));
     }
 }
