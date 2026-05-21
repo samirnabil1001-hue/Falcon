@@ -17,6 +17,7 @@
                         <tr>
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Name</th>
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Phone</th>
+                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Requests Count</th> <!-- العمود الجديد -->
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'service_type', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'service_type' ? 'desc' : 'asc']) }}" class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Service Type
@@ -54,7 +55,14 @@
                                     {{ $service->potentialCustomer->phone ?? 'N/A' }}
                                 </td>
 
-                                <!-- نوع الخدمة -->
+                                <!-- عدد مرات طلب الخدمة (إجمالي الطلبات للعميل) -->
+                                <td class="p-4 text-center whitespace-nowrap">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold leading-none text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full">
+                                        {{ $service->potentialCustomer ? $service->potentialCustomer->services()->count() : 0 }} طلبات
+                                    </span>
+                                </td>
+
+                                <!-- نوع الخدمة الأخيرة -->
                                 <td class="p-4 text-center whitespace-nowrap">
                                     <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
                                         {{ $service->service_type instanceof \App\Enums\CompanyService ? $service->service_type->label() : $service->service_type }}
@@ -62,8 +70,12 @@
                                 </td>
 
                                 <!-- الملاحظات -->
-                                <td class="p-4 text-center text-xs text-gray-600 dark:text-slate-400 max-w-xs truncate">
-                                    {{ $service->notes ?? '-' }}
+                                <td class="p-4 text-center text-xs text-gray-600 dark:text-slate-400 max-w-xs truncate" dir="rtl">
+                                    @if($service->notes)
+                                        {{ $service->notes }}
+                                    @else
+                                        <span class="text-gray-400 dark:text-slate-500 font-medium">نوع الخدمة المعتمدة: تنفيذ إجراء جديد</span>
+                                    @endif
                                 </td>
 
                                 <!-- اسم الموظف -->
@@ -76,15 +88,14 @@
                                     {{ $service->created_at->format('M d, Y • H:i') }}
                                 </td>
                                 
-                                <!-- زر المتابعة والمودال في خطوة واحدة -->
+                                <!-- زر المتابعة والمودال المدمج بأمان -->
                                 <td class="p-4 text-center whitespace-nowrap align-middle" x-data="{ showConfirmedModal: false }">
                                     @php
-                                        $customer = $service->potentialCustomer;
+                                        $currentCustomer = $service->potentialCustomer;
                                     @endphp
 
-                                    @if($customer)
+                                    @if($currentCustomer)
                                         <div class="grid grid-cols-1 items-center gap-2 max-w-[120px] mx-auto">
-                                            <!-- عند الضغط يتم تحويل قيمة showConfirmedModal إلى true لفتح المودال مباشرة -->
                                             <button @click="showConfirmedModal = true" type="button"
                                                 class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 dark:shadow-none cursor-pointer">
                                                 <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -94,9 +105,9 @@
                                             </button>
                                         </div>
 
-                                        <!-- المودال يظهر فقط عندما تصبح القيمة true -->
+                                        <!-- نافذة المودال المنبثقة للعميل الحالي في السطر -->
                                         <div x-show="showConfirmedModal" x-cloak @close-modal.window="showConfirmedModal = false">
-                                            <x-potential-customers.confirmed-modal :customer="$customer" />
+                                            <x-potential-customers.confirmed-modal :customer="$currentCustomer" />
                                         </div>
                                     @else
                                         <span class="text-xs text-gray-400 italic">No Customer</span>
@@ -105,7 +116,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="p-12 text-center text-gray-400 dark:text-slate-500 italic text-sm">
+                                <td colspan="8" class="p-12 text-center text-gray-400 dark:text-slate-500 italic text-sm">
                                     <div class="flex flex-col items-center justify-center gap-2">
                                         <svg class="w-8 h-8 text-gray-300 dark:text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />

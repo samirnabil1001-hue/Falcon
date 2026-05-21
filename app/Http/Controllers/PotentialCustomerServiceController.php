@@ -15,10 +15,17 @@ class PotentialCustomerServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = PotentialCustomerService::with([
-            'potentialCustomer',
-            'user'
-        ]);
+        // 1. جلب أحدث معرف خدمة (ID) لكل عميل فريد لمنع التكرار
+        $latestServiceIds = \App\Models\PotentialCustomerService::selectRaw('MAX(id) as id')
+            ->groupBy('potential_customer_id')
+            ->pluck('id');
+
+        // 2. بناء الاستعلام بناءً على الخدمات الفريدة فقط
+        $query = PotentialCustomerService::whereIn('id', $latestServiceIds)
+            ->with([
+                'potentialCustomer',
+                'user'
+            ]);
 
         /*
         |--------------------------------------------------------------------------
@@ -28,20 +35,14 @@ class PotentialCustomerServiceController extends Controller
 
         // Search
         if ($request->filled('search')) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('notes', 'like', "%{$search}%")
-
                     ->orWhere('service_type', 'like', "%{$search}%")
-
                     ->orWhereHas('potentialCustomer', function ($customer) use ($search) {
                         $customer->where('name', 'like', "%{$search}%")
                             ->orWhere('phone', 'like', "%{$search}%");
                     })
-
                     ->orWhereHas('user', function ($user) use ($search) {
                         $user->where('name', 'like', "%{$search}%");
                     });
@@ -73,20 +74,9 @@ class PotentialCustomerServiceController extends Controller
         | Sorting
         |--------------------------------------------------------------------------
         */
-
-        $allowedSorts = [
-            'created_at',
-            'service_type',
-            'id'
-        ];
-
-        $sortBy = in_array($request->sort_by, $allowedSorts)
-            ? $request->sort_by
-            : 'created_at';
-
-        $sortOrder = $request->sort_order === 'asc'
-            ? 'asc'
-            : 'desc';
+        $allowedSorts = ['created_at', 'service_type', 'id'];
+        $sortBy = in_array($request->sort_by, $allowedSorts) ? $request->sort_by : 'created_at';
+        $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
 
         $query->orderBy($sortBy, $sortOrder);
 
@@ -95,14 +85,9 @@ class PotentialCustomerServiceController extends Controller
         | Pagination
         |--------------------------------------------------------------------------
         */
+        $services = $query->paginate(10)->appends($request->query());
 
-        $services = $query->paginate(10)
-            ->appends($request->query());
-
-        return view(
-            'potential-customer-services.index',
-            compact('services')
-        );
+        return view('potential-customer-services.index', compact('services'));
     }
     /**
      * Store a newly created resource in storage.
