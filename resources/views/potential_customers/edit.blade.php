@@ -61,16 +61,17 @@
                             class="w-full rounded-lg border-gray-300 dark:border-slate-700 dark:bg-slate-900 text-gray-800 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                             
                             @php
-                                $currentSource = old('source', $potentialCustomer->source);
+                                // جلب القيمة المختارة سواء من الـ Form القديم أو قاعدة البيانات
+                                // نقوم بتحويلها إلى نص (string) للمقارنة الصحيحة لأن قيم الـ Enum هي strings
+                                $currentSource = old('source', $potentialCustomer->source instanceof \App\Enums\PotentialCustomerSource ? $potentialCustomer->source->value : $potentialCustomer->source);
                             @endphp
 
-                            <option value="Facebook" {{ $currentSource == 'Facebook' ? 'selected' : '' }}>فيسبوك (Facebook)</option>
-                            <option value="Instagram" {{ $currentSource == 'Instagram' ? 'selected' : '' }}>إنستغرام (Instagram)</option>
-                            <option value="WhatsApp" {{ $currentSource == 'WhatsApp' ? 'selected' : '' }}>واتساب (WhatsApp)</option>
-                            <option value="TikTok" {{ $currentSource == 'TikTok' ? 'selected' : '' }}>تيك توك (TikTok)</option>
-                            <option value="Google" {{ $currentSource == 'Google' ? 'selected' : '' }}>جوجل / موقع إلكتروني (Google)</option>
-                            <option value="Referral" {{ $currentSource == 'Referral' ? 'selected' : '' }}>ترشيح من عميل (Referral)</option>
-                            <option value="Other" {{ $currentSource == 'Other' ? 'selected' : '' }}>أخرى (Other)</option>
+                            @foreach(\App\Enums\PotentialCustomerSource::cases() as $sourceCase)
+                                <option value="{{ $sourceCase->value }}" {{ $currentSource === $sourceCase->value ? 'selected' : '' }}>
+                                    {{ $sourceCase->label() }} 
+                                </option>
+                            @endforeach
+
                         </select>
                         @error('source')
                             <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
