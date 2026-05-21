@@ -156,15 +156,18 @@ class PotentialCustomerService
                 'source' => ['required', new Enum(PotentialCustomerSource::class)],
             ];
         } else {
-            // إضافة الحقول الإضافية القادمة من مودال المتابعة لتتم فلترتها والتحقق منها بأمان
             $rules = [
                 'name' => 'sometimes|required|string|max:255',
                 'phone' => 'sometimes|required|string|max:20',
                 'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
                 'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
-                'reason' => 'nullable|string', // يمكن تخصيصها بـ Enum الخاص بك إن أردت
+                'reason' => 'nullable|string',
                 'next_follow_up_date' => 'nullable|date',
                 'notes' => 'nullable|string',
+
+                // 💡 أضف هذه السطور هنا للسماح بمرور حقول الخدمة المستهدفة
+                'service_type' => ['sometimes', 'required', new Enum(\App\Enums\CompanyService::class)],
+                'service_notes' => 'nullable|string',
             ];
         }
 

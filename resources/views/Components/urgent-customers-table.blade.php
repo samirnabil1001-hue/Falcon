@@ -145,6 +145,7 @@
                             x-data="{
                                 showModal: false,
                                 showCancelledModal: false,
+                                showConfirmedModal: false, {{-- إضافة المتغير هنا --}}
                                 checkStatus(e) {
                                     let selectedValue = e.target.value;
                                     let originalValue = e.target.getAttribute('data-original-value');
@@ -155,14 +156,16 @@
                                     } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
                                         this.showCancelledModal = true;
                                         e.target.value = originalValue;
+                                    } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}') { {{-- تفعيل فحص الحالة المؤكدة هنا أيضاً --}}
+                                        this.showConfirmedModal = true;
+                                        e.target.value = originalValue;
                                     } else if (selectedValue !== originalValue) {
-                                        // تمرير الحدث للمكون الأب لفتح مودال التأكيد الشامل
                                         $dispatch('change-status', { event: e, formId: 'status-form-urgent-contacted-{{ $customer->id }}' });
                                     }
                                 }
                             }">
 
-                            <!-- فورم خفي يحتوي على input نصي مخفي لاستقبال قيمة الحالة بشكل صحيح وآمن -->
+                            <!-- فورم خفي -->
                             <form id="status-form-urgent-contacted-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
@@ -177,9 +180,9 @@
                                 <x-potential-customers.action-buttons :customer="$customer" />
                             </div>
 
-                            <!-- المودالات المخصصة للحالات الحرجة (المهام / الإلغاء) -->
                             <x-potential-customers.contacted-modal :customer="$customer" />
                             <x-potential-customers.cancelled-modal :customer="$customer" />
+                            <x-potential-customers.confirmed-modal :customer="$customer" /> {{-- إضافة المودال هنا لتبويب قيد المتابعة --}}
                         </td>
                     </tr>
                 @empty
@@ -196,8 +199,7 @@
                 @forelse($newCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
-                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}
-                        </td>
+                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}</td>
                         <td class="px-4 py-3 text-xs">
                             <span
                                 class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
@@ -217,6 +219,7 @@
                             x-data="{
                                 showModal: false,
                                 showCancelledModal: false,
+                                showConfirmedModal: false, {{-- تم التأكيد على وجودها هنا --}}
                                 checkStatus(e) {
                                     let selectedValue = e.target.value;
                                     let originalValue = e.target.getAttribute('data-original-value');
@@ -227,13 +230,16 @@
                                     } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
                                         this.showCancelledModal = true;
                                         e.target.value = originalValue;
+                                    } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}') {
+                                        this.showConfirmedModal = true;
+                                        e.target.value = originalValue;
                                     } else if (selectedValue !== originalValue) {
                                         $dispatch('change-status', { event: e, formId: 'status-form-urgent-new-{{ $customer->id }}' });
                                     }
                                 }
                             }">
 
-                            <!-- فورم خفي يحتوي على input نصي مخفي لاستقبال قيمة الحالة بشكل صحيح وآمن -->
+                            <!-- فورم خفي -->
                             <form id="status-form-urgent-new-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
@@ -250,6 +256,7 @@
 
                             <x-potential-customers.contacted-modal :customer="$customer" />
                             <x-potential-customers.cancelled-modal :customer="$customer" />
+                            <x-potential-customers.confirmed-modal :customer="$customer" />
                         </td>
                     </tr>
                 @empty
@@ -262,7 +269,4 @@
             </tbody>
         </table>
     </div>
-
-    <!-- تضمين مودال التأكيد الشامل المستند إلى الـ x-data العلوي الخاص بهذا الـ Component -->
-    <x-confirmation-modal />
 </div>
