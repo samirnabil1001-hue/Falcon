@@ -1,5 +1,3 @@
-{{-- resources/views/components/urgent-customers-table.blade.php --}}
-
 <div x-data="{
     activeTab: 'contacted',
     confirmModal: false,
@@ -53,7 +51,6 @@
 }" @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
     class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-none">
 
-    <!-- رأس الجدول وأزرار التبديل -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5">
         <div>
             <h3 class="text-slate-700 dark:text-slate-200 text-sm font-bold flex items-center gap-2">
@@ -68,11 +65,9 @@
             </p>
         </div>
 
-        <!-- أزرار التبديل بين التبويبات (Tabs) -->
         <div
             class="flex p-1 bg-slate-100/80 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl w-full sm:w-auto self-stretch sm:self-auto gap-1 border border-slate-200/40 dark:border-slate-800/40">
 
-            <!-- تبويب: قيد المتابعة -->
             <button @click="activeTab = 'contacted'"
                 :class="activeTab === 'contacted' ?
                     'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm font-semibold' :
@@ -88,7 +83,6 @@
                 <span>قيد المتابعة</span>
             </button>
 
-            <!-- تبويب: جديد -->
             <button @click="activeTab = 'new'"
                 :class="activeTab === 'new' ?
                     'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm font-semibold' :
@@ -106,7 +100,6 @@
         </div>
     </div>
 
-    <!-- حاوي الجدول المتجاوب -->
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-right text-slate-600 dark:text-slate-300">
             <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-900/40 rounded-lg">
@@ -120,8 +113,8 @@
                 </tr>
             </thead>
 
-            <!-- تبويب قيد المتابعة (Contacted) -->
-            <tbody x-show="activeTab === 'contacted'" class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
+            <tbody x-show="activeTab === 'contacted'" x-cloak
+                class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
                 @forelse($contactedCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
@@ -145,7 +138,7 @@
                             x-data="{
                                 showModal: false,
                                 showCancelledModal: false,
-                                showConfirmedModal: false, {{-- إضافة المتغير هنا --}}
+                                showConfirmedModal: false,
                                 checkStatus(e) {
                                     let selectedValue = e.target.value;
                                     let originalValue = e.target.getAttribute('data-original-value');
@@ -156,7 +149,7 @@
                                     } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CANCELLED->value }}') {
                                         this.showCancelledModal = true;
                                         e.target.value = originalValue;
-                                    } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}') { {{-- تفعيل فحص الحالة المؤكدة هنا أيضاً --}}
+                                    } else if (selectedValue === '{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}') {
                                         this.showConfirmedModal = true;
                                         e.target.value = originalValue;
                                     } else if (selectedValue !== originalValue) {
@@ -165,7 +158,6 @@
                                 }
                             }">
 
-                            <!-- فورم خفي -->
                             <form id="status-form-urgent-contacted-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
@@ -180,9 +172,11 @@
                                 <x-potential-customers.action-buttons :customer="$customer" />
                             </div>
 
-                            <x-potential-customers.contacted-modal :customer="$customer" />
-                            <x-potential-customers.cancelled-modal :customer="$customer" />
-                            <x-potential-customers.confirmed-modal :customer="$customer" /> {{-- إضافة المودال هنا لتبويب قيد المتابعة --}}
+                            <div x-cloak>
+                                <x-potential-customers.contacted-modal :customer="$customer" />
+                                <x-potential-customers.cancelled-modal :customer="$customer" />
+                                <x-potential-customers.confirmed-modal :customer="$customer" />
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -194,12 +188,12 @@
                 @endforelse
             </tbody>
 
-            <!-- تبويب جديد (New) -->
-            <tbody x-show="activeTab === 'new'" class="divide-y divide-slate-100/70 dark:divide-slate-700/40" x-cloak>
+            <tbody x-show="activeTab === 'new'" x-cloak class="divide-y divide-slate-100/70 dark:divide-slate-700/40">
                 @forelse($newCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
-                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}</td>
+                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}
+                        </td>
                         <td class="px-4 py-3 text-xs">
                             <span
                                 class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
@@ -219,7 +213,7 @@
                             x-data="{
                                 showModal: false,
                                 showCancelledModal: false,
-                                showConfirmedModal: false, {{-- تم التأكيد على وجودها هنا --}}
+                                showConfirmedModal: false,
                                 checkStatus(e) {
                                     let selectedValue = e.target.value;
                                     let originalValue = e.target.getAttribute('data-original-value');
@@ -239,7 +233,6 @@
                                 }
                             }">
 
-                            <!-- فورم خفي -->
                             <form id="status-form-urgent-new-{{ $customer->id }}"
                                 action="{{ route('potential-customers.update-status', $customer->id) }}" method="POST"
                                 class="hidden">
@@ -254,9 +247,11 @@
                                 <x-potential-customers.action-buttons :customer="$customer" />
                             </div>
 
-                            <x-potential-customers.contacted-modal :customer="$customer" />
-                            <x-potential-customers.cancelled-modal :customer="$customer" />
-                            <x-potential-customers.confirmed-modal :customer="$customer" />
+                            <div x-cloak>
+                                <x-potential-customers.contacted-modal :customer="$customer" />
+                                <x-potential-customers.cancelled-modal :customer="$customer" />
+                                <x-potential-customers.confirmed-modal :customer="$customer" />
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -270,3 +265,8 @@
         </table>
     </div>
 </div>
+<style>
+    [x-cloak] {
+        display: none !important;
+    }
+</style>

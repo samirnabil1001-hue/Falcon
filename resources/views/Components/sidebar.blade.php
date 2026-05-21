@@ -29,6 +29,9 @@
         <x-sidebar-link :href="route('customer-follow-ups.index')" :active="request()->routeIs('customer-follow-ups.*')" icon="clock">
             Follow-ups Log
         </x-sidebar-link>
+           <x-sidebar-link :href="route('potential-customer-services.index')" :active="request()->routeIs('potential-customer-services.*')" icon="service">
+            service
+        </x-sidebar-link>
 
         <x-sidebar-link href="#" icon="settings"> 
             Settings 

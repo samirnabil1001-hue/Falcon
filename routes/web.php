@@ -8,6 +8,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\PotentialCustomerController;
 use App\Http\Controllers\CustomerFollowUpController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PotentialCustomerServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // 3. مسارات المتابعات والعمليات المتقدمة للعملاء (مرتبة بدقة لمنع تداخل المعرفات {id})
     Route::prefix('potential-customers')->group(function () {
-        
+
         // مسار العرض الرئيسي لجدول المتابعات
         Route::get('/follow-ups', [CustomerFollowUpController::class, 'index'])
             ->name('customer-follow-ups.index');
@@ -68,4 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
+Route::apiResource(
+    'potential-customer-services',
+    PotentialCustomerServiceController::class
+);
 require __DIR__ . '/auth.php';
