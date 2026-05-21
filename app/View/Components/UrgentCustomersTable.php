@@ -17,9 +17,9 @@ class UrgentCustomersTable extends Component
     {
         $user = Auth::user();
 
-        $this->newCustomers = $customerService->getLatestUrgentByStatus($user, 'new', 7);
+        $this->newCustomers = $customerService->getLatestUrgentByStatus($user, 'new', 6);
 
-        $this->contactedCustomers = $customerService->getLatestUrgentByStatus($user, 'contacted', 7);
+        $this->contactedCustomers = $customerService->getLatestUrgentByStatus($user, 'contacted', 6);
     }
 
     public function render()
