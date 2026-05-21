@@ -36,4 +36,9 @@ class PotentialCustomer extends Model
         // ربط المستخدم بالعملاء المحتملين بناءً على حقل added_by
         return $this->hasMany(PotentialCustomer::class, 'added_by');
     }
+    public function services(): HasMany
+    {
+        // هنا نخبر Laravel أن العميل لديه العديد من الخدمات في جدول الـ potential_customer_services
+        return $this->hasMany(PotentialCustomerService::class, 'potential_customer_id');
+    }
 }
