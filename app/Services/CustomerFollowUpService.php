@@ -17,18 +17,36 @@ class CustomerFollowUpService
      */
     public function getPaginatedCustomers(Request $request, int $perPage = 10): LengthAwarePaginator
     {
-        $query = PotentialCustomer::has('followUps')
-            ->withCount('followUps')
-            ->with(['followUps' => function ($query) {
-                $query->latest()->limit(1);
-            }]);
+        // البدء بالاستعلام وجلب الكاونت للمتابعات والخدمات معاً بأداء سريع
+        $query = PotentialCustomer::query()
+            ->where(function ($q) {
+                $q->has('followUps')
+                    ->orHas('services'); // 👈 يرجع العميل لو عنده متابعة أو لو عنده خدمة
+            })
+            ->withCount([
+                'followUps',
+                'services as services_count' // 👈 هيديك كاونت جاهز لعدد المرات في الجدول باسم services_count
+            ])
+            ->with([
+                'followUps' => function ($query) {
+                    $query->latest()->limit(1);
+                },
+                // جلب أحدث خدمة تم طلبها للعميل لعرض بياناتها مباشرة
+                'services' => function ($query) {
+                    $query->latest()->limit(1);
+                }
+            ]);
 
-        // تطبيق البحث
+        // تطبيق البحث (على العميل، المتابعات، أو الخدمات)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhereHas('services', function ($s) use ($search) {
+                        $s->where('service_type', 'like', "%{$search}%")
+                            ->orWhere('notes', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -37,18 +55,14 @@ class CustomerFollowUpService
             $query->where('status', $request->status);
         }
 
-        // تطبيق الفرز
+        // تطبيق الفرز والتأكد من الأعمدة المسموحة
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
-        
-        // التحقق من صحة أعمدة الفرز
-        $allowedSorts = ['name', 'created_at', 'follow_ups_count', 'status'];
+
+        $allowedSorts = ['name', 'created_at', 'follow_ups_count', 'services_count', 'status'];
+
         if (in_array($sortBy, $allowedSorts)) {
-            if ($sortBy === 'follow_ups_count') {
-                $query->orderBy('follow_ups_count', $sortOrder);
-            } else {
-                $query->orderBy($sortBy, $sortOrder);
-            }
+            $query->orderBy($sortBy, $sortOrder);
         } else {
             $query->latest();
         }
@@ -70,11 +84,11 @@ class CustomerFollowUpService
 
             CustomerFollowUp::create([
                 'potential_customer_id' => $customer->id,
-                'user_id'               => Auth::id(), 
-                'status'                => $data['status'],
-                'reason'                => $data['reason'] ?? null,
-                'next_follow_up_at'     => $data['next_follow_up_date'] ?? null,
-                'notes'                 => $data['notes'] ?? null,
+                'user_id' => Auth::id(),
+                'status' => $data['status'],
+                'reason' => $data['reason'] ?? null,
+                'next_follow_up_at' => $data['next_follow_up_date'] ?? null,
+                'notes' => $data['notes'] ?? null,
             ]);
 
             return $customer;
