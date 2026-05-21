@@ -106,12 +106,20 @@
                                         </div>
                                     </div>
 
-                                    <!-- عرض الملاحظات إن وجدت داخل صندوق مخصص متناسق مع اللون -->
-                                    @if ($item['notes'])
+                                    <!-- [تعديل مدمج 📝] عرض الملاحظات أو تفاصيل الخدمة عند الـ confirmed -->
+                                    @if ($item['notes'] || $item['status'] === 'confirmed' || $item['type'] === 'service')
                                         <div class="text-sm p-3 rounded-lg border mt-2 bg-white/80 dark:bg-slate-900/60
                                             {{ $item['type'] === 'service' ? 'text-emerald-800 dark:text-emerald-300 border-emerald-100 dark:border-emerald-500/20' : ($item['status'] === 'cancelled' ? 'text-rose-800 dark:text-rose-300 border-rose-100 dark:border-rose-500/20' : 'text-amber-800 dark:text-amber-300 border-amber-100 dark:border-amber-500/10') }}">
-                                            <span class="text-[11px] font-bold block mb-1 opacity-70">الملاحظات المسجلة:</span>
-                                            <p class="whitespace-pre-line">{{ $item['notes'] }}</p>
+                                            <span class="text-[11px] font-bold block mb-1 opacity-70">
+                                                {{ $item['notes'] ? 'الملاحظات المسجلة:' : 'تفاصيل الخدمة المؤكدة:' }}
+                                            </span>
+                                            <p class="whitespace-pre-line">
+                                                @if($item['notes'])
+                                                    {{ $item['notes'] }}
+                                                @else
+                                                    @if($item['reason'])  {{ $item['reason'] }} @endif
+                                                @endif
+                                            </p>
                                         </div>
                                     @endif
 
@@ -194,17 +202,19 @@
                                     x-text="selectedLog.reason"></p>
                             </div>
 
-                            <!-- الملاحظات الداخلية التفصيلية -->
+                            <!-- الملاحظات الداخلية التفصيلية / أو دعم نوع الخدمة بالبوب اب أيضاً -->
                             <div>
                                 <span class="block text-xs mb-1 opacity-70"
-                                    :class="selectedLog.type === 'service' ? 'text-emerald-800 dark:text-slate-400' : (selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400')">الملاحظات والتفاصيل الداخلية المسجلة:</span>
+                                    :class="selectedLog.type === 'service' ? 'text-emerald-800 dark:text-slate-400' : (selectedLog.status === 'cancelled' ? 'text-rose-800 dark:text-slate-400' : 'text-amber-800 dark:text-slate-400')">
+                                    <span x-text="selectedLog.notes ? 'الملاحظات والتفاصيل الداخلية المسجلة:' : 'تفاصيل الإجراء الحالية:'"></span>
+                                </span>
                                 <p class="text-xs whitespace-pre-line bg-white/80 dark:bg-slate-900/50 p-2.5 rounded-lg border max-h-[150px] overflow-y-auto text-gray-700 dark:text-slate-300"
                                     :class="{
                                         'border-emerald-100 dark:border-slate-700': selectedLog.type === 'service',
                                         'border-rose-100 dark:border-slate-700': selectedLog.type !== 'service' && selectedLog.status === 'cancelled',
                                         'border-amber-100 dark:border-slate-700': selectedLog.type !== 'service' && selectedLog.status !== 'cancelled'
                                     }"
-                                    x-text="selectedLog.notes || 'لا توجد ملاحظات تفصيلية إضافية مكتوبة لهذا السجل.'"></p>
+                                    x-text="selectedLog.notes ? selectedLog.notes : ((selectedLog.status === 'confirmed' || selectedLog.type === 'service') ? 'نوع الخدمة المعتمدة: ' + selectedLog.status_label : 'لا توجد ملاحظات تفصيلية إضافية مكتوبة لهذا السجل.')"></p>
                             </div>
 
                             <!-- التواريخ والمواعيد أسفل البوب اب -->
