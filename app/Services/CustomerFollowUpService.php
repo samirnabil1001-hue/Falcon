@@ -17,27 +17,25 @@ class CustomerFollowUpService
      */
     public function getPaginatedCustomers(Request $request, int $perPage = 10): LengthAwarePaginator
     {
-        // البدء بالاستعلام وجلب الكاونت للمتابعات والخدمات معاً بأداء سريع
         $query = PotentialCustomer::query()
             ->where(function ($q) {
                 $q->has('followUps')
-                    ->orHas('services'); // يرجع العميل لو عنده متابعة أو لو عنده خدمة
+                    ->orHas('services');
             })
             ->withCount([
                 'followUps',
-                'services as services_count' // هيديك كاونت جاهز لعدد المرات في الجدول باسم services_count
+                'services as services_count'
             ])
             ->with([
                 'followUps' => function ($query) {
                     $query->latest()->limit(1);
                 },
-                // جلب أحدث خدمة تم طلبها للعميل لعرض بياناتها مباشرة
                 'services' => function ($query) {
                     $query->latest()->limit(1);
                 }
             ]);
 
-        // تطبيق البحث (على العميل، المتابعات، أو الخدمات)
+        // تطبيق البحث
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -55,22 +53,32 @@ class CustomerFollowUpService
             $query->where('status', $request->status);
         }
 
-        // 👇 تطبيق فلترة الموظف الذكية (تبحث في المتابعات أو الخدمات التابعة للموظف)
-        if ($request->filled('user_id')) {
+        // 👇 الفلترة الذكية للموظفين والمستخدم الحالي
+        if ($request->get('my_clients') == '1') {
+            // إذا تم تفعيل checkbox "عملائي" -> فلترة بالـ ID للمستخدم الحالي مباشرة
+            $currentUserId = auth()->id();
+            $query->where(function ($q) use ($currentUserId) {
+                $q->whereHas('followUps', function ($f) use ($currentUserId) {
+                    $f->where('user_id', $currentUserId);
+                })->orWhereHas('services', function ($s) use ($currentUserId) {
+                    $s->where('user_id', $currentUserId);
+                });
+            });
+        } elseif ($request->filled('user_id')) {
+            // إذا لم يُفعل خيار عملائي، نتحقق من اختيار موظف آخر من المنسدلة
             $userId = $request->user_id;
             $query->where(function ($q) use ($userId) {
                 $q->whereHas('followUps', function ($f) use ($userId) {
                     $f->where('user_id', $userId);
                 })->orWhereHas('services', function ($s) use ($userId) {
-                    $s->where('user_id', $userId); // تأكد من وجود حقل user_id في جدول الخدمات إذا كنت تحتاج فلترته أيضاً
+                    $s->where('user_id', $userId);
                 });
             });
         }
 
-        // تطبيق الفرز والتأكد من الأعمدة المسموحة
+        // تطبيق الفرز
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
-
         $allowedSorts = ['name', 'created_at', 'follow_ups_count', 'services_count', 'status'];
 
         if (in_array($sortBy, $allowedSorts)) {
