@@ -5,11 +5,9 @@
 
             <!-- جهة اليمين: العنوان الرئيسي -->
             <div class="flex-shrink-0">
-                <h2
-                    class="font-black text-2xl tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <h2 class="font-black text-2xl tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     لوحة التحكم
-                    <span
-                        class="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md">
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md">
                         المدير التنفيذي
                     </span>
                 </h2>
@@ -18,27 +16,9 @@
             <!-- جهة اليسار: أدوات التحكم والفلترة -->
             <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto justify-end">
 
-                <!-- فلتر الموظفين المنسدل -->
-                <div class="relative min-w-[220px] w-full sm:w-auto">
-                    <!-- لاحظ إضافة الاستايل المباشر لمنع ظهور السهم الافتراضي في بعض المتصفحات القديمة -->
-                    <select id="userFilter" onchange="filterByUser(this.value)"
-                        class="w-full pr-4 pl-10 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-500 appearance-none cursor-pointer transition-all duration-200 shadow-sm hover:border-slate-300 dark:hover:border-slate-600"
-                        style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
-                        <option value="">كل الموظفين</option>
-                        @foreach ($usersWithCustomers as $user)
-                            <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }} ({{ $user->customers_count }})
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <!-- أيقونة السهم المخصصة بتاعتنا (جهة اليسار تماماً) -->
-                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
+                <!-- فلتر الموظفين المنسدل الذكي والمفصول -->
+                <div class="min-w-[220px] w-full sm:w-auto">
+                    <x-user-filter-dropdown :users="$usersWithCustomers" />
                 </div>
 
                 <!-- زر عرض العملاء -->
@@ -59,8 +39,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 font-sans text-right" dir="rtl">
 
         <!-- كرت: إجمالي العملاء -->
-        <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">إجمالي العملاء</h3>
@@ -87,13 +66,11 @@
         </div>
 
         <!-- كرت: قيد المتابعة -->
-        <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">قيد المتابعة</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}
-                    </p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($pendingCount) }}</p>
                 </div>
                 <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,13 +91,11 @@
         </div>
 
         <!-- كرت: تم التنفيذ -->
-        <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">تم التنفيذ</h3>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                        {{ number_format($confirmedCount) }}</p>
+                    <p class="text-3xl font-bold text-slate-800 dark:text-white mt-1">{{ number_format($confirmedCount) }}</p>
                 </div>
                 <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                     <svg class="w-8 h-8 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,8 +116,7 @@
         </div>
 
         <!-- كرت: نسبة نجاح الإغلاق الكلية -->
-        <div
-            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium">معدل نجاح الصفقات (Win Rate)</h3>
@@ -172,26 +146,21 @@
 
         <!-- الصف الأول: الرسوم البيانية الدائرية الصغيرة -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية
-                    ({{ $opRatio }}%)</h3>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">النسبة التشغيلية ({{ $opRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartOpRatio"></canvas>
                 </div>
             </div>
 
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">معدل الانتظار
-                    ({{ $waitRatio }}%)</h3>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">معدل الانتظار ({{ $waitRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartWaitRatio"></canvas>
                 </div>
             </div>
 
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
                 <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل مصادر العملاء</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartSources"></canvas>
@@ -201,19 +170,15 @@
 
         <!-- الصف الثاني: المقارنات الأفقية والعمودية -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي (
-                    {{ $closeRatio }}% )</h3>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة التنفيذ من الإجمالي ( {{ $closeRatio }}% )</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartExecutionTotal"></canvas>
                 </div>
             </div>
 
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض والعملاء غير المهتمين
-                    ({{ $rejectRatio }}%)</h3>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">نسبة الرفض والعملاء غير المهتمين ({{ $rejectRatio }}%)</h3>
                 <div class="relative" style="height: 200px;">
                     <canvas id="chartRejectRatio"></canvas>
                 </div>
@@ -223,21 +188,17 @@
         <!-- الصف الثالث: المقارنة المركبة وجدول أفضل الموظفين -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- مخطط التوزيع النهائي -->
-            <div
-                class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل النتائج النهائية (التنفيذ
-                    مقابل الرفض والمتابعة)</h3>
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+                <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">تحليل النتائج النهائية (التنفيذ مقابل الرفض والمتابعة)</h3>
                 <div class="relative" style="height: 300px;">
                     <canvas id="chartFinalComparison"></canvas>
                 </div>
             </div>
 
             <!-- جدول أفضل 5 موظفين مبيعاً -->
-            <div
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
                 <div>
-                    <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">أفضل 5 موظفين (المبيعات
-                        المؤكدة)</h3>
+                    <h3 class="text-slate-600 dark:text-slate-400 text-sm font-bold mb-4">أفضل 5 موظفين (المبيعات المؤكدة)</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right border-collapse">
                             <thead>
@@ -256,8 +217,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="2" class="py-4 text-center text-slate-400 text-xs">لا توجد
-                                            بيانات مبيعات مؤكدة بعد</td>
+                                        <td colspan="2" class="py-4 text-center text-slate-400 text-xs">لا توجد بيانات مبيعات مؤكدة بعد</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -272,17 +232,68 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // الدالة المسؤولة عن تحويل الصفحة وإضافة الـ user_id لرابط الـ URL عند التغيير
-    function filterByUser(userId) {
+    // تعديل الدالة لتعمل بالتوافق مع الـ Custom Component الذي يستدعي selectUser()
+    function selectUser(userId, userName) {
         const url = new URL(window.location.href);
         if (userId) {
             url.searchParams.set('user_id', userId);
         } else {
-            url.searchParams.delete('user_id'); // إذا اختار "كل الموظفين" يتم مسح الفلتر
+            url.searchParams.delete('user_id'); // عند اختيار "جميع الموظفين"
         }
         window.location.href = url.toString();
     }
 
+    // دوال تصفية المكون المخصص للبحث الفازي الداخلي
+    function normalizeArabic(text) {
+        if (!text) return '';
+        return text.trim().toLowerCase()
+            .replace(/[أإآا]/g, 'ا')
+            .replace(/[ةه]/g, 'ه')
+            .replace(/ى/g, 'ي')
+            .replace(/[\u064B-\u0652]/g, '');
+    }
+
+    function filterDropdownOptions() {
+        const rawInput = document.getElementById('dropdown-search').value;
+        const searchInput = normalizeArabic(rawInput);
+        const options = document.querySelectorAll('.option-item');
+        
+        options.forEach(option => {
+            const rawName = option.getAttribute('data-name');
+            const normalizedName = normalizeArabic(rawName);
+            
+            if (normalizedName.includes(searchInput) || rawName === "") {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
+
+    function toggleDropdown() {
+        const menu = document.getElementById('dropdown-menu');
+        const arrow = document.getElementById('dropdown-arrow');
+        menu.classList.toggle('hidden');
+        if(arrow) arrow.classList.toggle('rotate-180');
+        
+        if (!menu.classList.contains('hidden')) {
+            const searchInput = document.getElementById('dropdown-search');
+            if(searchInput) searchInput.focus();
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const container = document.getElementById('custom-dropdown-container');
+        const menu = document.getElementById('dropdown-menu');
+        const arrow = document.getElementById('dropdown-arrow');
+        
+        if (container && !container.contains(event.target) && menu) {
+            menu.classList.add('hidden');
+            if(arrow) arrow.classList.remove('rotate-180');
+        }
+    });
+
+    // كود الرسوم البيانية (Charts) بدون تعديل
     document.addEventListener('DOMContentLoaded', function() {
         const isDark = document.documentElement.classList.contains('dark');
         const textColor = isDark ? '#94a3b8' : '#64748b';
@@ -291,11 +302,7 @@
 
         const donutOptions = {
             cutout: '75%',
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
+            plugins: { legend: { display: false } },
             maintainAspectRatio: false
         };
 
@@ -346,9 +353,7 @@
                 labels: sourceLabels,
                 datasets: [{
                     data: sourceData,
-                    backgroundColor: [
-                        '#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6'
-                    ],
+                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6'],
                     borderWidth: 0
                 }]
             },
@@ -358,13 +363,7 @@
                     legend: {
                         display: true,
                         position: 'bottom',
-                        labels: {
-                            boxWidth: 12,
-                            color: textColor,
-                            font: {
-                                size: 10
-                            }
-                        }
+                        labels: { boxWidth: 12, color: textColor, font: { size: 10 } }
                     }
                 }
             }
@@ -384,22 +383,10 @@
             options: {
                 indexAxis: 'y',
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    x: {
-                        ticks: {
-                            color: textColor
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            color: textColor
-                        }
-                    }
+                    x: { ticks: { color: textColor } },
+                    y: { ticks: { color: textColor } }
                 }
             }
         });
@@ -417,11 +404,7 @@
             },
             options: {
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+                plugins: { legend: { display: false } }
             }
         });
 
@@ -430,41 +413,17 @@
             type: 'bar',
             data: {
                 labels: ['توزيع الإجمالي'],
-                datasets: [{
-                        label: 'تم التنفيذ',
-                        data: [confirmedCount],
-                        backgroundColor: '#10b981',
-                        borderRadius: 5
-                    },
-                    {
-                        label: 'غير مهتم',
-                        data: [cancelledCount],
-                        backgroundColor: '#f43f5e',
-                        borderRadius: 5
-                    },
-                    {
-                        label: 'قيد المتابعة',
-                        data: [pendingCount],
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 5
-                    }
+                datasets: [
+                    { label: 'تم التنفيذ', data: [confirmedCount], backgroundColor: '#10b981', borderRadius: 5 },
+                    { label: 'غير مهتم', data: [cancelledCount], backgroundColor: '#f43f5e', borderRadius: 5 },
+                    { label: 'قيد المتابعة', data: [pendingCount], backgroundColor: '#f59e0b', borderRadius: 5 }
                 ]
             },
             options: {
                 maintainAspectRatio: false,
                 scales: {
-                    x: {
-                        stacked: true,
-                        ticks: {
-                            color: textColor
-                        }
-                    },
-                    y: {
-                        stacked: true,
-                        ticks: {
-                            color: textColor
-                        }
-                    }
+                    x: { stacked: true, ticks: { color: textColor } },
+                    y: { stacked: true, ticks: { color: textColor } }
                 }
             }
         });
