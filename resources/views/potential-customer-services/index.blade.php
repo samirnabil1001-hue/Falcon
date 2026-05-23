@@ -7,9 +7,8 @@
         <x-potential-customer-services.header :totalCount="$services->total()" />
 
         <!-- لوحة الفلترة والبحث -->
-        <x-potential-customer-services.filter-panel :search="request('search')" :dateFrom="request('date_from')" :dateTo="request('date_to')"
-            :serviceType="request('service_type')" :userId="request('user_id')" :sortBy="request('sort_by', 'created_at')" :sortOrder="request('sort_order', 'desc')" />
-
+        <x-potential-customer-services.filter-panel :users="$users" :search="request('search')" :dateFrom="request('date_from')"
+            :dateTo="request('date_to')" :serviceType="request('service_type')" :userId="request('user_id')" :sortBy="request('sort_by', 'created_at')" :sortOrder="request('sort_order', 'desc')" />
         <!-- جدول البيانات -->
         <div
             class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">

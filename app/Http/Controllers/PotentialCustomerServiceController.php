@@ -54,8 +54,10 @@ class PotentialCustomerServiceController extends Controller
             $query->where('service_type', $request->service_type);
         }
 
-        // Filter by employee
-        if ($request->filled('user_id')) {
+        // تصفية السجلات حسب المستخدم الحالي (Checkbox) أو الموظف المختار (Dropdown)
+        if ($request->boolean('only_me')) {
+            $query->where('user_id', auth()->id());
+        } elseif ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
@@ -71,7 +73,7 @@ class PotentialCustomerServiceController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Sorting
+        | Sorting & Execution
         |--------------------------------------------------------------------------
         */
         $allowedSorts = ['created_at', 'service_type', 'id'];
@@ -80,14 +82,18 @@ class PotentialCustomerServiceController extends Controller
 
         $query->orderBy($sortBy, $sortOrder);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pagination
-        |--------------------------------------------------------------------------
-        */
         $services = $query->paginate(10)->appends($request->query());
 
-        return view('potential-customer-services.index', compact('services'));
+        // اقتباس نفس الفكرة الذكية من الـ CEO Dashboard: 
+        // جلب الموظفين الذين لديهم خدمات مسجلة بالفعل مع استبعاد المستخدم الحالي (أنت)
+        $users = \App\Models\User::join('potential_customer_services', 'users.id', '=', 'potential_customer_services.user_id')
+            ->select('users.id', 'users.name', \DB::raw('count(potential_customer_services.id) as customers_count'))
+            ->where('users.id', '!=', auth()->id()) // استبعاد المستخدم الحالي
+            ->groupBy('users.id', 'users.name')
+            ->orderBy('users.name')
+            ->get();
+
+        return view('potential-customer-services.index', compact('services', 'users'));
     }
     /**
      * Store a newly created resource in storage.
