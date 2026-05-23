@@ -32,49 +32,8 @@
             </select>
         </div>
 
-        <!-- Custom User Filter -->
-        <div class="relative" id="custom-dropdown-container">
-            <input type="hidden" name="user_id" id="hidden-user-id" value="{{ request('user_id') }}">
-            
-            <button type="button" id="dropdown-btn" onclick="toggleDropdown()"
-                class="w-full text-right flex justify-between items-center text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer py-2.5 px-3 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span id="dropdown-label">
-                    @if(request('user_id') && $users->firstWhere('id', request('user_id')))
-                        {{ $users->firstWhere('id', request('user_id'))->name }}
-                    @else
-                        جميع الموظفين
-                    @endif
-                </span>
-                <svg class="h-4 w-4 text-slate-400 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-
-            <div id="dropdown-menu" class="hidden absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
-                <!-- خانة البحث الداخلية -->
-                <div class="p-2 border-b border-slate-100 dark:border-slate-700">
-                    <input type="text" id="dropdown-search" oninput="filterDropdownOptions()" placeholder="ابحث عن موظف (أحمد، عبدالله...)"
-                        class="w-full text-xs rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 focus:outline-none focus:border-violet-500">
-                </div>
-                <!-- خيارات الموظفين مع الـ Scroll -->
-                <div id="options-list" class="max-h-[190px] overflow-y-auto text-sm text-slate-700 dark:text-slate-200">
-                    <div onclick="selectUser('', 'جميع الموظفين')" class="option-item px-3 py-2 hover:bg-violet-50 dark:hover:bg-violet-950/40 cursor-pointer transition-colors" data-name="">
-                        جميع الموظفين
-                    </div>
-                    @if($users)
-                        @foreach ($users as $user)
-                            @if($user->id !== auth()->id())
-                                <div onclick="selectUser('{{ $user->id }}', '{{ $user->name }}')" 
-                                     class="option-item px-3 py-2 hover:bg-violet-50 dark:hover:bg-violet-950/40 cursor-pointer transition-colors {{ request('user_id') == $user->id ? 'bg-violet-500/10 font-medium text-violet-600' : '' }}" 
-                                     data-name="{{ $user->name }}">
-                                    {{ $user->name }}
-                                </div>
-                            @endif
-                        @endforeach
-                    @endif
-                </div>
-            </div>
-        </div>
+        <!-- Custom User Filter Component -->
+        <x-user-filter-dropdown :users="$users" />
 
         <!-- Checkbox "عملائي" السريع -->
         <div class="flex items-center justify-start px-2">
@@ -105,27 +64,26 @@
 </form>
 
 <script>
-    // دالة ذكية لتنظيف وتوحيد الحروف العربية المتشابهة لتسهيل البحث الفازي (Fuzzy Search)
+    // دالة توحيد الحروف العربية
     function normalizeArabic(text) {
         if (!text) return '';
         return text.trim().toLowerCase()
-            .replace(/[أإآا]/g, 'ا')  // توحيد كل أشكال الألف إلى ألف عادية
-            .replace(/[ةه]/g, 'ه')    // توحيد التاء المربوطة والهاء
-            .replace(/ى/g, 'ي')       // توحيد الألف المقصورة والياء
-            .replace(/[\u064B-\u0652]/g, ''); // إزالة التشكيل تماماً إن وُجد
+            .replace(/[أإآا]/g, 'ا')
+            .replace(/[ةه]/g, 'ه')
+            .replace(/ى/g, 'ي')
+            .replace(/[\u064B-\u0652]/g, '');
     }
 
-    // تصفية الموظفين بناءً على الحروف المتشابهة والمتقاربة
+    // تصفية الموظفين بناءً على البحث المدخل
     function filterDropdownOptions() {
         const rawInput = document.getElementById('dropdown-search').value;
-        const searchInput = normalizeArabic(rawInput); // النص المدخل بعد التنظيف
+        const searchInput = normalizeArabic(rawInput);
         const options = document.querySelectorAll('.option-item');
         
         options.forEach(option => {
             const rawName = option.getAttribute('data-name');
-            const normalizedName = normalizeArabic(rawName); // اسم الموظف بعد التنظيف
+            const normalizedName = normalizeArabic(rawName);
             
-            // التحقق مما إذا كان اسم الموظف يحتوي على الحروف المتتابعة المدخلة
             if (normalizedName.includes(searchInput) || rawName === "") {
                 option.style.display = 'block';
             } else {
@@ -136,7 +94,7 @@
 
     function toggleDropdown() {
         const checkbox = document.getElementById('my-clients-checkbox');
-        if (checkbox.checked) return;
+        if (checkbox && checkbox.checked) return;
 
         const menu = document.getElementById('dropdown-menu');
         const arrow = document.getElementById('dropdown-arrow');
@@ -153,7 +111,7 @@
         document.getElementById('dropdown-label').innerText = name;
         document.getElementById('dropdown-menu').classList.add('hidden');
         document.getElementById('dropdown-arrow').classList.remove('rotate-180');
-        document.getElementById('filter-form').submit();
+        document.getElementById('filter-form').submit(); // سيعمل لأن الـ input المخفي ما زال داخل الـ form
     }
 
     function handleCheckboxChange(checkbox) {
@@ -161,27 +119,30 @@
         if (checkbox.checked) {
             document.getElementById('hidden-user-id').value = '';
             document.getElementById('dropdown-label').innerText = 'جميع الموظفين';
-            dropdownBtn.disabled = true;
+            if(dropdownBtn) dropdownBtn.disabled = true;
         } else {
-            dropdownBtn.disabled = false;
+            if(dropdownBtn) dropdownBtn.disabled = false;
         }
         checkbox.form.submit();
     }
 
+    // إغلاق القائمة عند النقر خارجها
     document.addEventListener('click', function(event) {
         const container = document.getElementById('custom-dropdown-container');
         const menu = document.getElementById('dropdown-menu');
         const arrow = document.getElementById('dropdown-arrow');
         
-        if (container && !container.contains(event.target)) {
+        if (container && !container.contains(event.target) && menu) {
             menu.classList.add('hidden');
-            arrow.classList.remove('rotate-180');
+            if(arrow) arrow.classList.remove('rotate-180');
         }
     });
 
     document.addEventListener("DOMContentLoaded", function() {
-        if (document.getElementById('my-clients-checkbox').checked) {
-            document.getElementById('dropdown-btn').disabled = true;
+        const checkbox = document.getElementById('my-clients-checkbox');
+        const dropdownBtn = document.getElementById('dropdown-btn');
+        if (checkbox && checkbox.checked && dropdownBtn) {
+            dropdownBtn.disabled = true;
         }
     });
 </script>
