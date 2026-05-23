@@ -1,10 +1,14 @@
+@props(['search', 'status', 'sortBy', 'sortOrder', 'users'])
+
 <form action="{{ url()->current() }}" method="GET"
-    class=" mb-0 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+    class="mb-0 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
 
     <input type="hidden" name="sort_by" value="{{ $sortBy }}">
     <input type="hidden" name="sort_order" value="{{ $sortOrder }}">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {{-- تعديل الـ grid ليتناسب مع زيادة الحقول (4 أعمدة في الشاشات الكبيرة بدلاً من 3) --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
         <!-- Search Field -->
         <div class="relative">
             <input type="text" name="search" value="{{ $search }}" placeholder="بحث بالاسم أو رقم الهاتف..."
@@ -31,17 +35,34 @@
             </select>
         </div>
 
+        <!-- User Filter (المنسدل الجديد الخاص بالموظفين) -->
+        <div>
+            <select name="user_id" onchange="this.form.submit()"
+                class="w-full text-sm rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer py-2.5">
+                <option value="">جميع الموظفين</option>
+                @if($users)
+                    @foreach ($users as $user)
+                        <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
+                    @endforeach
+                @endif
+            </select>
+        </div>
+
         <!-- Actions -->
-        <div class="flex gap-2 justify-end">
-            @if ($search || $status)
+        <div class="flex gap-2 justify-end items-center lg:col-span-1 md:col-span-2">
+            @if ($search || $status || request('user_id'))
                 <a href="{{ route('customer-follow-ups.index') }}"
                     class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center transition-colors">
-                    clear </a>
+                    إلغاء الفلترة 
+                </a>
             @endif
 
             <button type="submit"
-                class="w-full sm:w-auto bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-1 px-5 rounded-xl transition-all shadow-sm">
-                apply layout filter </button>
+                class="w-full sm:w-auto bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2.5 px-5 rounded-xl transition-all shadow-sm">
+                تطبيق الفلترة
+            </button>
         </div>
     </div>
 </form>

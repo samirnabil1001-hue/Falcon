@@ -6,6 +6,7 @@ use App\Services\CustomerFollowUpService;
 use App\Models\PotentialCustomer;
 use App\Enums\PotentialCustomerStatus;
 use App\Enums\CompanyService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 
@@ -24,8 +25,8 @@ class CustomerFollowUpController extends Controller
     public function index(Request $request)
     {
         $customers = $this->followUpService->getPaginatedCustomers($request, 10);
-
-        return view('potential_customers.follow-ups-index', compact('customers'));
+        $users = User::where('is_active', true)->get();
+        return view('potential_customers.follow-ups-index', compact('customers','users'));
     }
 
     /**

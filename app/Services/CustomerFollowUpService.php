@@ -21,11 +21,11 @@ class CustomerFollowUpService
         $query = PotentialCustomer::query()
             ->where(function ($q) {
                 $q->has('followUps')
-                    ->orHas('services'); // 👈 يرجع العميل لو عنده متابعة أو لو عنده خدمة
+                    ->orHas('services'); // يرجع العميل لو عنده متابعة أو لو عنده خدمة
             })
             ->withCount([
                 'followUps',
-                'services as services_count' // 👈 هيديك كاونت جاهز لعدد المرات في الجدول باسم services_count
+                'services as services_count' // هيديك كاونت جاهز لعدد المرات في الجدول باسم services_count
             ])
             ->with([
                 'followUps' => function ($query) {
@@ -53,6 +53,18 @@ class CustomerFollowUpService
         // تطبيق فلترة الحالة
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // 👇 تطبيق فلترة الموظف الذكية (تبحث في المتابعات أو الخدمات التابعة للموظف)
+        if ($request->filled('user_id')) {
+            $userId = $request->user_id;
+            $query->where(function ($q) use ($userId) {
+                $q->whereHas('followUps', function ($f) use ($userId) {
+                    $f->where('user_id', $userId);
+                })->orWhereHas('services', function ($s) use ($userId) {
+                    $s->where('user_id', $userId); // تأكد من وجود حقل user_id في جدول الخدمات إذا كنت تحتاج فلترته أيضاً
+                });
+            });
         }
 
         // تطبيق الفرز والتأكد من الأعمدة المسموحة
