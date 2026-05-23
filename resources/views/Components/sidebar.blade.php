@@ -33,7 +33,7 @@
             service
         </x-sidebar-link>
 
-        <x-sidebar-link href="#" icon="settings"> 
+        <x-sidebar-link :href="route('profile.edit')"  icon="settings"> 
             Settings 
         </x-sidebar-link>
     </nav>

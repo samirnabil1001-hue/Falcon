@@ -18,8 +18,9 @@
 
 <body class="font-sans text-gray-900 antialiased bg-gray-100 dark:bg-gray-950">
     
-    @if(request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.request'))
-        <!-- 1. تصميم البطاقة المخصص لصفحات الدخول والتسجيل الافتراضية -->
+    <!-- تم تعديل الشرط هنا ليشمل صفحات التحقق من الإيميل وتغيير كلمة المرور لتظهر داخل البطاقة وفي المنتصف -->
+    @if(request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.*') || request()->routeIs('verification.*'))
+        <!-- 1. تصميم البطاقة المخصص لصفحات الدخول، التسجيل، التحقق، واستعادة كلمة المرور -->
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900 px-4">
             <div class="mb-2">
                 <a href="/">
