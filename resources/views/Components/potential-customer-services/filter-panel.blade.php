@@ -27,7 +27,7 @@
     }
 @endphp
 
-<form method="GET" action="{{ url()->current() }}" x-data="{ onlyMe: {{ $onlyMe ? 'true' : 'false' }} }"
+<form method="GET" action="{{ url()->current() }}" id="filter-search-form" x-data="{ onlyMe: {{ $onlyMe ? 'true' : 'false' }} }"
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-3 py-4 shrink-0 items-end text-right"
     dir="rtl">
 
@@ -37,17 +37,15 @@
 
     <!-- 1. البحث العام (الأكثر أهمية - مساحة 3 أعمدة) -->
     <div class="flex flex-col gap-1 lg:col-span-3">
-        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">البحث
-            العام</label>
+        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">البحث العام</label>
         <input type="text" name="search" value="{{ $search }}" placeholder="ابحث بالملاحظات، الهاتف..."
             class="w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all py-2 px-3">
     </div>
 
     <!-- 2. نوع الخدمة (مساحة عمودين) -->
     <div class="flex flex-col gap-1 lg:col-span-2">
-        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">نوع
-            الخدمة</label>
-        <select name="service_type"
+        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">نوع الخدمة</label>
+        <select name="service_type" onchange="document.getElementById('filter-search-form').submit();"
             class="w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all py-2 px-3">
             <option value="">كل الخدمات</option>
             @foreach (\App\Enums\CompanyService::cases() as $serviceCase)
@@ -64,21 +62,20 @@
     <!-- 4. تاريخ من (مساحة عمودين) -->
     <div class="flex flex-col gap-1 lg:col-span-2">
         <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">من تاريخ</label>
-        <input type="date" name="date_from" value="{{ $dateFrom }}"
+        <input type="date" name="date_from" value="{{ $dateFrom }}" onchange="document.getElementById('filter-search-form').submit();"
             class="w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all py-2 px-3">
     </div>
 
     <!-- 5. تاريخ إلى (مساحة عمودين) -->
     <div class="flex flex-col gap-1 lg:col-span-2">
-        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">إلى
-            تاريخ</label>
-        <input type="date" name="date_to" value="{{ $dateTo }}"
+        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">إلى تاريخ</label>
+        <input type="date" name="date_to" value="{{ $dateTo }}" onchange="document.getElementById('filter-search-form').submit();"
             class="w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all py-2 px-3">
     </div>
+
     <div class="flex flex-col gap-1 lg:col-span-2">
-        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">الموظف
-            المسؤول</label>
-        <select name="user_id" :disabled="onlyMe"
+        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">الموظف المسؤول</label>
+        <select name="user_id" :disabled="onlyMe" onchange="document.getElementById('filter-search-form').submit();"
             :class="onlyMe ? 'opacity-40 cursor-not-allowed bg-gray-100 dark:bg-slate-800 text-gray-400' : ''"
             class="w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all py-2 px-3">
             <option value="">كل الموظفين</option>
@@ -89,15 +86,15 @@
             @endforeach
         </select>
     </div>
+
     <!-- 6. خيار "سجلاتي" وأزرار التفعيل (في نهاية الفلتر تماماً - مساحة عمود واحد واسع) -->
     <div class="flex flex-col gap-1 lg:col-span-1 w-full min-w-[90px]">
         <!-- الخيار التلقائي محاذاته لأعلى الأزرار لمنع تداخل النصوص أفقياً -->
         <label class="inline-flex items-center gap-1.5 cursor-pointer select-none mb-1 self-start">
-            <input type="checkbox" name="only_me" value="1" x-model="onlyMe"
+            <input type="checkbox" name="only_me" value="1" x-model="onlyMe" onchange="document.getElementById('filter-search-form').submit();"
                 class="w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-offset-slate-900">
             <span class="text-[11px] font-bold text-gray-600 dark:text-slate-300 whitespace-nowrap">سجلاتي</span>
         </label>
-
 
         <!-- أزرار الإرسال والمسح السريع -->
         <div class="flex gap-1 w-full">
