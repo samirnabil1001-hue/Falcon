@@ -1,4 +1,14 @@
 <x-guest-layout>
+    <!-- رابط العودة إلى الرئيسية فوق البطاقة مباشرة -->
+    <div class="mb-4">
+        <a class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group" href="{{ url('/') }}">
+            <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            العودة للرئيسية
+        </a>
+    </div>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 

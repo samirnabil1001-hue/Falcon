@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
 
 <head>
     <meta charset="utf-8">
@@ -16,21 +16,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-        <div>
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </div>
+<body class="font-sans text-gray-900 antialiased bg-gray-100 dark:bg-gray-950">
+    
+    @if(request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.request'))
+        <!-- 1. تصميم البطاقة المخصص لصفحات الدخول والتسجيل الافتراضية -->
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900 px-4">
+            <div class="mb-2">
+                <a href="/">
+                    <x-application-logo class="w-16 h-16 fill-current text-indigo-600 dark:text-indigo-400" />
+                </a>
+            </div>
 
-        <div
-            class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+            <div class="w-full sm:max-w-md mt-4 px-8 py-8 bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden sm:rounded-2xl transition-all">
+                {{ $slot }}
+            </div>
+        </div>
+    @else
+        <!-- 2. تصميم حر طليق بدون أي قيود مخصص للـ Landing Page -->
+        <div class="min-h-screen">
             {{ $slot }}
         </div>
-    </div>
-    <x-toaster />
+    @endif
 
+    <x-toaster />
 </body>
 
 </html>
