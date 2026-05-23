@@ -4,24 +4,30 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\PotentialCustomer;
-    use App\Enums\PotentialCustomerStatus;
-    use Illuminate\Auth\Access\Response;
+use App\Enums\PotentialCustomerStatus;
+use Illuminate\Auth\Access\Response;
 
 class PotentialCustomerPolicy
 {
     /**
-     * التحقق من صلاحية التحديث العام
+     * التحقق من صلاحية العرض الموحد للعميل
+     */
+    public function view(User $user, PotentialCustomer $potentialCustomer): bool
+    {
+        return $user->isCEO() || $user->id === $potentialCustomer->user_id;
+    }
+
+    /**
+     * التحقق من صلاحية التحديث العام (الاسم، الهاتف، المصدر)
      */
     public function update(User $user, PotentialCustomer $potentialCustomer): bool
     {
-        // تم التعديل من user_id إلى added_by
-        return $user->id === $potentialCustomer->added_by;
+        return $user->isCEO() || $user->id === $potentialCustomer->user_id;
     }
 
     /**
      * التحقق من صلاحية تحديث الحالة فقط
      */
-
     public function updateStatus(User $user, PotentialCustomer $potentialCustomer): Response
     {
         // الحصول على القيمة النصية للحالة الحالية للعميل
@@ -29,7 +35,7 @@ class PotentialCustomerPolicy
             ? $potentialCustomer->status->value
             : $potentialCustomer->status;
 
-        // 1. شرط الفرونت: إذا كانت الحالة مغلقة (مؤكدة أو ملغية) يمنع التعديل نهائياً لأي رتبة
+        // 1. شرط الحظر: إذا كانت الحالة مغلقة (مؤكدة أو ملغية) يمنع التعديل نهائياً لأي رتبة
         $lockedStatuses = [
             PotentialCustomerStatus::CONFIRMED->value,
             PotentialCustomerStatus::CANCELLED->value
@@ -44,7 +50,7 @@ class PotentialCustomerPolicy
             return Response::allow();
         }
 
-        if ($user->id === $potentialCustomer->added_by) {
+        if ($user->id === $potentialCustomer->user_id) {
             return Response::allow();
         }
 
@@ -56,6 +62,15 @@ class PotentialCustomerPolicy
      */
     public function delete(User $user, PotentialCustomer $potentialCustomer): bool
     {
-        return $user->id === $potentialCustomer->added_by;
+        return $user->isCEO() || $user->id === $potentialCustomer->user_id;
+    }
+
+    /**
+     * التحقق من صلاحية نقل تبعية العميل لموظف آخر (الـ CEO فقط)
+     */
+    public function updateAddedBy(User $user, PotentialCustomer $potentialCustomer): bool
+    {
+        // تم استخدام ميثود الموديل الموحدة لمشروعك لضمان ثبات الكود
+        return $user->isCEO();
     }
 }

@@ -40,26 +40,20 @@
             select.value = this.pendingStatusValue;
             form.submit();
         }
-    }"
-    @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
-    class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
+    }" @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
+        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
 
         <x-potential-customers.header :totalCount="$customers->total()" />
 
-        <x-potential-customers.filter-panel 
-            :search="request('search')"
-            :dateFrom="request('date_from')"
-            :dateTo="request('date_to')"
-            :source="request('source')"
-            :status="request('status')"
-            :sortBy="request('sort_by', 'added_at')"
-            :sortOrder="request('sort_order', 'desc')" 
-        />
+        <x-potential-customers.filter-panel :search="request('search')" :dateFrom="request('date_from')" :dateTo="request('date_to')" :source="request('source')"
+            :status="request('status')" :sortBy="request('sort_by', 'added_at')" :sortOrder="request('sort_order', 'desc')" />
 
-        <div class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <div
+            class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
             <div class="h-full overflow-auto custom-scrollbar">
                 <table class="w-full min-w-[1000px] border-collapse text-left">
-                    <thead class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
+                    <thead
+                        class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
                         <tr>
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'name', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'name' ? 'desc' : 'asc']) }}"
@@ -97,11 +91,13 @@
                                     class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     Added At
                                     @if (request('sort_by', 'added_at') === 'added_at')
-                                        <span class="text-xs">{{ request('sort_order', 'desc') === 'asc' ? '▲' : '▼' }}</span>
+                                        <span
+                                            class="text-xs">{{ request('sort_order', 'desc') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">
+                            <th
+                                class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">
                                 Actions</th>
                         </tr>
                     </thead>
@@ -110,10 +106,12 @@
                         @forelse($customers as $customer)
                             <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors group">
                                 <td class="p-4 text-center whitespace-nowrap">
-                                    <span class="font-semibold text-sm text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $customer->name }}</span>
+                                    <span
+                                        class="font-semibold text-sm text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $customer->name }}</span>
                                 </td>
 
-                                <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
+                                <td
+                                    class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
                                     {{ $customer->phone }}
                                 </td>
 
@@ -126,8 +124,34 @@
                                 </td>
 
                                 @if (auth()->user()->isCEO())
-                                    <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
-                                        {{ $customer->creator->name ?? 'System' }}
+                                    <td
+                                        class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
+                                        <!-- أضفنا معرف فريد لكل فورم باستخدام الـ id الخاص بالعميل -->
+                                        <form id="update-user-form-{{ $customer->id }}"
+                                            action="{{ route('potential-customers.update-added-by', $customer->id) }}"
+                                            method="POST" class="inline-block">
+                                            @csrf
+                                            @method('PUT')
+
+                                            <!-- أضفنا أحداث Alpine.js هنا للتحكم في الموديل -->
+                                            <select name="user_id"
+                                                                        @change="
+                                                pendingFormId = 'update-user-form-{{ $customer->id }}';
+                                                modalTitle = 'تغيير المسؤول عن العميل';
+                                                modalMessage = 'هل أنت متأكد من رغبتك في نقل تبعية العميل إلى موظف آخر؟';
+                                                confirmColor = 'bg-rose-600 hover:bg-rose-700';
+                                                confirmModal = true;
+                                            "
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="">System</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}"
+                                                        {{ $customer->user_id == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
                                     </td>
                                 @endif
 
@@ -203,7 +227,8 @@
             </div>
         </div>
 
-        <div class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
+        <div
+            class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
             {{ $customers->appends(request()->query())->links() }}
         </div>
     </div>

@@ -24,7 +24,7 @@ class PotentialCustomerService
 
         // 1. صلاحيات العرض
         if ($user->role !== UserRole::CEO) {
-            $query->where('added_by', $user->id);
+            $query->where('user_id', $user->id);
         }
 
         // 2. فلترة البحث بالاسم أو الهاتف
@@ -86,7 +86,7 @@ class PotentialCustomerService
 
         return PotentialCustomer::create(array_merge($validated, [
             'status' => PotentialCustomerStatus::NEW ,
-            'added_by' => $userId,
+            'user_id' => $userId,
             'added_at' => now(),
         ]));
     }
@@ -188,7 +188,7 @@ class PotentialCustomerService
 
         // قيود الصلاحيات الخاصة بك
         if ($user->role !== UserRole::CEO) {
-            $query->where('added_by', $user->id);
+            $query->where('user_id', $user->id);
         }
 
         // 💡 التعديل هنا: استخدام oldest لترتيب المضاف أولاً (تاريخ أقدم) وتحديد العدد بـ 5

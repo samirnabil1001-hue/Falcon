@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('status')->default('new');
             $table->string('source')->nullable(); 
             $table->timestamp('added_at')->nullable(); 
-            $table->foreignId('added_by')->constrained('users'); 
+            $table->foreignId('user_id')->constrained('users'); 
             $table->timestamps();
         });
     }

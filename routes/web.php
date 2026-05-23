@@ -20,7 +20,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
 Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,6 +29,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // مجموعة مسارات العملاء المحتملين
     Route::prefix('potential-customers')->group(function () {
 
         Route::get('/follow-ups', [CustomerFollowUpController::class, 'index'])
@@ -43,6 +43,10 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
         Route::patch('/{potentialCustomer}/status', [PotentialCustomerController::class, 'updateStatus'])
             ->name('potential-customers.update-status');
+
+        // تم نقل المسار هنا ليكون من ضمن الـ prefix والميدل وير بشكل منظم ومحمي
+        Route::put('/{potentialCustomer}/update-added-by', [PotentialCustomerController::class, 'updateAddedBy'])
+            ->name('potential-customers.update-added-by');
     });
 
     Route::resource('potential-customers', PotentialCustomerController::class);
@@ -52,7 +56,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         PotentialCustomerServiceController::class
     );
 
-    // 6. مسارات إدارة المستخدمين والتحكم بالحسابات
+    // مسارات إدارة المستخدمين والتحكم بالحسابات
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');

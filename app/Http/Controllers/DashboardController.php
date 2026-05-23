@@ -20,7 +20,7 @@ class DashboardController extends Controller
         if ($user->isCEO()) {
 
             // جلب المستخدمين الذين أضافوا عملاء محتملين فعلياً لتغذية الـ Dropdown (حل آمن بدون العلاقات)
-            $usersWithCustomers = User::join('potential_customers', 'users.id', '=', 'potential_customers.added_by')
+            $usersWithCustomers = User::join('potential_customers', 'users.id', '=', 'potential_customers.user_id')
                 ->select('users.id', 'users.name', DB::raw('count(potential_customers.id) as customers_count'))
                 ->groupBy('users.id', 'users.name')
                 ->get();
@@ -29,7 +29,7 @@ class DashboardController extends Controller
             $ceoQuery = PotentialCustomer::query();
 
             if ($request->has('user_id') && $request->user_id != '') {
-                $ceoQuery->where('added_by', $request->user_id);
+                $ceoQuery->where('user_id', $request->user_id);
             }
 
             // حساب أعداد الحالات الكلية (تتأثر بالفلتر تلقائياً)
@@ -61,7 +61,7 @@ class DashboardController extends Controller
 
             // أعلى 5 موظفين مبيعاً (ثابت لعرض الأداء العام للموظفين في الشركة دائماً)
             $topAgents = DB::table('potential_customers')
-                ->join('users', 'potential_customers.added_by', '=', 'users.id')
+                ->join('users', 'potential_customers.user_id', '=', 'users.id')
                 ->select('users.name', DB::raw('count(*) as total_sales'))
                 ->where('potential_customers.status', PotentialCustomerStatus::CONFIRMED)
                 ->groupBy('users.id', 'users.name')
@@ -91,7 +91,7 @@ class DashboardController extends Controller
         // ==========================================
         // 2. لوحة تحكم المندوب / العميل العادي (Agent)
         // ==========================================
-        $myCustomersQuery = PotentialCustomer::where('added_by', $user->id);
+        $myCustomersQuery = PotentialCustomer::where('user_id', $user->id);
 
         $totalCustomers = (clone $myCustomersQuery)->count();
         $newCount       = (clone $myCustomersQuery)->where('status', PotentialCustomerStatus::NEW)->count();

@@ -34,7 +34,7 @@ class PotentialCustomerFactory extends Factory
             ),
             
             'added_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
-            'added_by' => $this->faker->randomElement([1, 2, 3]),
+            'user_id' => $this->faker->randomElement([1, 2, 3]),
         ];
     }
 }

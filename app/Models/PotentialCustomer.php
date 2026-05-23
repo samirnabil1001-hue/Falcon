@@ -5,40 +5,50 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class PotentialCustomer extends Model
 {
     use HasFactory;
 
+    // تم تبديل user_id إلى user_id
     protected $fillable = [
         'name',
         'phone',
         'status',
         'source',
         'added_at',
-        'added_by',
+        'user_id', 
     ];
 
-    public function creator()
+    // تم تحديث الفتاح الأجنبي هنا ليكون user_id
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'added_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
+
     protected $casts = [
         'status' => \App\Enums\PotentialCustomerStatus::class,
         'source' => \App\Enums\PotentialCustomerSource::class,
     ];
+
     public function followUps(): HasMany
     {
-        // البارامتر الثاني هو الفتاح الأجنبي الموجود في جدول الـ customer_follow_ups
         return $this->hasMany(CustomerFollowUp::class, 'potential_customer_id');
     }
-    public function potentialCustomers()
+
+    /**
+     * إذا كنت تريد ربط المستخدم بالعملاء المحتملين من جهة موديل الـ User،
+     * فهذه الدالة مكانها الأصح في موديل User وليس هنا.
+     * لكن إذا كنت بحاجتها هنا، فقد تم تحديث الفتاح الأجنبي فيها إلى user_id:
+     */
+    public function potentialCustomers(): HasMany
     {
-        // ربط المستخدم بالعملاء المحتملين بناءً على حقل added_by
-        return $this->hasMany(PotentialCustomer::class, 'added_by');
+        return $this->hasMany(PotentialCustomer::class, 'user_id');
     }
+
     public function services(): HasMany
     {
-        // هنا نخبر Laravel أن العميل لديه العديد من الخدمات في جدول الـ potential_customer_services
         return $this->hasMany(PotentialCustomerService::class, 'potential_customer_id');
     }
 }
