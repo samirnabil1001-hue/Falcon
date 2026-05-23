@@ -20,8 +20,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// مجموعة المسارات المحمية بتسجيل الدخول والتحقق من البريد
-Route::middleware(['auth', 'verified'])->group(function () {
+// مجموعة المسارات المحمية بتسجيل الدخول والتحقق من البريد + الحساب النشط
+// Added 'active' middleware to this group
+Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
     // 1. لوحة التحكم والعمليات العامة
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -32,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 3. مسارات المتابعات والعمليات المتقدمة للعملاء (مرتبة بدقة لمنع تداخل المعرفات {id})
+    // 3. مسارات المتابعات والعمليات المتقدمة للعملاء
     Route::prefix('potential-customers')->group(function () {
 
         // مسار العرض الرئيسي لجدول المتابعات
@@ -52,7 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('potential-customers.update-status');
     });
 
-    // 4. مسارات الـ CRUD القياسية للعملاء المحتملين (تحتوي على index, create, store, edit, update, destroy)
+    // 4. مسارات الـ CRUD القياسية للعملاء المحتملين
     Route::resource('potential-customers', PotentialCustomerController::class);
 
     // 5. صلاحيات الإدارة للمستخدمين والـ Roles (CEO & TeamLead)
@@ -73,4 +74,5 @@ Route::apiResource(
     'potential-customer-services',
     PotentialCustomerServiceController::class
 );
+
 require __DIR__ . '/auth.php';

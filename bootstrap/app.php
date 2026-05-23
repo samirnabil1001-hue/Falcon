@@ -11,12 +11,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->append(
             \App\Http\Middleware\ActivityLogMiddleware::class
         );
 
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+        ]);
+
+        $middleware->priority([
+            \Illuminate\Auth\Middleware\Authenticate::class,
+            \App\Http\Middleware\EnsureUserIsActive::class, 
+            \App\Http\Middleware\ActivityLogMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
