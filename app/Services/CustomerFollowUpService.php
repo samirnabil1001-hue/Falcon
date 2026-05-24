@@ -114,4 +114,24 @@ class CustomerFollowUpService
             return $customer;
         });
     }
+    public function logCustomerFollowUpsCount()
+    {
+        $statuses = CustomerFollowUp::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->get();
+
+        error_log("--- Customer Follow-Ups Count by Status ---");
+
+        $result = [];
+        foreach ($statuses as $statusData) {
+            // إذا كانت الـ status عبارة عن Enum Object بناخد الـ value بتاعته، وإلا بناخد القيمة النصية مباشرة
+            $statusValue = is_object($statusData->status) ? $statusData->status->value : ($statusData->status ?? 'Unknown');
+
+            error_log("Status: {$statusValue} | Total: {$statusData->total}");
+
+            $result[$statusValue] = $statusData->total;
+        }
+
+        return $result;
+    }
 }

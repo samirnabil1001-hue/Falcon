@@ -26,7 +26,20 @@ class CustomerFollowUpController extends Controller
     {
         $customers = $this->followUpService->getPaginatedCustomers($request, 10);
         $users = User::where('is_active', true)->get();
-        return view('potential_customers.follow-ups-index', compact('customers','users'));
+
+        // جلب الأعداد الحقيقية من السيرفس
+        $actualCounts = $this->followUpService->logCustomerFollowUpsCount();
+
+        // بناء الداتا بالشكل المطلوب للـ View مع وضع 0 كقيمة افتراضية
+        $statusCounts = collect(PotentialCustomerStatus::cases())->map(function ($status) use ($actualCounts) {
+            return [
+                'status' => $status->value,                     // 'new', 'contacted'...
+                'label' => $status->label(),                   // 'جديد', 'قيد المتابعة'...
+                'count' => $actualCounts[$status->value] ?? 0, // العدد من الداتابيز أو 0 لو مش موجود
+            ];
+        });
+
+        return view('potential_customers.follow-ups-index', compact('customers', 'users', 'statusCounts'));
     }
 
     /**
