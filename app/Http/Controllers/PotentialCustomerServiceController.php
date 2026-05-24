@@ -2,42 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\PotentialCustomerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PotentialCustomerServiceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        // 1. جلب أحدث معرف خدمة (ID) لكل عميل فريد لمنع التكرار
-        $latestServiceIds = \App\Models\PotentialCustomerService::selectRaw('MAX(id) as id')
+        // 1. جلب أحدث معرف خدمة (ID) لكل عميل فريد بأعلى أداء ومتوافق مع Strict Mode
+        $latestServiceIds = PotentialCustomerService::select(DB::raw('MAX(id) as id'))
             ->groupBy('potential_customer_id')
             ->pluck('id');
 
-        // 2. بناء الاستعلام بناءً على الخدمات الفريدة فقط
+        // 2. بناء الاستعلام بناءً على الخدمات الفريدة فقط باستخدام السلسلة المرنة when()
         $query = PotentialCustomerService::whereIn('id', $latestServiceIds)
             ->with([
                 'potentialCustomer',
                 'user'
             ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Filters
-        |--------------------------------------------------------------------------
-        */
-
-        // Search
-        if ($request->filled('search')) {
+        // تطبيق البحث الذكي
+        $query->when($request->filled('search'), function ($q) use ($request) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('notes', 'like', "%{$search}%")
+            $q->where(function ($subQuery) use ($search) {
+                $subQuery->where('notes', 'like', "%{$search}%")
                     ->orWhere('service_type', 'like', "%{$search}%")
                     ->orWhereHas('potentialCustomer', function ($customer) use ($search) {
                         $customer->where('name', 'like', "%{$search}%")
@@ -47,54 +40,55 @@ class PotentialCustomerServiceController extends Controller
                         $user->where('name', 'like', "%{$search}%");
                     });
             });
-        }
+        });
 
-        // Filter by service type
-        if ($request->filled('service_type')) {
-            $query->where('service_type', $request->service_type);
-        }
+        // الفلترة حسب نوع الخدمة
+        $query->when($request->filled('service_type'), function ($q) use ($request) {
+            $q->where('service_type', $request->service_type);
+        });
 
-        // تصفية السجلات حسب المستخدم الحالي (Checkbox) أو الموظف المختار (Dropdown)
-        if ($request->boolean('only_me')) {
-            $query->where('user_id', auth()->id());
-        } elseif ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
+        // تصفية السجلات حسب المستخدم الحالي أو الموظف المختار
+        $userId = $request->boolean('only_me') ? auth()->id() : $request->user_id;
+        $query->when($userId, function ($q, $userId) {
+            $q->where('user_id', $userId);
+        });
 
-        // Date from
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
+        // الفلترة بالتاريخ (من وإلى)
+        $query->when($request->filled('date_from'), function ($q) use ($request) {
+            $q->whereDate('created_at', '>=', $request->date_from);
+        })->when($request->filled('date_to'), function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', $request->date_to);
+        });
 
-        // Date to
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sorting & Execution
-        |--------------------------------------------------------------------------
-        */
+        // إعدادات الفرز الآمن
         $allowedSorts = ['created_at', 'service_type', 'id'];
         $sortBy = in_array($request->sort_by, $allowedSorts) ? $request->sort_by : 'created_at';
-        $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
+        $sortOrder = strtolower($request->sort_order ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
         $query->orderBy($sortBy, $sortOrder);
 
-        $services = $query->paginate(10)->appends($request->query());
+        // جلب البيانات مع الحفاظ على الـ Query String بالمتصفح للـ Pagination
+        $services = $query->paginate(10)->withQueryString();
 
-        // اقتباس نفس الفكرة الذكية من الـ CEO Dashboard: 
         // جلب الموظفين الذين لديهم خدمات مسجلة بالفعل مع استبعاد المستخدم الحالي (أنت)
-        $users = \App\Models\User::join('potential_customer_services', 'users.id', '=', 'potential_customer_services.user_id')
-            ->select('users.id', 'users.name', \DB::raw('count(potential_customer_services.id) as customers_count'))
-            ->where('users.id', '!=', auth()->id()) // استبعاد المستخدم الحالي
+        $users = User::join('potential_customer_services', 'users.id', '=', 'potential_customer_services.user_id')
+            ->select('users.id', 'users.name', DB::raw('count(potential_customer_services.id) as customers_count'))
+            ->where('users.id', '!=', auth()->id())
             ->groupBy('users.id', 'users.name')
             ->orderBy('users.name')
             ->get();
 
         return view('potential-customer-services.index', compact('services', 'users'));
     }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('potential-customer-services.create');
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -107,38 +101,36 @@ class PotentialCustomerServiceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $service = PotentialCustomerService::create($validated);
+        PotentialCustomerService::create($validated);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Potential customer service created successfully',
-            'data' => $service
-        ], 201);
+        return redirect()->route('potential-customer-services.index')
+            ->with('success', 'تم إضافة الخدمة للعميل بنجاح.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(PotentialCustomerService $service)
     {
-        $service = PotentialCustomerService::with([
-            'potentialCustomer',
-            'user'
-        ])->findOrFail($id);
+        // تم استخدام الـ Route Model Binding المباشر والأسرع بدلاً من جلب الـ ID يدوياً
+        $service->load(['potentialCustomer', 'user']);
 
-        return response()->json([
-            'status' => true,
-            'data' => $service
-        ]);
+        return view('potential-customer-services.show', compact('service'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(PotentialCustomerService $service)
+    {
+        return view('potential-customer-services.edit', compact('service'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, PotentialCustomerService $service)
     {
-        $service = PotentialCustomerService::findOrFail($id);
-
         $validated = $request->validate([
             'potential_customer_id' => 'sometimes|exists:potential_customers,id',
             'user_id' => 'sometimes|exists:users,id',
@@ -148,25 +140,18 @@ class PotentialCustomerServiceController extends Controller
 
         $service->update($validated);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Potential customer service updated successfully',
-            'data' => $service
-        ]);
+        return redirect()->route('potential-customer-services.index')
+            ->with('success', 'تم تحديث بيانات الخدمة بنجاح.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(PotentialCustomerService $service)
     {
-        $service = PotentialCustomerService::findOrFail($id);
-
         $service->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Potential customer service deleted successfully'
-        ]);
+        return redirect()->route('potential-customer-services.index')
+            ->with('success', 'تم حذف الخدمة بنجاح.');
     }
 }

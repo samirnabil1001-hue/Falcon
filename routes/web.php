@@ -16,22 +16,27 @@ use App\Http\Controllers\PotentialCustomerServiceController;
 |--------------------------------------------------------------------------
 */
 
+// الصفحة الرئيسية للموقع
 Route::get('/', function () {
     return view('welcome');
 });
 
+// المسارات المحمية بتسجيل الدخول والتحقق من الحساب
 Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
+    // لوحة التحكم وسجل العمليات
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
 
+    // إدارة الملف الشخصي للمستخدم
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // مجموعة مسارات العملاء المحتملين
+    // مجموعة مسارات العملاء المحتملين والخدمات التابعة لهم
     Route::prefix('potential-customers')->group(function () {
 
+        // مسارات المتابعات (Follow Ups)
         Route::get('/follow-ups', [CustomerFollowUpController::class, 'index'])
             ->name('customer-follow-ups.index');
 
@@ -41,22 +46,22 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::post('/{customer}/follow-ups', [CustomerFollowUpController::class, 'store'])
             ->name('customer-follow-ups.store');
 
+        // تحديثات سريعة لبيانات العميل المحتمل
         Route::patch('/{potentialCustomer}/status', [PotentialCustomerController::class, 'updateStatus'])
             ->name('potential-customers.update-status');
 
-        // تم نقل المسار هنا ليكون من ضمن الـ prefix والميدل وير بشكل منظم ومحمي
         Route::put('/{potentialCustomer}/update-added-by', [PotentialCustomerController::class, 'updateAddedBy'])
             ->name('potential-customers.update-added-by');
+
+        // حل مشكلة الـ API: تحويلها إلى Web Resource عادي ليتوافق مع صفحات الـ Blade والتوجيهات الكلاسيكية
+        Route::resource('services', PotentialCustomerServiceController::class)
+            ->names('potential-customer-services'); 
     });
 
+    // الـ Resource الأساسي لإدارة تفاصيل العملاء المحتملين (CRUD)
     Route::resource('potential-customers', PotentialCustomerController::class);
 
-    Route::apiResource(
-        'potential-customer-services',
-        PotentialCustomerServiceController::class
-    );
-
-    // مسارات إدارة المستخدمين والتحكم بالحسابات
+    // مسارات إدارة المستخدمين وصلاحيات الحسابات
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
@@ -64,4 +69,5 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
 });
 
+// مسارات التحقق والتسجيل الافتراضية الخاصة بـ Laravel Breeze / Jetstream
 require __DIR__ . '/auth.php';
