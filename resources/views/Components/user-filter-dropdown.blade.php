@@ -30,13 +30,13 @@
             </div>
             @if($users)
                 @foreach ($users as $user)
-                    @if($user->id !== auth()->id())
+               
                         <div onclick="selectUser('{{ $user->id }}', '{{ $user->name }}')" 
                              class="option-item px-3 py-2 hover:bg-violet-50 dark:hover:bg-violet-950/40 cursor-pointer transition-colors {{ request('user_id') == $user->id ? 'bg-violet-500/10 font-medium text-violet-600' : '' }}" 
                              data-name="{{ $user->name }}">
                             {{ $user->name }}
                         </div>
-                    @endif
+             
                 @endforeach
             @endif
         </div>

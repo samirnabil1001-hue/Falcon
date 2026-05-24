@@ -1,6 +1,5 @@
 <div class="flex gap-3 mb-4 " dir="rtl">
 
-    <!-- 1. بطاقة إجمالي العملاء -->
     <div class="flex-fill" style="min-width: 250px;">
         <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden"
             style="border-right: 5px solid #0d6efd !important;">
@@ -8,7 +7,8 @@
                 <div>
                     <h6 class="text-muted mb-1 fw-bold" style="font-size: 0.9rem;">إجمالي الإجرائات</h6>
                     <h3 class="mb-0 fw-black" style="color: #333; font-size: 1.8rem;">
-                        {{ number_format($statusCounts->sum('count')) }}
+                        {{-- 👇 التعديل هنا: قمنا بفلترة المصفوفة لاستبعاد 'new' قبل الـ sum --}}
+                        {{ number_format(collect($statusCounts)->where('status', '!==', 'new')->sum('count')) }}
                     </h3>
                 </div>
                 <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
