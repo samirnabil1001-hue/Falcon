@@ -114,9 +114,58 @@ class CustomerFollowUpService
             return $customer;
         });
     }
-    public function logCustomerFollowUpsCount()
+    public function logCustomerFollowUpsCount(Request $request)
     {
-        $statuses = CustomerFollowUp::selectRaw('status, count(*) as total')
+        // بناء الاستعلام على جدول المتابعات وربطه بفلتر العملاء
+        $query = CustomerFollowUp::query()
+            ->whereHas('potentialCustomer', function ($q) use ($request) {
+                // الفلترة الأساسية (يملك متابعات أو خدمات) لضمان تطابق البيانات مع القائمة
+                $q->where(function ($sub) {
+                    $sub->has('followUps')->orHas('services');
+                });
+
+                // تطبيق البحث
+                if ($request->filled('search')) {
+                    $search = $request->search;
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%")
+                            ->orWhereHas('services', function ($s) use ($search) {
+                                $s->where('service_type', 'like', "%{$search}%")
+                                    ->orWhere('notes', 'like', "%{$search}%");
+                            });
+                    });
+                }
+
+                // تطبيق فلترة الحالة
+                if ($request->filled('status')) {
+                    $q->where('status', $request->status);
+                }
+
+                // الفلترة الذكية للموظفين والمستخدم الحالي
+                if ($request->get('my_clients') == '1') {
+                    $currentUserId = auth()->id();
+                    $q->where(function ($sub) use ($currentUserId) {
+                        $sub->whereHas('followUps', function ($f) use ($currentUserId) {
+                            $f->where('user_id', $currentUserId);
+                        })->orWhereHas('services', function ($s) use ($currentUserId) {
+                            $s->where('user_id', $currentUserId);
+                        });
+                    });
+                } elseif ($request->filled('user_id')) {
+                    $userId = $request->user_id;
+                    $q->where(function ($sub) use ($userId) {
+                        $sub->whereHas('followUps', function ($f) use ($userId) {
+                            $f->where('user_id', $userId);
+                        })->orWhereHas('services', function ($s) use ($userId) {
+                            $s->where('user_id', $userId);
+                        });
+                    });
+                }
+            });
+
+        // نفس الكود الخاص بك تماماً للحساب، وطباعة الـ Log، وإرجاع الـ Response بنفس الشكل
+        $statuses = $query->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->get();
 
@@ -124,7 +173,7 @@ class CustomerFollowUpService
 
         $result = [];
         foreach ($statuses as $statusData) {
-            // إذا كانت الـ status عبارة عن Enum Object بناخد الـ value بتاعته، وإلا بناخد القيمة النصية مباشرة
+            // إذا كانت الـ status عبارة عن Enum Object بناخد الـ value بتاعتة، وإلا بناخد القيمة النصية مباشرة
             $statusValue = is_object($statusData->status) ? $statusData->status->value : ($statusData->status ?? 'Unknown');
 
             error_log("Status: {$statusValue} | Total: {$statusData->total}");

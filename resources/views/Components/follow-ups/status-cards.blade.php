@@ -6,7 +6,7 @@
             style="border-right: 5px solid #0d6efd !important;">
             <div class="card-body d-flex align-items-center justify-content-between p-3">
                 <div>
-                    <h6 class="text-muted mb-1 fw-bold" style="font-size: 0.9rem;">إجمالي العملاء</h6>
+                    <h6 class="text-muted mb-1 fw-bold" style="font-size: 0.9rem;">إجمالي الإجرائات</h6>
                     <h3 class="mb-0 fw-black" style="color: #333; font-size: 1.8rem;">
                         {{ number_format($statusCounts->sum('count')) }}
                     </h3>

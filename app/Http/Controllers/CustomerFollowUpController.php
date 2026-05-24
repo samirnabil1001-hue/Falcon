@@ -28,7 +28,7 @@ class CustomerFollowUpController extends Controller
         $users = User::where('is_active', true)->get();
 
         // جلب الأعداد الحقيقية من السيرفس
-        $actualCounts = $this->followUpService->logCustomerFollowUpsCount();
+        $actualCounts = $this->followUpService->logCustomerFollowUpsCount( $request);
 
         // بناء الداتا بالشكل المطلوب للـ View مع وضع 0 كقيمة افتراضية
         $statusCounts = collect(PotentialCustomerStatus::cases())->map(function ($status) use ($actualCounts) {
