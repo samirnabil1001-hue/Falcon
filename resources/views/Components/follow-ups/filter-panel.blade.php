@@ -6,9 +6,8 @@
     <input type="hidden" name="sort_by" value="{{ $sortBy }}">
     <input type="hidden" name="sort_order" value="{{ $sortOrder }}">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
         
-        <!-- Search Field -->
         <div class="relative">
             <input type="text" name="search" value="{{ $search }}" placeholder="بحث بالاسم أو رقم الهاتف..."
                 class="w-full text-sm rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all">
@@ -19,7 +18,6 @@
             </div>
         </div>
 
-        <!-- Status Filter -->
         <div>
             <select name="status" onchange="this.form.submit()"
                 class="w-full text-sm rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer py-2.5">
@@ -32,10 +30,15 @@
             </select>
         </div>
 
-        <!-- Custom User Filter Component -->
         <x-user-filter-dropdown :users="$users" />
 
-        <!-- Checkbox "عملائي" السريع -->
+        <div class="md:col-span-2 lg:col-span-2">
+            <x-date-range-picker 
+                :dateFrom="request('date_from')" 
+                :dateTo="request('date_to')" 
+            />
+        </div>
+
         <div class="flex items-center justify-start px-2">
             <label class="relative flex items-center cursor-pointer select-none text-sm font-medium text-slate-700 dark:text-slate-300">
                 <input type="checkbox" id="my-clients-checkbox" name="my_clients" value="1" 
@@ -46,9 +49,9 @@
             </label>
         </div>
 
-        <!-- Actions -->
-        <div class="flex gap-2 justify-end items-center lg:col-span-1 md:col-span-2">
-            @if ($search || $status || request('user_id') || request('my_clients'))
+        <div class="flex gap-2 justify-end items-center lg:col-span-6 md:col-span-2">
+            {{-- تحديث الشرط ليشمل إلغاء الفلترة إذا كانت تواريخ الـ date_from أو date_to ممتلئة --}}
+            @if ($search || $status || request('user_id') || request('my_clients') || request('date_from') || request('date_to'))
                 <a href="{{ route('customer-follow-ups.index') }}"
                     class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center transition-colors">
                     إلغاء الفلترة 
@@ -111,7 +114,7 @@
         document.getElementById('dropdown-label').innerText = name;
         document.getElementById('dropdown-menu').classList.add('hidden');
         document.getElementById('dropdown-arrow').classList.remove('rotate-180');
-        document.getElementById('filter-form').submit(); // سيعمل لأن الـ input المخفي ما زال داخل الـ form
+        document.getElementById('filter-form').submit(); 
     }
 
     function handleCheckboxChange(checkbox) {

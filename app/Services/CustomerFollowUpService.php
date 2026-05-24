@@ -53,9 +53,20 @@ class CustomerFollowUpService
             $query->where('status', $request->status);
         }
 
-        // 👇 الفلترة الذكية للموظفين والمستخدم الحالي
+        // 👇 [جديد] تطبيق فلترة نطاق التاريخ (Date Range Filter)
+        if ($request->filled('date_from')) {
+            $query->whereHas('followUps', function ($f) use ($request) {
+                $f->whereDate('created_at', '>=', $request->date_from);
+            });
+        }
+        if ($request->filled('date_to')) {
+            $query->whereHas('followUps', function ($f) use ($request) {
+                $f->whereDate('created_at', '<=', $request->date_to);
+            });
+        }
+
+        // الفلترة الذكية للموظفين والمستخدم الحالي
         if ($request->get('my_clients') == '1') {
-            // إذا تم تفعيل checkbox "عملائي" -> فلترة بالـ ID للمستخدم الحالي مباشرة
             $currentUserId = auth()->id();
             $query->where(function ($q) use ($currentUserId) {
                 $q->whereHas('followUps', function ($f) use ($currentUserId) {
@@ -65,7 +76,6 @@ class CustomerFollowUpService
                 });
             });
         } elseif ($request->filled('user_id')) {
-            // إذا لم يُفعل خيار عملائي، نتحقق من اختيار موظف آخر من المنسدلة
             $userId = $request->user_id;
             $query->where(function ($q) use ($userId) {
                 $q->whereHas('followUps', function ($f) use ($userId) {
@@ -116,10 +126,8 @@ class CustomerFollowUpService
     }
     public function logCustomerFollowUpsCount(Request $request)
     {
-        // بناء الاستعلام على جدول المتابعات وربطه بفلتر العملاء
         $query = CustomerFollowUp::query()
             ->whereHas('potentialCustomer', function ($q) use ($request) {
-                // الفلترة الأساسية (يملك متابعات أو خدمات) لضمان تطابق البيانات مع القائمة
                 $q->where(function ($sub) {
                     $sub->has('followUps')->orHas('services');
                 });
@@ -164,7 +172,15 @@ class CustomerFollowUpService
                 }
             });
 
-        // نفس الكود الخاص بك تماماً للحساب، وطباعة الـ Log، وإرجاع الـ Response بنفس الشكل
+        // 👇 [جديد] تطبيق فلترة التاريخ مباشرة على جدول المتابعات الفعلي لحساب الأعداد بدقة
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // مخرجات الدالة والـ Log دون أي تغيير في شكل الـ Response
         $statuses = $query->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->get();
@@ -173,7 +189,6 @@ class CustomerFollowUpService
 
         $result = [];
         foreach ($statuses as $statusData) {
-            // إذا كانت الـ status عبارة عن Enum Object بناخد الـ value بتاعتة، وإلا بناخد القيمة النصية مباشرة
             $statusValue = is_object($statusData->status) ? $statusData->status->value : ($statusData->status ?? 'Unknown');
 
             error_log("Status: {$statusValue} | Total: {$statusData->total}");
