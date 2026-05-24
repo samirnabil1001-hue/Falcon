@@ -175,7 +175,7 @@
                             <div x-cloak>
                                 <x-potential-customers.contacted-modal :customer="$customer" />
                                 <x-potential-customers.cancelled-modal :customer="$customer" />
-                                <x-potential-customers.confirmed-modal :customer="$customer" />
+                                <x-potential-customers.confirmed-modal :route="route('potential-customers.update-status', $customer->id)" />
                             </div>
                         </td>
                     </tr>
