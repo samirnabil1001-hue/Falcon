@@ -44,6 +44,9 @@ class UserController extends Controller
         if (auth()->id() === $user->id) {
             return back()->with('error', 'You cannot delete yourself!');
         }
+        $user->update([
+            'is_active' => false
+        ]);
 
         $user->delete(); // This will now set 'deleted_at' instead of removing the row
         return back()->with('success', 'User moved to trash!');

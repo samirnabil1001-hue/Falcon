@@ -58,27 +58,28 @@
             let form = document.getElementById(this.formToSubmit);
             if (this.isStatusChange) {
                 let select = form.querySelector('select[name=\'status\']');
-                if(select) select.value = this.pendingStatusValue;
+                if (select) select.value = this.pendingStatusValue;
             } else {
                 let select = form.querySelector('select[name=\'user_id\']');
-                if(select) select.value = this.pendingUserIdValue;
+                if (select) select.value = this.pendingUserIdValue;
             }
             form.submit();
         }
-    }" 
-    @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
-    @change-user.window="handleUserChange($event.detail.event, $event.detail.formId)"
-    class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
+    }" @change-status.window="handleStatusChange($event.detail.event, $event.detail.formId)"
+        @change-user.window="handleUserChange($event.detail.event, $event.detail.formId)"
+        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300">
 
         <x-potential-customers.header :totalCount="$customers->total()" />
 
         <x-potential-customers.filter-panel :search="request('search')" :dateFrom="request('date_from')" :dateTo="request('date_to')" :source="request('source')"
             :status="request('status')" :sortBy="request('sort_by', 'added_at')" :sortOrder="request('sort_order', 'desc')" />
 
-        <div class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <div
+            class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
             <div class="h-full overflow-auto custom-scrollbar">
                 <table class="w-full min-w-[1000px] border-collapse text-left">
-                    <thead class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
+                    <thead
+                        class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
                         <tr>
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Name</th>
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Phone</th>
@@ -88,31 +89,42 @@
                                 <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added By</th>
                             @endif
                             <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added At</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">Actions</th>
+                            <th
+                                class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">
+                                Actions</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
                         @forelse($customers as $customer)
                             <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors group">
-                                <td class="p-4 text-center whitespace-nowrap"><span class="font-semibold text-sm text-gray-900 dark:text-gray-100">{{ $customer->name }}</span></td>
-                                <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">{{ $customer->phone }}</td>
-                                <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.source-badge :source="$customer->source" /></td>
-                                <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.status-badge :status="$customer->status" /></td>
+                                <td class="p-4 text-center whitespace-nowrap"><span
+                                        class="font-semibold text-sm text-gray-900 dark:text-gray-100">{{ $customer->name }}</span>
+                                </td>
+                                <td
+                                    class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
+                                    {{ $customer->phone }}</td>
+                                <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.source-badge
+                                        :source="$customer->source" /></td>
+                                <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.status-badge
+                                        :status="$customer->status" /></td>
 
                                 @if (auth()->user()->isCEO())
-                                    <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
-                                        <form id="update-user-form-{{ $customer->id }}" action="{{ route('potential-customers.update-added-by', $customer->id) }}" method="POST" class="inline-block w-full">
+                                    <td
+                                        class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-400">
+                                        <form id="update-user-form-{{ $customer->id }}"
+                                            action="{{ route('potential-customers.update-added-by', $customer->id) }}"
+                                            method="POST" class="inline-block w-full">
                                             @csrf
                                             @method('PUT')
 
-                                            <select name="user_id"
-                                                    data-original-value="{{ $customer->user_id }}"
-                                                    @change="$dispatch('change-user', { event: $event, formId: 'update-user-form-{{ $customer->id }}' })"
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-1.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                            <select name="user_id" data-original-value="{{ $customer->user_id }}"
+                                                @change="$dispatch('change-user', { event: $event, formId: 'update-user-form-{{ $customer->id }}' })"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-1.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                                                 <option value="">System</option>
                                                 @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}" {{ $customer->user_id == $user->id ? 'selected' : '' }}>
+                                                    <option value="{{ $user->id }}"
+                                                        {{ $customer->user_id == $user->id ? 'selected' : '' }}>
                                                         {{ $user->name }}
                                                     </option>
                                                 @endforeach
@@ -154,29 +166,36 @@
 
                                     <x-potential-customers.contacted-modal :customer="$customer" />
                                     <x-potential-customers.cancelled-modal :customer="$customer" />
-                                    <x-potential-customers.confirmed-modal :customer="$customer" />
+                                    <x-potential-customers.confirmed-modal :route="route('potential-customers.update-status', $customer->id)" />
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="p-12 text-center text-gray-400">No data found.</td></tr>
+                            <tr>
+                                <td colspan="7" class="p-12 text-center text-gray-400">No data found.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
+        <div
+            class="shrink-0 pt-4 mt-2 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 dynamic-pagination">
             {{ $customers->appends(request()->query())->links() }}
         </div>
 
         <!-- تم تنظيف تكرار الـ x-cloak هنا لتجنب وميض المتصفح -->
-        <div x-cloak x-show="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-            <div @click.away="confirmModal = false" class="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-sm w-full shadow-2xl">
+        <div x-cloak x-show="confirmModal"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <div @click.away="confirmModal = false"
+                class="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-sm w-full shadow-2xl">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white" x-text="modalTitle"></h3>
                 <p class="text-sm text-gray-500 dark:text-slate-400 mt-2" x-text="modalMessage"></p>
                 <div class="flex justify-end gap-2 mt-4">
-                    <button @click="confirmModal = false" class="px-4 py-2 bg-gray-200 text-gray-800 text-xs rounded-lg dark:bg-slate-700 dark:text-slate-300">إلغاء</button>
-                    <button @click="submitPendingForm()" :class="confirmColor" class="px-4 py-2 text-white text-xs rounded-lg">تأكيد</button>
+                    <button @click="confirmModal = false"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 text-xs rounded-lg dark:bg-slate-700 dark:text-slate-300">إلغاء</button>
+                    <button @click="submitPendingForm()" :class="confirmColor"
+                        class="px-4 py-2 text-white text-xs rounded-lg">تأكيد</button>
                 </div>
             </div>
         </div>
