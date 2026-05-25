@@ -1,62 +1,71 @@
-<div class="flex gap-3 mb-4 " dir="rtl">
+<div class="flex gap-2 mb-2 w-full" dir="rtl">
 
-    <div class="flex-fill" style="min-width: 250px;">
-        <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden"
-            style="border-right: 5px solid #0d6efd !important;">
-            <div class="card-body d-flex align-items-center justify-content-between p-3">
-                <div>
-                    <h6 class="text-muted mb-1 fw-bold" style="font-size: 0.9rem;">إجمالي الإجرائات</h6>
-                    <h3 class="mb-0 fw-black" style="color: #333; font-size: 1.8rem;">
-                        {{-- 👇 التعديل هنا: قمنا بفلترة المصفوفة لاستبعاد 'new' قبل الـ sum --}}
-                        {{ number_format(collect($statusCounts)->where('status', '!==', 'new')->sum('count')) }}
-                    </h3>
+    {{-- إجمالي الإجراءات --}}
+    <div class="flex-1">
+        <div class="bg-blue-50 border-r-4 border-blue-500  shadow-sm">
+
+            <div class="py-2 px-3">
+
+                <div class="font-bold text-[12px] text-blue-600 mb-1">
+                    إجمالي الإجرائات
                 </div>
-                <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
-                    style="background-color: rgba(13, 110, 253, 0.1);">
-                    <i class="fs-4 bi bi-people text-primary"></i>
+
+                <div class="font-bold text-[20px] leading-none text-gray-800">
+                    {{ number_format(collect($statusCounts)->where('status', '!==', 'new')->sum('count')) }}
                 </div>
+
             </div>
         </div>
     </div>
 
+    {{-- الحالات --}}
     @foreach ($statusCounts as $item)
         @if ($item['status'] !== 'new')
-            <div class="flex-fill" style="min-width: 250px;">
-                <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden"
-                    style="border-right: 5px solid 
-                    @if ($item['status'] === 'contacted') #fd7e14 
-                    @elseif($item['status'] === 'cancelled') #dc3545 
-                    @elseif($item['status'] === 'confirmed') #198754 
-                    @else #6c757d @endif !important;">
 
-                    <div class="card-body d-flex align-items-center justify-content-between p-3">
-                        <div>
-                            <h6 class="text-muted mb-1 fw-bold" style="font-size: 0.9rem;">
-                                {{ $item['label'] }}
-                            </h6>
-                            <h3 class="mb-0 fw-black" style="color: #333; font-size: 1.8rem;">
-                                {{ number_format($item['count']) }}
-                            </h3>
+            <div class="flex-1">
+
+                <div class="
+                     shadow-sm border-r-4
+
+                    @if ($item['status'] === 'contacted')
+                        bg-orange-50 border-orange-500
+                    @elseif($item['status'] === 'cancelled')
+                        bg-red-50 border-red-500
+                    @elseif($item['status'] === 'confirmed')
+                        bg-green-50 border-green-500
+                    @else
+                        bg-gray-50 border-gray-500
+                    @endif
+                ">
+
+                    <div class="py-2 px-3">
+
+                        <div class="
+                            font-bold text-[12px] mb-1
+
+                            @if ($item['status'] === 'contacted')
+                                text-orange-600
+                            @elseif($item['status'] === 'cancelled')
+                                text-red-600
+                            @elseif($item['status'] === 'confirmed')
+                                text-green-600
+                            @else
+                                text-gray-600
+                            @endif
+                        ">
+                            {{ $item['label'] }}
                         </div>
 
-                        <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
-                            style="background-color: 
-                            @if ($item['status'] === 'contacted') rgba(253, 126, 20, 0.1) 
-                            @elseif($item['status'] === 'cancelled') rgba(220, 53, 69, 0.1) 
-                            @elseif($item['status'] === 'confirmed') rgba(25, 135, 84, 0.1) 
-                            @else rgba(108, 117, 125, 0.1) @endif;">
-
-                            <i class="fs-4 
-                                @if ($item['status'] === 'contacted') bi bi-telephone-outbound text-warning
-                                @elseif($item['status'] === 'cancelled') bi bi-person-x text-danger
-                                @elseif($item['status'] === 'confirmed') bi bi-check-circle text-success
-                                @else bi bi-info-circle text-secondary @endif">
-                            </i>
+                        <div class="font-bold text-[20px] leading-none text-gray-800">
+                            {{ number_format($item['count']) }}
                         </div>
+
                     </div>
 
                 </div>
+
             </div>
+
         @endif
     @endforeach
 
