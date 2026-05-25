@@ -17,37 +17,35 @@
                     <thead
                         class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
                         <tr>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Name</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Phone
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">اسم العميل</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">رقم هاتف العميل
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Requests Count
-                            </th> <!-- العمود الجديد -->
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">عدد الطلبات</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'service_type', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'service_type' ? 'desc' : 'asc']) }}"
                                     class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                                    Service Type
+                                    نوع الخدمة
                                     @if (request('sort_by') === 'service_type')
                                         <span class="text-xs">{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Notes</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Assigned Employee
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">ملاحظات</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">الموظف المسؤول
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'created_at', 'sort_order' => request('sort_order') === 'asc' && request('sort_by') === 'created_at' ? 'desc' : 'asc']) }}"
                                     class="inline-flex items-center justify-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                                    Created At
+                                    تاريخ الإنشاء
                                     @if (request('sort_by', 'created_at') === 'created_at')
                                         <span
                                             class="text-xs">{{ request('sort_order', 'desc') === 'asc' ? '▲' : '▼' }}</span>
                                     @endif
                                 </a>
                             </th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Actions</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">الإجراءات</th>
                         </tr>
                     </thead>
-
                     <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
                         @forelse($services as $service)
                             <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors group">

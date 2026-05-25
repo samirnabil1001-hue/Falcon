@@ -7,7 +7,7 @@
     
     <!-- From -->
     <div class="flex items-center gap-2 flex-1 cursor-pointer" onclick="this.querySelector('input').showPicker()">
-        <span class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">From</span>
+        <span class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">من</span>
         <input type="date" id="date_from" name="date_from" value="{{ $dateFrom }}"
             max="{{ now()->format('Y-m-d') }}" onchange="handleDateFromChange(this)"
             class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">
@@ -17,7 +17,7 @@
 
     <!-- To -->
     <div class="flex items-center gap-2 flex-1 cursor-pointer" onclick="this.querySelector('input').showPicker()">
-        <span class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">To</span>
+        <span class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider select-none">إلي</span>
         <input type="date" id="date_to" name="date_to" value="{{ $dateTo }}"
             max="{{ now()->format('Y-m-d') }}" onchange="handleDateToChange(this)"
             class="w-full text-xs bg-transparent border-0 text-gray-800 dark:text-gray-200 p-0 focus:ring-0 cursor-pointer dynamic-date-input">

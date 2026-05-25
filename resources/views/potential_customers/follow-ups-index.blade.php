@@ -19,7 +19,7 @@
             form.submit();
         }
     }"
-        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300 text-right"
+        class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 p-5 md:p-6 h-[calc(100vh-12rem)] lg:h-[calc(100vh-7rem)] flex flex-col overflow-hidden transition-colors duration-300 text-center text-[14px]"
         dir="rtl">
 
         <!-- الهيدر -->
@@ -38,12 +38,12 @@
         <div
             class="flex-1 h-0 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm mt-4">
             <div class="h-full overflow-auto custom-scrollbar">
-                <table class="w-full min-w-[1000px] border-collapse text-right">
+                <table class="w-full min-w-[1000px] border-collapse text-center text-[14px]">
                     <!-- الهيدر الثابت أثناء التمرير العلوى والسفلي -->
                     <thead
                         class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-xs uppercase">
                         <tr>
-                            <th scope="col" class="p-4 font-bold tracking-wider text-right">
+                            <th scope="col" class="p-4 font-bold tracking-wider text-start text-[14px]">
                                 <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'name', 'sort_order' => request('sort_by') === 'name' && request('sort_order') === 'asc' ? 'desc' : 'asc']) }}"
                                     class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                     العميل
@@ -92,7 +92,7 @@
                             <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors group">
 
                                 <!-- اسم العميل -->
-                                <td class="p-4 whitespace-nowrap text-right">
+                                <td class="p-4 whitespace-nowrap text-center text-[14px]">
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-100/50 dark:border-indigo-900/30">

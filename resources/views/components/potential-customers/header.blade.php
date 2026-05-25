@@ -1,10 +1,11 @@
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 shrink-0">
     <div>
         <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
-            Potential Customers Management
+            إدارة العملاء المحتملين
+
         </h3>
-        <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Seamlessly manage, route, and convert your
-            incoming leads</p>
+        <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">إدارة وتوجيه وتحويل العملاء المحتملين الواردين 
+</p>
     </div>
     <div class="flex items-center gap-3 self-end sm:self-auto">
         <div

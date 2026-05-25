@@ -81,17 +81,19 @@
                     <thead
                         class="sticky top-0 z-20 bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300">
                         <tr>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Customer Name</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Phone</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Source</th>
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Status</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">اسم العميل</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">رقم الهاتف</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">المصدر</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">الحالة</th>
                             @if (auth()->user()->isCEO())
-                                <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added By</th>
+                                <th class="p-4 font-bold tracking-wider text-center text-[14px]">أُضيف بواسطة
+                                </th>
                             @endif
-                            <th class="p-4 text-center uppercase text-[10px] font-bold tracking-wider">Added At</th>
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px]">تاريخ الإضافة
+                            </th>
                             <th
-                                class="p-4 text-center uppercase text-[10px] font-bold tracking-wider w-48 min-w-[190px]">
-                                Actions</th>
+                                class="p-4 font-bold tracking-wider text-center text-[14px] w-48 min-w-[190px]">
+                                الإجراءات</th>
                         </tr>
                     </thead>
 

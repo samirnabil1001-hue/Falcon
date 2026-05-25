@@ -6,7 +6,7 @@
     <input type="hidden" name="sort_by" value="{{ $sortBy }}">
     <input type="hidden" name="sort_order" value="{{ $sortOrder }}">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
 
         <div class="relative">
             <input type="text" name="search" value="{{ $search }}" placeholder="بحث بالاسم أو رقم الهاتف..."
@@ -19,12 +19,14 @@
                 </svg>
             </div>
         </div>
+
         <div class="md:col-span-2 lg:col-span-2">
             <x-date-range-picker :dateFrom="request('date_from')" :dateTo="request('date_to')" />
         </div>
-        <x-user-filter-dropdown :users="$users" />
 
-
+        <div>
+            <x-user-filter-dropdown :users="$users" />
+        </div>
 
         <div class="flex items-center justify-start px-2">
             <label
@@ -36,18 +38,17 @@
             </label>
         </div>
 
-        <div class="flex gap-2 justify-end items-center lg:col-span-5 md:col-span-2">
-            {{-- تم إزالة المتغير $status من شرط ظهور زر إلغاء الفلترة --}}
+        <div class="flex gap-2 justify-end items-center md:col-span-2 lg:col-span-1">
             @if ($search || request('user_id') || request('my_clients') || request('date_from') || request('date_to'))
                 <a href="{{ route('customer-follow-ups.index') }}"
-                    class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center transition-colors">
-                    إلغاء الفلترة
+                    class="whitespace-nowrap bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center transition-colors">
+                    إلغاء
                 </a>
             @endif
 
             <button type="submit"
-                class="w-full sm:w-auto bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2.5 px-5 rounded-xl transition-all shadow-sm">
-                تطبيق الفلترة
+                class="w-full lg:w-auto whitespace-nowrap bg-gray-200 hover:bg-indigo-600 hover:text-white dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-indigo-600 text-gray-700 text-xs font-semibold py-2.5 px-5 rounded-xl transition-all shadow-sm">
+                تطبيق
             </button>
         </div>
     </div>
