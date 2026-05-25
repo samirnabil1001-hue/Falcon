@@ -12,7 +12,7 @@
       x-data="{ 
           isSubmitting: false,
           phone: '{{ old('phone', $customer?->phone) }}',
-          selectedCountry: '{{ old('country_code', $customer?->country_code ?? '+20') }}', {{-- 👈 تثبيت كود الدولة المخزن --}}
+          selectedCountry: '{{ old('country_code', $customer?->country_code ?? '+20') }}',
           phoneError: '',
           countries: {
               '+20':  { name: '🇪🇬 مصر',       length: 10, placeholder: '100 123 4567', pattern: '^1[0125][0-9]{8}$' },
@@ -52,7 +52,9 @@
         @method('PUT')
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {{-- 💡 تم تعديل الكلاس هنا ليكون grid-cols-1 دائماً لتصبح كل الحقول تحت بعضها --}}
+    <div class="grid grid-cols-1 gap-6">
+        
         <div>
             <label for="name" class="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
                 اسم العميل <span class="text-red-500">*</span>
@@ -85,7 +87,6 @@
                         </svg>
                     </div>
                     
-                    {{-- 💡 تعديل الربط هنا باستخدام x-model للتأكد من إرسال القيمة الصحيحة للـ Controller --}}
                     <select name="country_code"
                             id="country_code"
                             x-model="selectedCountry"
@@ -121,39 +122,40 @@
                 <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center justify-start">{{ $message }}</p>
             @enderror
         </div>
-    </div>
 
-    <div>
-        <label for="source" class="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
-            مصدر العميل <span class="text-red-500">*</span>
-        </label>
-        <div class="relative">
-            <select name="source" required
-                    id="source"
-                    style="background-image: none;"
-                    class="w-full appearance-none rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150 @error('source') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror">
-                
-                <option value="" disabled {{ !old('source', $customer?->source) ? 'selected' : '' }}>اختر المصدر</option>
-                
-                @php
-                    $currentSource = old('source', $customer?->source instanceof \App\Enums\PotentialCustomerSource ? $customer->source->value : $customer?->source);
-                @endphp
+        <div>
+            <label for="source" class="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
+                مصدر العميل <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <select name="source" required
+                        id="source"
+                        style="background-image: none;"
+                        class="w-full appearance-none rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150 @error('source') border-red-500 focus:ring-red-500/20 focus:border-red-500 @enderror">
+                    
+                    <option value="" disabled {{ !old('source', $customer?->source) ? 'selected' : '' }}>اختر المصدر</option>
+                    
+                    @php
+                        $currentSource = old('source', $customer?->source instanceof \App\Enums\PotentialCustomerSource ? $customer->source->value : $customer?->source);
+                    @endphp
 
-                @foreach(\App\Enums\PotentialCustomerSource::cases() as $source)
-                    <option value="{{ $source->value }}" {{ $currentSource === $source->value ? 'selected' : '' }}>
-                        {{ $source->label() }} ({{ $source->value }})
-                    </option>
-                @endforeach
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                    @foreach(\App\Enums\PotentialCustomerSource::cases() as $source)
+                        <option value="{{ $source->value }}" {{ $currentSource === $source->value ? 'selected' : '' }}>
+                            {{ $source->label() }} 
+                        </option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
             </div>
+            @error('source')
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center justify-start">{{ $message }}</p>
+            @enderror
         </div>
-        @error('source')
-            <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center justify-start">{{ $message }}</p>
-        @enderror
+
     </div>
 
     <div class="flex items-center justify-end gap-3 pt-6 mt-4 border-t border-gray-100 dark:border-gray-800">
