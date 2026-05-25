@@ -160,7 +160,10 @@
                                         @if ($isCreator)
                                             <div x-show="showConfirmedModal" x-cloak
                                                 @close-modal.window="showConfirmedModal = false">
-                                                <x-potential-customers.confirmed-modal :customer="$currentCustomer" />
+                                                <x-potential-customers.confirmed-modal :route="route(
+                                                    'potential-customers.update-status',
+                                                    $currentCustomer->id,
+                                                )" />
                                             </div>
                                         @endif
                                     @else
