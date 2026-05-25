@@ -8,6 +8,6 @@
     font-family="Arial"
     font-weight="bold"
     fill="gray">
-    Falcon
+    فالكون
   </text>
 </svg>

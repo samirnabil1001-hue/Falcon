@@ -3,38 +3,35 @@
 
     <!-- Logo Section -->
     <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-800 dark:text-white">{{ config('app.name') }}</h1>
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white">فالكون</h1>
         <button id="closeBtn" class="md:hidden text-gray-700 dark:text-gray-300">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            falcon
         </button>
     </div>
 
     <!-- Navigation Links -->
     <nav class="p-4 space-y-2">
         <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="home">
-            Dashboard
+            لوحة التحكم
         </x-sidebar-link>
 
         <x-sidebar-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="users">
-            Users
+            الموظفين
         </x-sidebar-link>
 
         <x-sidebar-link :href="route('potential-customers.index')" :active="request()->routeIs('potential-customers.index')" icon="users">
-            Potential Customers
+            العملاء
         </x-sidebar-link>
 
-        <!-- 👈 الرابط الجديد لإدارة المتابعات والـ Log -->
+        <x-sidebar-link :href="route('potential-customer-services.index')" :active="request()->routeIs('potential-customer-services.*')" icon="service">
+            الخدمات
+        </x-sidebar-link>
         <x-sidebar-link :href="route('customer-follow-ups.index')" :active="request()->routeIs('customer-follow-ups.*')" icon="clock">
-            Follow-ups Log
-        </x-sidebar-link>
-           <x-sidebar-link :href="route('potential-customer-services.index')" :active="request()->routeIs('potential-customer-services.*')" icon="service">
-            service
+            سجلات العملاء
         </x-sidebar-link>
 
-        <x-sidebar-link :href="route('profile.edit')"  icon="settings"> 
-            Settings 
+        <x-sidebar-link :href="route('profile.edit')" icon="settings">
+            الإعدادت
         </x-sidebar-link>
     </nav>
 </aside>

@@ -1,93 +1,39 @@
+{{-- resources/views/potential-customers/edit.blade.php --}}
+
 <x-app-layout>
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div dir="rtl" class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-right">
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-950 dark:text-white tracking-tight">
+                    تعديل بيانات العميل
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    أنت تقوم بتعديل بيانات العميل: <span class="text-blue-600 dark:text-blue-400 font-bold">{{ $potentialCustomer->name }}</span>
+                </p>
+            </div>
+
+            <a href="{{ route('potential-customers.index') }}"
+               class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-all duration-200">
+                <span>رجوع</span>
+                <svg class="w-4 h-4 ms-2 transform rtl:-scale-x-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-800 overflow-hidden">
             
-            <!-- الهيدر وزر العودة -->
-            <div class="flex justify-between items-center mb-6" dir="rtl">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-slate-200 leading-tight">
-                        تعديل بيانات العميل المحتمل
-                    </h2>
-                    <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                        أنت تقوم بتعديل بيانات العميل: <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $potentialCustomer->name }}</span>
-                    </p>
-                </div>
-                <a href="{{ route('potential-customers.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-gray-200 transition-all">
-                    إلغاء وتراجع
-                </a>
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                    تعديل تفاصيل ملف العميل
+                </h3>
             </div>
 
-            <!-- كارت الفورم -->
-            <div class="bg-white dark:bg-slate-800 overflow-hidden shadow-sm sm:rounded-xl border border-gray-100 dark:border-slate-700 p-6 sm:p-8" dir="rtl">
-                
-                <form action="{{ route('potential-customers.update', $potentialCustomer->id) }}" method="POST" class="space-y-6">
-                    @csrf
-                    @method('PUT') <!-- 👈 مهمة جداً لتعريف الـ Route بأن الإجراء هو Update -->
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- اسم العميل (Customer Name) -->
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                                اسم العميل <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $potentialCustomer->name) }}" required
-                                class="w-full rounded-lg border-gray-300 dark:border-slate-700 dark:bg-slate-900 text-gray-800 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm"
-                                placeholder="اسم العميل الكامل">
-                            @error('name')
-                                <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- رقم الهاتف (Phone) -->
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                                رقم الهاتف <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" name="phone" id="phone" value="{{ old('phone', $potentialCustomer->phone) }}" required
-                                class="w-full rounded-lg border-gray-300 dark:border-slate-700 dark:bg-slate-900 text-gray-800 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm text-left"
-                                dir="ltr" placeholder="+20 1xxxxxxxxx">
-                            @error('phone')
-                                <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- مصدر العميل (Source) -->
-                    <div>
-                        <label for="source" class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                            مصدر العميل (Source) <span class="text-rose-500">*</span>
-                        </label>
-                        <select name="source" id="source" required
-                            class="w-full rounded-lg border-gray-300 dark:border-slate-700 dark:bg-slate-900 text-gray-800 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
-                            
-                            @php
-                                // جلب القيمة المختارة سواء من الـ Form القديم أو قاعدة البيانات
-                                // نقوم بتحويلها إلى نص (string) للمقارنة الصحيحة لأن قيم الـ Enum هي strings
-                                $currentSource = old('source', $potentialCustomer->source instanceof \App\Enums\PotentialCustomerSource ? $potentialCustomer->source->value : $potentialCustomer->source);
-                            @endphp
-
-                            @foreach(\App\Enums\PotentialCustomerSource::cases() as $sourceCase)
-                                <option value="{{ $sourceCase->value }}" {{ $currentSource === $sourceCase->value ? 'selected' : '' }}>
-                                    {{ $sourceCase->label() }} 
-                                </option>
-                            @endforeach
-
-                        </select>
-                        @error('source')
-                            <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- أزرار التحكم في أسفل الفورم -->
-                    <div class="pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-end gap-3">
-                        <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-semibold transition-all shadow-sm">
-                            تحديث وتعديل البيانات
-                        </button>
-                    </div>
-
-                </form>
-
+            <div class="p-6">
+                <x-potential-customers.form :customer="$potentialCustomer" />
             </div>
+
         </div>
     </div>
 </x-app-layout>

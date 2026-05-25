@@ -101,9 +101,12 @@
                                 <td class="p-4 text-center whitespace-nowrap"><span
                                         class="font-semibold text-sm text-gray-900 dark:text-gray-100">{{ $customer->name }}</span>
                                 </td>
-                                <td
-                                    class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
-                                    {{ $customer->phone }}</td>
+                                <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300"
+                                    dir="ltr">
+                                    <span
+                                        class="text-gray-400 dark:text-slate-500 font-normal">{{ $customer->country_code }}</span>
+                                    <span>{{ $customer->phone }}</span>
+                                </td>
                                 <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.source-badge
                                         :source="$customer->source" /></td>
                                 <td class="p-4 text-center whitespace-nowrap"><x-potential-customers.status-badge

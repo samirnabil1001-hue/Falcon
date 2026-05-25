@@ -46,8 +46,21 @@ class PotentialCustomerController extends Controller
      */
     public function store(Request $request)
     {
-        // يفضل دائماً إضافة التحقق هنا أو استخدام Form Request
-        $this->customerService->store($request->all(), auth()->id());
+        // 1. التحقق من البيانات القادمة من الـ Form
+        $validated = $request->validate([
+            'name'         => 'required|string|max:255',
+            'phone'        => 'required|string|max:50',
+            'country_code' => 'required|string|max:10', // إجباري لضمان وصوله دائماً
+            'source'       => 'required|string|max:100',
+        ]);
+
+        // تأمين إضافي في حال وصوله فارغاً كـ String
+        if (empty($validated['country_code'])) {
+            $validated['country_code'] = '+20';
+        }
+
+        // 2. تمرير المصفوفة التي تحتوي على كود الدولة للسيرفيس
+        $this->customerService->store($validated, auth()->id());
 
         return redirect()
             ->route('potential-customers.index')
@@ -81,14 +94,19 @@ class PotentialCustomerController extends Controller
     {
         $this->authorize('update', $potentialCustomer);
 
-        // 1. التحقق من البيانات أثناء التعديل العادي
+        // 1. التحقق من البيانات أثناء التعديل
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:50',
-            'source' => 'required|string|max:100',
+            'name'         => 'required|string|max:255',
+            'phone'        => 'required|string|max:50',
+            'country_code' => 'required|string|max:10', // إجباري عند التعديل أيضاً
+            'source'       => 'required|string|max:100',
         ]);
 
-        // 2. تمرير الموديل والبيانات المعدلة للسيرفيس
+        if (empty($validated['country_code'])) {
+            $validated['country_code'] = '+20';
+        }
+
+        // 2. تمرير المصفوفة المُحدثة كاملة بكود الدولة إلى السيرفيس
         $this->customerService->update($potentialCustomer, $validated);
 
         return redirect()
@@ -99,26 +117,21 @@ class PotentialCustomerController extends Controller
     /**
      * تحديث حالة العميل وتسجيل المتابعة التاريخية (Web Version)
      */
-    /**
-     * تحديث حالة العميل وتسجيل المتابعة التاريخية (Web Version)
-     */
     public function updateStatus(Request $request, PotentialCustomer $potentialCustomer)
     {
         $this->authorize('updateStatus', $potentialCustomer);
 
-        //  تحديث الـ Validation لكي يسمح بحقول الخدمة بالمرور عند التأكيد
-        $validated = $request->validate([
-            'status' => 'required|string',
-            'notes' => 'nullable|string',
-            'reason' => 'nullable|string',
-            'next_follow_up_date' => 'nullable|date',
+        $confirmedValue = PotentialCustomerStatus::CONFIRMED->value;
 
-            // 👇 الحقول المطلوبة التي كانت تسبب الخطأ في السيرفيس
-            'service_type' => 'required_if:status,confirmed|string|nullable', // ستصبح مطلوبة فقط إذا كانت الحالة confirmed
-            'service_notes' => 'nullable|string',
+        $validated = $request->validate([
+            'status'              => 'required|string',
+            'notes'               => 'nullable|string',
+            'reason'              => 'nullable|string',
+            'next_follow_up_date' => 'nullable|date',
+            'service_type'        => "required_if:status,{$confirmedValue},confirmed,CONFIRMED|string|nullable", 
+            'service_notes'       => 'nullable|string',
         ]);
 
-        // تنفيذ التحديث واللوج من خلال السيرفيس
         $this->customerService->updateStatusAndLogFollowUp(
             $potentialCustomer,
             $validated,
@@ -147,15 +160,12 @@ class PotentialCustomerController extends Controller
      */
     public function updateAddedBy(Request $request, PotentialCustomer $potentialCustomer)
     {
-        // 1. التحقق من صلاحية الـ CEO عبر الـ Policy
         $this->authorize('updateAddedBy', $potentialCustomer);
 
-        // 2. التحقق من صحة المستخدم الجديد
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
 
-        // 3. تحديث الحقل مباشرة في قاعدة البيانات
         $potentialCustomer->update([
             'user_id' => $validated['user_id']
         ]);

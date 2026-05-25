@@ -3,15 +3,15 @@
 namespace App\Services;
 
 use App\Models\PotentialCustomer;
-use App\Models\CustomerFollowUp; // 👈 تم الاستيراد هنا
+use App\Models\CustomerFollowUp; 
 use App\Enums\UserRole;
 use App\Enums\PotentialCustomerStatus;
 use App\Enums\PotentialCustomerSource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Support\Facades\DB;     // 👈 تم الاستيراد هنا
-use Illuminate\Support\Facades\Auth;   // 👈 تم الاستيراد هنا
+use Illuminate\Support\Facades\DB;     
+use Illuminate\Support\Facades\Auth;   
 
 class PotentialCustomerService
 {
@@ -85,7 +85,7 @@ class PotentialCustomerService
         $validated = $this->validateData($data, true);
 
         return PotentialCustomer::create(array_merge($validated, [
-            'status' => PotentialCustomerStatus::NEW ,
+            'status' => PotentialCustomerStatus::NEW,
             'user_id' => $userId,
             'added_at' => now(),
         ]));
@@ -102,7 +102,7 @@ class PotentialCustomerService
     }
 
     /**
-     * 👈 دالة تحديث الحالة المتقدمة مع تسجيل المتابعة (Log)
+     * دالة تحديث الحالة المتقدمة مع تسجيل المتابعة (Log)
      */
     public function updateStatusAndLogFollowUp(PotentialCustomer $customer, array $data, int $userId): PotentialCustomer
     {
@@ -127,8 +127,8 @@ class PotentialCustomerService
                 \App\Models\PotentialCustomerService::create([
                     'potential_customer_id' => $customer->id,
                     'user_id' => $userId,
-                    'service_type' => $validated['service_type'], // لازم تتبعت من الفورم (مثل: flights, tourist_visas)
-                    'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null, // ملاحظات الخدمة
+                    'service_type' => $validated['service_type'], 
+                    'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null, 
                 ]);
             }
 
@@ -151,23 +151,24 @@ class PotentialCustomerService
     {
         if ($isStore) {
             $rules = [
-                'name' => 'required|string|max:255',
-                'phone' => 'required|string|max:20',
-                'source' => ['required', new Enum(PotentialCustomerSource::class)],
+                'name'         => 'required|string|max:255',
+                'phone'        => 'required|string|max:20',
+                'country_code' => 'required|string|max:10', // 💡 تم إضافة السطر هنا لـ Store
+                'source'       => ['required', new Enum(PotentialCustomerSource::class)],
             ];
         } else {
             $rules = [
-                'name' => 'sometimes|required|string|max:255',
-                'phone' => 'sometimes|required|string|max:20',
-                'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
-                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
-                'reason' => 'nullable|string',
+                'name'         => 'sometimes|required|string|max:255',
+                'phone'        => 'sometimes|required|string|max:20',
+                'country_code' => 'sometimes|required|string|max:10', // 💡 تم إضافة السطر هنا لـ Edit
+                'source'       => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+                'status'       => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'reason'       => 'nullable|string',
                 'next_follow_up_date' => 'nullable|date',
-                'notes' => 'nullable|string',
+                'notes'        => 'nullable|string',
 
-                // 💡 أضف هذه السطور هنا للسماح بمرور حقول الخدمة المستهدفة
                 'service_type' => ['sometimes', 'required', new Enum(\App\Enums\CompanyService::class)],
-                'service_notes' => 'nullable|string',
+                'service_notes'=> 'nullable|string',
             ];
         }
 
@@ -179,6 +180,7 @@ class PotentialCustomerService
 
         return $validator->validated();
     }
+
     /**
      * جلب أحدث 5 عملاء فقط لحالة معينة بناءً على صلاحيات المستخدم المحددة
      */
@@ -186,12 +188,10 @@ class PotentialCustomerService
     {
         $query = PotentialCustomer::where('status', $status);
 
-        // قيود الصلاحيات الخاصة بك
         if ($user->role !== UserRole::CEO) {
             $query->where('user_id', $user->id);
         }
 
-        // 💡 التعديل هنا: استخدام oldest لترتيب المضاف أولاً (تاريخ أقدم) وتحديد العدد بـ 5
         return $query->oldest('added_at')
             ->take($limit)
             ->get();
