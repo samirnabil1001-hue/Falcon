@@ -53,9 +53,10 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::put('/{potentialCustomer}/update-added-by', [PotentialCustomerController::class, 'updateAddedBy'])
             ->name('potential-customers.update-added-by');
 
-        // حل مشكلة الـ API: تحويلها إلى Web Resource عادي ليتوافق مع صفحات الـ Blade والتوجيهات الكلاسيكية
-        Route::resource('services', PotentialCustomerServiceController::class)
-            ->names('potential-customer-services'); 
+        Route::resource('potential-customer-services', PotentialCustomerServiceController::class)->only([
+            'index',
+            'store'
+        ]);
     });
 
     // الـ Resource الأساسي لإدارة تفاصيل العملاء المحتملين (CRUD)

@@ -26,7 +26,13 @@
 
             <form action="{{ $route }}" method="POST" class="m-0">
                 @csrf
-                @method('PATCH')
+                
+                @if($isStoreRoute)
+                    @method('POST')
+                    <input type="hidden" name="potential_customer_id" value="{{ $customer->id }}">
+                @else
+                    @method('PATCH')
+                @endif
 
                 <input type="hidden" name="status" value="{{ \App\Enums\PotentialCustomerStatus::CONFIRMED->value }}">
 
@@ -39,8 +45,7 @@
 
                             <div class="mt-4 space-y-4 text-sm text-gray-500 dark:text-slate-400">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">نوع
-                                        الخدمه</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">نوع الخدمه</label>
                                     <div class="relative w-full">
                                         <select name="service_type" required
                                             class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg pr-3 pl-10 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 appearance-none bg-none text-right [appearance:none] [&::-ms-expand]:hidden">
@@ -50,21 +55,16 @@
                                             @endforeach
                                         </select>
 
-                                        <!-- السهم المخصص الوحيد في جهة اليسار -->
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3 text-gray-500 dark:text-slate-400">
-                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3 text-gray-500 dark:text-slate-400">
+                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                                             </svg>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ملاحظات</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ملاحظات</label>
                                     <textarea name="notes" rows="3" placeholder="أضف مزيد من التفاصيل ..."
                                         class="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"></textarea>
                                 </div>
