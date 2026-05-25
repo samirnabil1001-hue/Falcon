@@ -2,7 +2,7 @@
 
     {{-- إجمالي الإجراءات --}}
     <div class="flex-1">
-        <div class="bg-blue-50 border-r-4 border-blue-500  shadow-sm">
+        <div class="bg-blue-50 border-r-4 border-blue-500  shadow-sm text-start">
 
             <div class="py-2 px-3">
 
@@ -22,7 +22,7 @@
     @foreach ($statusCounts as $item)
         @if ($item['status'] !== 'new')
 
-            <div class="flex-1">
+            <div class="flex-1 text-start">
 
                 <div class="
                      shadow-sm border-r-4

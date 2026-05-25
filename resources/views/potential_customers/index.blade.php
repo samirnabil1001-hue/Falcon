@@ -91,8 +91,7 @@
                             @endif
                             <th class="p-4 font-bold tracking-wider text-center text-[14px]">تاريخ الإضافة
                             </th>
-                            <th
-                                class="p-4 font-bold tracking-wider text-center text-[14px] w-48 min-w-[190px]">
+                            <th class="p-4 font-bold tracking-wider text-center text-[14px] w-48 min-w-[190px]">
                                 الإجراءات</th>
                         </tr>
                     </thead>
@@ -123,17 +122,32 @@
                                             @csrf
                                             @method('PUT')
 
-                                            <select name="user_id" data-original-value="{{ $customer->user_id }}"
-                                                @change="$dispatch('change-user', { event: $event, formId: 'update-user-form-{{ $customer->id }}' })"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-1.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                                                <option value="">System</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}"
-                                                        {{ $customer->user_id == $user->id ? 'selected' : '' }}>
-                                                        {{ $user->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="relative w-full">
+
+                                                <!-- أضفنا bg-none لإزالة أي سهم خلفية قادم من إضافات Tailwind -->
+                                                <select name="user_id" data-original-value="{{ $customer->user_id }}"
+                                                    @change="$dispatch('change-user', { event: $event, formId: 'update-user-form-{{ $customer->id }}' })"
+                                                    class="appearance-none bg-none bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-1.5 pl-8 pr-3 dark:bg-slate-700 dark:border-slate-600 dark:text-white cursor-pointer">
+                                                    <option value="">System</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}"
+                                                            {{ $customer->user_id == $user->id ? 'selected' : '' }}>
+                                                            {{ $user->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                <!-- السهم المخصص الوحيد والمثبت على الشمال تماماً -->
+                                                <div
+                                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 text-gray-500 dark:text-slate-400">
+                                                    <svg class="h-2 w-2" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+
+                                            </div>
                                         </form>
                                     </td>
                                 @endif

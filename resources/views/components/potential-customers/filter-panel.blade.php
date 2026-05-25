@@ -27,36 +27,47 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
         <!-- Source -->
-        <select name="source" onchange="this.form.submit()"
-            class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
+        <div class="relative w-full">
+            <select name="source" onchange="this.form.submit()"
+                class="appearance-none [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5 pr-3 pl-9">
 
-            <option value="">كل المصادر</option>
+                <option value="">كل المصادر</option>
 
-            @foreach (App\Enums\PotentialCustomerSource::cases() as $sourceOption)
-                <option value="{{ $sourceOption->value }}" {{ $source == $sourceOption->value ? 'selected' : '' }}>
+                @foreach (App\Enums\PotentialCustomerSource::cases() as $sourceOption)
+                    <option value="{{ $sourceOption->value }}" {{ $source == $sourceOption->value ? 'selected' : '' }}>
+                        {{ $sourceOption->label() }}
+                    </option>
+                @endforeach
+            </select>
 
-                    {{ $sourceOption->label() }}
+            <div
+                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-slate-500">
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
 
-                </option>
-            @endforeach
+        <div class="relative w-full">
+            <select name="status" onchange="this.form.submit()"
+                class="appearance-none [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none w-full text-xs rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5 pr-3 pl-9">
 
-        </select>
+                <option value="">كل الحالات</option>
 
-        <!-- Status -->
-        <select name="status" onchange="this.form.submit()"
-            class="w-full text-xs rounded-xl border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer py-2.5">
+                @foreach (App\Enums\PotentialCustomerStatus::cases() as $statusOption)
+                    <option value="{{ $statusOption->value }}" {{ $status == $statusOption->value ? 'selected' : '' }}>
+                        {{ $statusOption->label() }}
+                    </option>
+                @endforeach
+            </select>
 
-            <option value="">كل الحالات</option>
-
-            @foreach (App\Enums\PotentialCustomerStatus::cases() as $statusOption)
-                <option value="{{ $statusOption->value }}" {{ $status == $statusOption->value ? 'selected' : '' }}>
-
-                    {{ $statusOption->label() }}
-
-                </option>
-            @endforeach
-
-        </select>
+            <div
+                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-slate-500">
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
 
     </div>
 

@@ -72,10 +72,12 @@
                                             ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                                             : match ($role) {
                                                 'CEO' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                                                'TeamLead' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                                                default => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                                'TeamLead'
+                                                    => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                                default
+                                                    => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
                                             };
-                                        
+
                                         $roleLabel = match ($role) {
                                             'CEO' => 'الرئيس التنفيذي',
                                             'TeamLead' => 'قائد الفريق',
@@ -141,23 +143,33 @@
                                                 action="{{ route('users.update-role', $user->id) }}" method="POST"
                                                 class="m-0 flex items-center">
                                                 @csrf @method('PATCH')
-                                                <div class="relative flex items-center">
-                                                    <select name="role"
+
+                                                <div class="relative flex items-center w-28"> <select name="role"
                                                         @change="openConfirm('تغيير الصلاحية', 'هل أنت متأكد من رغبتك في تغيير صلاحية المستخدم {{ $user->name }}؟', 'role-form-{{ $user->id }}', 'bg-blue-600')"
                                                         {{ !$user->is_active ? 'disabled' : '' }}
-                                                        class="h-8 w-28 text-[11px] font-bold rounded-md ps-2 pe-6 border-gray-200 dark:border-gray-600 focus:ring-1 transition-all py-0 leading-none {{ !$user->is_active ? 'bg-gray-100 text-gray-400' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 cursor-pointer hover:border-blue-400' }}">
+                                                        class="appearance-none [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none h-8 w-full text-[11px] font-bold rounded-md ps-2 pe-7 border-gray-200 dark:border-gray-600 focus:ring-1 transition-all py-0 leading-none {{ !$user->is_active ? 'bg-gray-100 text-gray-400' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 cursor-pointer hover:border-blue-400' }}">
                                                         <option value="" disabled selected>
-                                                            {{ $user->role->name ?? 'اختر الصلاحية' }}</option>
+                                                            {{ $user->role->name ?? 'اختر الصلاحية' }}
+                                                        </option>
                                                         @foreach (App\Enums\UserRole::cases() as $roleOption)
                                                             @if ($user->role?->value !== $roleOption->value)
                                                                 <option value="{{ $roleOption->value }}">
-                                                                    {{ $roleOption->name }}</option>
+                                                                    {{ $roleOption->name }}
+                                                                </option>
                                                             @endif
                                                         @endforeach
                                                     </select>
+
+                                                    <div
+                                                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 text-gray-500 dark:text-gray-400">
+                                                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
                                             </form>
-
                                             <form id="status-form-{{ $user->id }}"
                                                 action="{{ route('users.toggle-status', $user->id) }}" method="POST"
                                                 class="m-0 flex items-center">
@@ -204,7 +216,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="p-10 text-center text-gray-400 italic">لا يوجد مستخدمون في النظام حالياً.</td>
+                                <td colspan="7" class="p-10 text-center text-gray-400 italic">لا يوجد مستخدمون في
+                                    النظام حالياً.</td>
                             </tr>
                         @endforelse
                     </tbody>
