@@ -19,38 +19,44 @@ class DashboardController extends Controller
         // ==========================================
         if ($user->isCEO()) {
 
-            // جلب المستخدمين الذين أضافوا عملاء محتملين فعلياً لتغذية الـ Dropdown (حل آمن بدون العلاقات)
             $usersWithCustomers = User::join('potential_customers', 'users.id', '=', 'potential_customers.user_id')
                 ->select('users.id', 'users.name', DB::raw('count(potential_customers.id) as customers_count'))
                 ->groupBy('users.id', 'users.name')
                 ->get();
 
-            // تجهيز الـ Query الأساسي للعملاء وقبول الفلترة بحسب المستخدم
             $ceoQuery = PotentialCustomer::query();
 
-            if ($request->has('user_id') && $request->user_id != '') {
+            // تطبيق الفلاتر (الموظف، السنة، الشهر)
+            if ($request->filled('user_id')) {
                 $ceoQuery->where('user_id', $request->user_id);
             }
 
-            // حساب أعداد الحالات الكلية (تتأثر بالفلتر تلقائياً)
+            if ($request->filled('year')) {
+                $ceoQuery->whereYear('created_at', $request->year);
+            }
+
+            if ($request->filled('month')) {
+                $ceoQuery->whereMonth('created_at', $request->month);
+            }
+
+            // حساب الأعداد
             $totalCustomers = (clone $ceoQuery)->count();
             $newCount       = (clone $ceoQuery)->where('status', PotentialCustomerStatus::NEW)->count();
             $pendingCount   = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CONTACTED)->count();
             $confirmedCount = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CONFIRMED)->count();
             $cancelledCount = (clone $ceoQuery)->where('status', PotentialCustomerStatus::CANCELLED)->count();
 
-            // حساب النسب المئوية مع تفادي خطأ القسمة على صفر
+            // الحسابات النسبية
             $safeTotal   = $totalCustomers > 0 ? $totalCustomers : 1;
             $opRatio     = round((($totalCustomers - $newCount) / $safeTotal) * 100, 1);
             $waitRatio   = round(($pendingCount / $safeTotal) * 100, 1);
             $closeRatio  = round(($confirmedCount / $safeTotal) * 100, 1);
             $rejectRatio = round(($cancelledCount / $safeTotal) * 100, 1);
 
-            // حساب معدل النجاح (Win Rate) بناءً على الصفقات المحسومة فقط
             $decidedTotal = $confirmedCount + $cancelledCount;
             $winRate      = $decidedTotal > 0 ? round(($confirmedCount / $decidedTotal) * 100, 1) : 0;
 
-            // إحصائيات مصادر العملاء (تتأثر بالفلتر أيضاً)
+            // مصادر العملاء
             $sourceStats = (clone $ceoQuery)->select('source', DB::raw('count(*) as total'))
                 ->groupBy('source')
                 ->get()
@@ -59,29 +65,24 @@ class DashboardController extends Controller
                     'total' => $item->total
                 ]);
 
-            // أعلى 5 موظفين مبيعاً (ثابت لعرض الأداء العام للموظفين في الشركة دائماً)
-            $topAgents = DB::table('potential_customers')
+            // أعلى 5 موظفين مبيعاً (مع تطبيق نفس الفلاتر)
+            $topAgentsQuery = DB::table('potential_customers')
                 ->join('users', 'potential_customers.user_id', '=', 'users.id')
                 ->select('users.name', DB::raw('count(*) as total_sales'))
-                ->where('potential_customers.status', PotentialCustomerStatus::CONFIRMED)
-                ->groupBy('users.id', 'users.name')
+                ->where('potential_customers.status', PotentialCustomerStatus::CONFIRMED);
+
+            if ($request->filled('year')) $topAgentsQuery->whereYear('potential_customers.created_at', $request->year);
+            if ($request->filled('month')) $topAgentsQuery->whereMonth('potential_customers.created_at', $request->month);
+
+            $topAgents = $topAgentsQuery->groupBy('users.id', 'users.name')
                 ->orderByDesc('total_sales')
                 ->take(5)
                 ->get();
 
             return view('dashboards.ceo', compact(
-                'usersWithCustomers',
-                'totalCustomers',
-                'newCount', 
-                'pendingCount',
-                'confirmedCount',
-                'cancelledCount',
-                'opRatio',
-                'waitRatio',
-                'closeRatio',
-                'rejectRatio',
-                'winRate',
-                'topAgents'
+                'usersWithCustomers', 'totalCustomers', 'newCount', 'pendingCount',
+                'confirmedCount', 'cancelledCount', 'opRatio', 'waitRatio',
+                'closeRatio', 'rejectRatio', 'winRate', 'topAgents'
             ))->with([
                 'sourceLabels' => $sourceStats->pluck('label')->toArray(),
                 'sourceData'   => $sourceStats->pluck('total')->toArray()
@@ -89,7 +90,7 @@ class DashboardController extends Controller
         }
 
         // ==========================================
-        // 2. لوحة تحكم المندوب / العميل العادي (Agent)
+        // 2. لوحة تحكم المندوب (Agent)
         // ==========================================
         $myCustomersQuery = PotentialCustomer::where('user_id', $user->id);
 
@@ -114,7 +115,6 @@ class DashboardController extends Controller
                 'total' => $item->total
             ]);
 
-        // جلب أحدث العملاء العاجلين للمندوب للمتابعة السريعة
         $recentUrgentCustomers = (clone $myCustomersQuery)
             ->whereIn('status', [PotentialCustomerStatus::NEW, PotentialCustomerStatus::CONTACTED])
             ->orderBy('updated_at', 'desc')
@@ -122,16 +122,8 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboards.agent', compact(
-            'totalCustomers',
-            'newCount',
-            'pendingCount',
-            'confirmedCount',
-            'cancelledCount',
-            'opRatio',
-            'waitRatio',
-            'closeRatio',
-            'rejectRatio',
-            'recentUrgentCustomers'
+            'totalCustomers', 'newCount', 'pendingCount', 'confirmedCount', 'cancelledCount',
+            'opRatio', 'waitRatio', 'closeRatio', 'rejectRatio', 'recentUrgentCustomers'
         ))->with([
             'sourceLabels' => $sourceStats->pluck('label')->toArray(),
             'sourceData'   => $sourceStats->pluck('total')->toArray()
