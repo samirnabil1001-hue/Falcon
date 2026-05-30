@@ -1,6 +1,4 @@
-إليك الملف `show-history.blade.php` كاملاً بعد دمج التعديلات الأخيرة لعرض اسم الموظف (`user_name`) بشكل احترافي ومتناسق مع تصميمك الحالي:
 
-```html
 <x-app-layout>
     <div class="py-12" x-data="{ openDetailPopup: false, selectedLog: {} }">
         <div class="mx-auto sm:px-6 lg:px-8">

@@ -185,7 +185,11 @@
 
                                     <x-potential-customers.contacted-modal :customer="$customer" />
                                     <x-potential-customers.cancelled-modal :customer="$customer" />
-                                    <x-potential-customers.confirmed-modal :route="route('potential-customers.update-status', $customer->id)" />
+                                    <x-potential-customers.confirmed-modal 
+                                    :customer="$customer" 
+                                    :isStoreRoute="false" 
+                                    :route="route('potential-customers.update-status', $customer->id)" 
+                                />
                                 </td>
                             </tr>
                         @empty

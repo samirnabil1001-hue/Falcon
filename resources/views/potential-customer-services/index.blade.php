@@ -138,8 +138,12 @@
 
                                         <div x-show="showConfirmedModal" x-cloak
                                             @close-modal.window="showConfirmedModal = false">
-                                            <x-potential-customers.confirmed-modal :customer="$currentCustomer"
-                                                :route="route('potential-customer-services.store')" />
+                                 
+                                                <x-potential-customers.confirmed-modal 
+                                                    :customer="$currentCustomer" 
+                                                    :isStoreRoute="true" 
+                                                    :route="route('potential-customer-services.store', $currentCustomer->id)" 
+                                                />
                                         </div>
                                     @else
                                         <span class="text-xs text-gray-400 italic">No Customer</span>
