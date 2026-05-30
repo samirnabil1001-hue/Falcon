@@ -46,7 +46,6 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::post('/{customer}/follow-ups', [CustomerFollowUpController::class, 'store'])
             ->name('customer-follow-ups.store');
 
-        // تحديثات سريعة لبيانات العميل المحتمل
         Route::patch('/{potentialCustomer}/status', [PotentialCustomerController::class, 'updateStatus'])
             ->name('potential-customers.update-status');
 
@@ -59,13 +58,14 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         ]);
     });
 
-    // الـ Resource الأساسي لإدارة تفاصيل العملاء المحتملين (CRUD)
     Route::resource('potential-customers', PotentialCustomerController::class);
 
     // مسارات إدارة المستخدمين وصلاحيات الحسابات
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::middleware(['auth', 'prevent.ceo'])->group(function () {
+        Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
     Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
 
 });

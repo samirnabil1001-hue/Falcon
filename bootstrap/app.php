@@ -6,8 +6,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -19,11 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'prevent.ceo' => \App\Http\Middleware\PreventCeoModification::class, 
         ]);
 
         $middleware->priority([
             \Illuminate\Auth\Middleware\Authenticate::class,
-            \App\Http\Middleware\EnsureUserIsActive::class, 
+            \App\Http\Middleware\EnsureUserIsActive::class,
             \App\Http\Middleware\ActivityLogMiddleware::class,
         ]);
     })
