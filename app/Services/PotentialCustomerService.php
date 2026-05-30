@@ -4,70 +4,51 @@ namespace App\Services;
 
 use App\Models\PotentialCustomer;
 use App\Models\CustomerFollowUp;
+use App\Models\PotentialCustomerService as ServiceModel; 
 use App\Enums\UserRole;
 use App\Enums\PotentialCustomerStatus;
 use App\Enums\PotentialCustomerSource;
+use App\Enums\CompanyService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+
 class PotentialCustomerService
 {
-    /**
-     * جلب البيانات - تدعم الفلترة، البحث، النطاق الزمني، والترتيب الديناميكي
-     */
     public function getPaginated($user, array $filters = [], $perPage = 10)
     {
         $query = PotentialCustomer::with('creator');
 
-        // 1. صلاحيات العرض
         if ($user->role !== UserRole::CEO) {
             $query->where('user_id', $user->id);
         }
 
-        // 2. فلترة البحث بالاسم أو الهاتف
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('phone', 'LIKE', "%{$search}%");
+                  ->orWhere('phone', 'LIKE', "%{$search}%");
             });
         }
 
-        // 3. الفلترة حسب مصدر العميل
         if (!empty($filters['source'])) {
-            $source = $filters['source'] instanceof PotentialCustomerSource
-                ? $filters['source']->value
-                : $filters['source'];
+            $source = $filters['source'] instanceof PotentialCustomerSource ? $filters['source']->value : $filters['source'];
             $query->where('source', $source);
         }
 
-        // 4. الفلترة حسب حالة العميل
         if (!empty($filters['status'])) {
-            $status = $filters['status'] instanceof PotentialCustomerStatus
-                ? $filters['status']->value
-                : $filters['status'];
+            $status = $filters['status'] instanceof PotentialCustomerStatus ? $filters['status']->value : $filters['status'];
             $query->where('status', $status);
         }
 
-        // 5. الفلترة بالنطاق الزمني لتاريخ الإضافة
-        if (!empty($filters['date_from'])) {
-            $query->whereDate('added_at', '>=', $filters['date_from']);
-        }
+        if (!empty($filters['date_from'])) $query->whereDate('added_at', '>=', $filters['date_from']);
+        if (!empty($filters['date_to'])) $query->whereDate('added_at', '<=', $filters['date_to']);
 
-        if (!empty($filters['date_to'])) {
-            $query->whereDate('added_at', '<=', $filters['date_to']);
-        }
-
-        // 6. الترتيب الديناميكي الآمن
         $sortBy = $filters['sort_by'] ?? 'added_at';
         $sortOrder = $filters['sort_order'] ?? 'desc';
 
-        $allowedSortFields = ['name', 'source', 'status', 'added_at'];
-        $allowedSortOrders = ['asc', 'desc'];
-
-        if (in_array($sortBy, $allowedSortFields) && in_array(strtolower($sortOrder), $allowedSortOrders)) {
+        if (in_array($sortBy, ['name', 'source', 'status', 'added_at']) && in_array(strtolower($sortOrder), ['asc', 'desc'])) {
             $query->orderBy($sortBy, $sortOrder);
         } else {
             $query->latest('added_at');
@@ -76,23 +57,17 @@ class PotentialCustomerService
         return $query->paginate($perPage);
     }
 
-    /**
-     * إنشاء عميل - مع التحقق وإسناد الحالة تلقائياً كـ Enum
-     */
     public function store(array $data, int $userId)
     {
         $validated = $this->validateData($data, true);
 
         return PotentialCustomer::create(array_merge($validated, [
-            'status' => PotentialCustomerStatus::NEW ,
+            'status' => PotentialCustomerStatus::NEW,
             'user_id' => $userId,
             'added_at' => now(),
         ]));
     }
 
-    /**
-     * تحديث عميل العام (بيانات شخصية أو تعديل عادي)
-     */
     public function update(PotentialCustomer $customer, array $data)
     {
         $validated = $this->validateData($data, false);
@@ -100,9 +75,6 @@ class PotentialCustomerService
         return $customer;
     }
 
-    /**
-     * دالة تحديث الحالة المتقدمة مع تسجيل المتابعة (Log)
-     */
     public function updateStatusAndLogFollowUp(PotentialCustomer $customer, array $data, int $userId): PotentialCustomer
     {
         $validated = $this->validateData($data, false);
@@ -121,12 +93,11 @@ class PotentialCustomerService
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            if ($validated['status'] === \App\Enums\PotentialCustomerStatus::CONFIRMED->value || $validated['status'] === \App\Enums\PotentialCustomerStatus::CONFIRMED) {
-
-                \App\Models\PotentialCustomerService::create([
+            if ($validated['status'] === PotentialCustomerStatus::CONFIRMED->value) {
+                ServiceModel::create([
                     'potential_customer_id' => $customer->id,
                     'user_id' => $userId,
-                    'service_type' => $validated['service_type'],
+                    'service_type' => $validated['service_type'] ?? null,
                     'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null,
                 ]);
             }
@@ -135,76 +106,58 @@ class PotentialCustomerService
         });
     }
 
-    /**
-     * حذف عميل
-     */
     public function delete(PotentialCustomer $customer)
     {
         return $customer->delete();
     }
 
-    /**
-     * قواعد التحقق الذكية والمرنة
-     */
     protected function validateData(array $data, bool $isStore = true)
     {
-        // قواعد التحقق الأساسية
         $rules = [
-            'name' => $isStore ? 'required|string|max:255' : 'sometimes|required|string|max:255',
-            'phone' => $isStore ? 'required|string|max:20' : 'sometimes|required|string|max:20',
+            'name'         => $isStore ? 'required|string|max:255' : 'sometimes|required|string|max:255',
+            'phone'        => $isStore ? 'required|string|max:20' : 'sometimes|required|string|max:20',
             'country_code' => $isStore ? 'required|string|max:10' : 'sometimes|required|string|max:10',
-            'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+            'source'       => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
         ];
 
         if (!$isStore) {
             $rules = array_merge($rules, [
-                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
-                'reason' => 'nullable|string',
+                'status'        => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'reason'        => 'nullable|string',
                 'next_follow_up_date' => 'nullable|date',
-                'notes' => 'nullable|string',
-                'service_type' => ['sometimes', 'required', new Enum(\App\Enums\CompanyService::class)],
+                'notes'         => 'nullable|string',
+                'service_type'  => ['sometimes', 'required', new Enum(CompanyService::class)],
                 'service_notes' => 'nullable|string',
             ]);
         }
 
         $validator = Validator::make($data, $rules);
+        if ($validator->fails()) throw new ValidationException($validator);
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
-
-        // التحقق من التكرار في حالة الإضافة فقط (Store)
         if ($isStore) {
-            $existingCustomer = DB::table('potential_customers')
+            $existing = DB::table('potential_customers')
                 ->join('users', 'potential_customers.user_id', '=', 'users.id')
                 ->where('phone', $data['phone'])
                 ->where('country_code', $data['country_code'])
                 ->select('users.name as user_name')
                 ->first();
 
-            if ($existingCustomer) {
-                $customValidator = Validator::make([], []); // مصفوفة فارغة
-                $customValidator->errors()->add('phone', "هذا العميل مضاف مسبقاً بواسطة: {$existingCustomer->user_name}");
-                throw new ValidationException($customValidator);
+            if ($existing) {
+                $v = Validator::make([], []);
+                $v->errors()->add('phone', "هذا العميل مضاف مسبقاً بواسطة: {$existing->user_name}");
+                throw new ValidationException($v);
             }
         }
 
         return $validator->validated();
     }
 
-    /**
-     * جلب أحدث 5 عملاء فقط لحالة معينة بناءً على صلاحيات المستخدم المحددة
-     */
     public function getLatestUrgentByStatus($user, string $status, $limit = 5)
     {
         $query = PotentialCustomer::where('status', $status);
-
         if ($user->role !== UserRole::CEO) {
             $query->where('user_id', $user->id);
         }
-
-        return $query->oldest('added_at')
-            ->take($limit)
-            ->get();
+        return $query->oldest('added_at')->take($limit)->get();
     }
 }

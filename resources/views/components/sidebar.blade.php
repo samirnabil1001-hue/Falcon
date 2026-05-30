@@ -27,7 +27,7 @@
             الخدمات
         </x-sidebar-link>
         <x-sidebar-link :href="route('customer-follow-ups.index')" :active="request()->routeIs('customer-follow-ups.*')" icon="clock">
-            سجلات العملاء
+       سجل التعاملات
         </x-sidebar-link>
 
         <x-sidebar-link :href="route('profile.edit')" icon="settings">
