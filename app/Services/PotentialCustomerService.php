@@ -3,16 +3,15 @@
 namespace App\Services;
 
 use App\Models\PotentialCustomer;
-use App\Models\CustomerFollowUp; 
+use App\Models\CustomerFollowUp;
 use App\Enums\UserRole;
 use App\Enums\PotentialCustomerStatus;
 use App\Enums\PotentialCustomerSource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Support\Facades\DB;     
-use Illuminate\Support\Facades\Auth;   
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 class PotentialCustomerService
 {
     /**
@@ -85,7 +84,7 @@ class PotentialCustomerService
         $validated = $this->validateData($data, true);
 
         return PotentialCustomer::create(array_merge($validated, [
-            'status' => PotentialCustomerStatus::NEW,
+            'status' => PotentialCustomerStatus::NEW ,
             'user_id' => $userId,
             'added_at' => now(),
         ]));
@@ -127,8 +126,8 @@ class PotentialCustomerService
                 \App\Models\PotentialCustomerService::create([
                     'potential_customer_id' => $customer->id,
                     'user_id' => $userId,
-                    'service_type' => $validated['service_type'], 
-                    'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null, 
+                    'service_type' => $validated['service_type'],
+                    'notes' => $validated['service_notes'] ?? $validated['notes'] ?? null,
                 ]);
             }
 
@@ -149,33 +148,45 @@ class PotentialCustomerService
      */
     protected function validateData(array $data, bool $isStore = true)
     {
-        if ($isStore) {
-            $rules = [
-                'name'         => 'required|string|max:255',
-                'phone'        => 'required|string|max:20',
-                'country_code' => 'required|string|max:10', // 💡 تم إضافة السطر هنا لـ Store
-                'source'       => ['required', new Enum(PotentialCustomerSource::class)],
-            ];
-        } else {
-            $rules = [
-                'name'         => 'sometimes|required|string|max:255',
-                'phone'        => 'sometimes|required|string|max:20',
-                'country_code' => 'sometimes|required|string|max:10', // 💡 تم إضافة السطر هنا لـ Edit
-                'source'       => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
-                'status'       => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
-                'reason'       => 'nullable|string',
-                'next_follow_up_date' => 'nullable|date',
-                'notes'        => 'nullable|string',
+        // قواعد التحقق الأساسية
+        $rules = [
+            'name' => $isStore ? 'required|string|max:255' : 'sometimes|required|string|max:255',
+            'phone' => $isStore ? 'required|string|max:20' : 'sometimes|required|string|max:20',
+            'country_code' => $isStore ? 'required|string|max:10' : 'sometimes|required|string|max:10',
+            'source' => ['sometimes', 'required', new Enum(PotentialCustomerSource::class)],
+        ];
 
+        if (!$isStore) {
+            $rules = array_merge($rules, [
+                'status' => ['sometimes', 'required', new Enum(PotentialCustomerStatus::class)],
+                'reason' => 'nullable|string',
+                'next_follow_up_date' => 'nullable|date',
+                'notes' => 'nullable|string',
                 'service_type' => ['sometimes', 'required', new Enum(\App\Enums\CompanyService::class)],
-                'service_notes'=> 'nullable|string',
-            ];
+                'service_notes' => 'nullable|string',
+            ]);
         }
 
         $validator = Validator::make($data, $rules);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);
+        }
+
+        // التحقق من التكرار في حالة الإضافة فقط (Store)
+        if ($isStore) {
+            $existingCustomer = DB::table('potential_customers')
+                ->join('users', 'potential_customers.user_id', '=', 'users.id')
+                ->where('phone', $data['phone'])
+                ->where('country_code', $data['country_code'])
+                ->select('users.name as user_name')
+                ->first();
+
+            if ($existingCustomer) {
+                $customValidator = Validator::make([], []); // مصفوفة فارغة
+                $customValidator->errors()->add('phone', "هذا العميل مضاف مسبقاً بواسطة: {$existingCustomer->user_name}");
+                throw new ValidationException($customValidator);
+            }
         }
 
         return $validator->validated();

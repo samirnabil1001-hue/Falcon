@@ -14,11 +14,15 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('phone');
+            $table->string('country_code', 5)->nullable();
             $table->string('status')->default('new');
-            $table->string('source')->nullable(); 
-            $table->timestamp('added_at')->nullable(); 
-            $table->foreignId('user_id')->constrained('users'); 
+            $table->string('source')->nullable();
+            $table->timestamp('added_at')->nullable();
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
+
+            // Create a composite unique index for phone and country_code
+            $table->unique(['phone', 'country_code']);
         });
     }
 
