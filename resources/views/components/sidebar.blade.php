@@ -1,3 +1,7 @@
+@php
+    use App\Enums\UserRole;
+    $user = auth()->user();
+@endphp
 <aside id="sidebar"
     class="fixed md:static top-0 right-0 z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-lg transform translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
 
@@ -15,9 +19,11 @@
             لوحة التحكم
         </x-sidebar-link>
 
-        <x-sidebar-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="users">
-            الموظفين
-        </x-sidebar-link>
+        @if ($user && in_array($user->role, [UserRole::CEO, UserRole::TEAM_LEAD]))
+            <x-sidebar-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="users">
+                الموظفين
+            </x-sidebar-link>
+        @endif
 
         <x-sidebar-link :href="route('potential-customers.index')" :active="request()->routeIs('potential-customers.index')" icon="users">
             العملاء
@@ -27,7 +33,7 @@
             الخدمات
         </x-sidebar-link>
         <x-sidebar-link :href="route('customer-follow-ups.index')" :active="request()->routeIs('customer-follow-ups.*')" icon="clock">
-       سجل التعاملات
+            سجل التعاملات
         </x-sidebar-link>
 
         <x-sidebar-link :href="route('profile.edit')" icon="settings">
