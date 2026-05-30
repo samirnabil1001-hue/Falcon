@@ -19,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
-            'prevent.ceo' => \App\Http\Middleware\PreventCeoModification::class, 
+            'prevent.ceo' => \App\Http\Middleware\PreventCeoModification::class,
+            'not.last.ceo' => \App\Http\Middleware\EnsureNotLastCEO::class,
         ]);
 
         $middleware->priority([

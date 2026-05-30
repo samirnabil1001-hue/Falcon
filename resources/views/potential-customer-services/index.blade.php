@@ -106,12 +106,10 @@
                                 <td class="p-4 text-center whitespace-nowrap align-middle" x-data="{ showConfirmedModal: false }">
                                     @php
                                         $currentCustomer = $service->potentialCustomer;
-                                        // فحص ما إذا كان المستخدم الحالي هو صاحب السجل
                                         $isCreator = auth()->id() === $service->user_id;
                                     @endphp
 
                                     @if ($currentCustomer)
-                                        <!-- تم تعديل الحاوية لتصبح flex-row-reverse من أجل ترتيب الأزرار بشكل صحيح في الـ RTL مع gap مناسب -->
                                         <div
                                             class="flex flex-row-reverse items-center justify-center gap-2 max-w-[240px] mx-auto">
                                             <a href="{{ route('customer-follow-ups.show', $currentCustomer->id) }}"
@@ -126,42 +124,23 @@
                                                 </svg>
                                                 السجل
                                             </a>
-                                            @if ($isCreator)
-                                                <button @click="showConfirmedModal = true" type="button"
-                                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 dark:shadow-none cursor-pointer">
-                                                    <svg class="w-3.5 h-3.5 text-white" fill="none"
-                                                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                    متابعة
-                                                </button>
-                                            @else
-                                                <button type="button" disabled
-                                                    title="لا تملك صلاحية المتابعة لهذا السجل"
-                                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed opacity-75">
-                                                    <svg class="w-3.5 h-3.5 text-gray-400 dark:text-slate-500"
-                                                        fill="none" stroke="currentColor" stroke-width="2"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                    متابعة
-                                                </button>
-                                            @endif
 
-
-
+                                            <button @click="showConfirmedModal = true" type="button"
+                                                class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 dark:shadow-none cursor-pointer">
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor"
+                                                    stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                متابعة
+                                            </button>
                                         </div>
 
-                                        <!-- مودال المتابعة المنبثق -->
-                                        @if ($isCreator)
-                                            <div x-show="showConfirmedModal" x-cloak
-                                                @close-modal.window="showConfirmedModal = false">
-                                                <x-potential-customers.confirmed-modal :customer="$currentCustomer"
-                                                    :route="route('potential-customer-services.store')" />
-                                            </div>
-                                        @endif
+                                        <div x-show="showConfirmedModal" x-cloak
+                                            @close-modal.window="showConfirmedModal = false">
+                                            <x-potential-customers.confirmed-modal :customer="$currentCustomer"
+                                                :route="route('potential-customer-services.store')" />
+                                        </div>
                                     @else
                                         <span class="text-xs text-gray-400 italic">No Customer</span>
                                     @endif

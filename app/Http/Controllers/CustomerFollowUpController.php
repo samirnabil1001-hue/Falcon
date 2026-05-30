@@ -118,7 +118,6 @@ class CustomerFollowUpController extends Controller
             ]);
         }
 
-        // 3. الترتيب التنازلي النقي الآن بدون أي تكرار
         $sortedTimeline = $unifiedTimeline->sortByDesc('created_at');
 
         return view('potential_customers.show-history', compact('customer', 'sortedTimeline'));

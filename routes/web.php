@@ -66,8 +66,9 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
-    Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
-
+    Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])
+        ->name('users.update-role')
+        ->middleware('not.last.ceo');
 });
 
 // مسارات التحقق والتسجيل الافتراضية الخاصة بـ Laravel Breeze / Jetstream
