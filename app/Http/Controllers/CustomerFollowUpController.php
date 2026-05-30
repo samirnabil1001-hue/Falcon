@@ -28,7 +28,7 @@ class CustomerFollowUpController extends Controller
         $users = User::where('is_active', true)->get();
 
         // جلب الأعداد الحقيقية من السيرفس
-        $actualCounts = $this->followUpService->logCustomerFollowUpsCount( $request);
+        $actualCounts = $this->followUpService->logCustomerFollowUpsCount($request);
 
         // بناء الداتا بالشكل المطلوب للـ View مع وضع 0 كقيمة افتراضية
         $statusCounts = collect(PotentialCustomerStatus::cases())->map(function ($status) use ($actualCounts) {
@@ -83,38 +83,44 @@ class CustomerFollowUpController extends Controller
      */
     public function show($customerId)
     {
-        $customer = PotentialCustomer::with(['followUps', 'services'])->findOrFail($customerId);
+        // جلب البيانات مع الموظفين المرتبطين بها مباشرة
+        $customer = PotentialCustomer::with([
+            'followUps.user',
+            'services.user'
+        ])->findOrFail($customerId);
 
         $unifiedTimeline = collect();
 
-        // 1. تحويل المتابعات لشكل موحد (مع استثناء الحالات المؤكدة منعاً للتكرار)
+        // 1. تحويل المتابعات
         foreach ($customer->followUps as $log) {
-            // 🛑 السطر السحري: إذا كانت المتابعة مؤكدة تخطاها لأن الخدمة ستظهر بدلاً منها
-            if ($log->status->value === 'confirmed') {
+            if ($log->status->value === 'confirmed')
                 continue;
-            }
 
             $unifiedTimeline->push([
                 'type' => 'follow_up',
                 'status' => $log->status->value,
                 'status_label' => $log->status->label(),
-                'reason' => is_object($log->reason) ? $log->reason->label() : ($log->reason ?? 'بدون سبب محدد'),
+                'reason' => is_object($log->reason) ? $log->reason->label() : ($log->reason ?? 'بدون سبب'),
                 'notes' => $log->notes,
                 'created_at' => $log->created_at,
                 'next_follow_up_at' => $log->next_follow_up_at,
+                // الوصول للاسم من الموديل مباشرة
+                'user_name' => $log->user->name ?? 'System',
             ]);
         }
 
-        // 2. تحويل الخدمات لشكل موحد (ستظهر هنا كعنصر المبيعات المؤكد الوحيد في هذا التوقيت)
+        // 2. تحويل الخدمات
         foreach ($customer->services as $service) {
             $unifiedTimeline->push([
                 'type' => 'service',
                 'status' => 'confirmed',
-                'status_label' => 'تنفيذ  ',
+                'status_label' => 'تنفيذ',
                 'reason' => is_object($service->service_type) ? $service->service_type->label() : $service->service_type,
                 'notes' => $service->notes,
                 'created_at' => $service->created_at,
                 'next_follow_up_at' => null,
+                // الوصول للاسم من الموديل مباشرة
+                'user_name' => $service->user->name ?? 'System',
             ]);
         }
 
