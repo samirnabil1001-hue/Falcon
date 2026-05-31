@@ -104,11 +104,12 @@
                                 </td>
 
                                 <!-- رقم الهاتف -->
-                                <td class="p-4 whitespace-nowrap text-left text-xs font-medium text-gray-600 dark:text-slate-300 font-mono tracking-wide"
+                                <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300"
                                     dir="ltr">
-                                    {{ $customer->phone }}
+                                    <span
+                                        class="text-gray-400 dark:text-slate-500 font-normal">{{ $customer->country_code }}</span>
+                                    <span>{{ $customer->phone }}</span>
                                 </td>
-
                                 <!-- الحالة الحالية -->
                                 <td class="p-4 text-center whitespace-nowrap">
                                     <x-follow-ups.status-badge :status="$customer->status" />
