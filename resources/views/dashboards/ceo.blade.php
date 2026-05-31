@@ -43,13 +43,32 @@
                 <div class="min-w-[220px] w-full sm:w-auto">
                     <x-user-filter-dropdown :users="$usersWithCustomers" />
                 </div>
-
+                @if (request()->has('year') || request()->has('month') || request()->has('user_id'))
+                    <a href="{{ url()->current() }}"
+                        class="whitespace-nowrap bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center transition-colors">
+                        إلغاء
+                    </a>
+                @endif
                 <a href="{{ route('potential-customers.index') }}"
                     class="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-50 transition-all shadow-sm">
                     عرض العملاء
                 </a>
             </div>
+            <script>
+                function updateFilters(key, value) {
+                    let url = new URL(window.location.href);
+                    if (value) {
+                        url.searchParams.set(key, value);
+                    } else {
+                        url.searchParams.delete(key);
+                    }
+                    window.location.href = url.toString();
+                }
 
+                function clearFilters() {
+                    window.location.href = window.location.pathname;
+                }
+            </script>
         </div>
     </x-slot>
 
