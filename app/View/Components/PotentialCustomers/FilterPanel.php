@@ -13,8 +13,9 @@ class FilterPanel extends Component
     public $status;
     public $sortBy;
     public $sortOrder;
+    public $users;
 
-    public function __construct($search = null, $dateFrom = null, $dateTo = null, $source = null, $status = null, $sortBy = 'added_at', $sortOrder = 'desc')
+    public function __construct($search = null, $users=[], $dateFrom = null, $dateTo = null, $source = null, $status = null, $sortBy = 'added_at', $sortOrder = 'desc')
     {
         $this->search = $search;
         $this->dateFrom = $dateFrom;
@@ -23,6 +24,10 @@ class FilterPanel extends Component
         $this->status = $status;
         $this->sortBy = $sortBy;
         $this->sortOrder = $sortOrder;
+        $this->users = $users;
+
+
+
     }
 
     public function render()

@@ -118,7 +118,12 @@
                 @forelse($contactedCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
-                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}</td>
+                        <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300"
+                            dir="ltr">
+                            <span
+                                class="text-gray-400 dark:text-slate-500 font-normal">{{ $customer->country_code }}</span>
+                            <span>{{ $customer->phone }}</span>
+                        </td>
                         <td class="px-4 py-3 text-xs">
                             <span
                                 class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-[11px]">
@@ -176,7 +181,7 @@
                                 <x-potential-customers.contacted-modal :customer="$customer" />
                                 <x-potential-customers.cancelled-modal :customer="$customer" />
                                 <x-potential-customers.confirmed-modal :customer="$customer" :isStoreRoute="false"
-                                        :route="route('potential-customers.update-status', $customer->id)" />
+                                    :route="route('potential-customers.update-status', $customer->id)" />
 
                             </div>
                         </td>
@@ -194,7 +199,12 @@
                 @forelse($newCustomers as $customer)
                     <tr class="hover:bg-slate-50/40 dark:hover:bg-slate-900/20 transition-colors">
                         <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{{ $customer->name }}</td>
-                        <td class="px-4 py-3 text-xs tracking-wide font-mono" dir="ltr">{{ $customer->phone }}
+                           <td class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300"
+                                    dir="ltr">
+                                    <span
+                                        class="text-gray-400 dark:text-slate-500 font-normal">{{ $customer->country_code }}</span>
+                                    <span>{{ $customer->phone }}</span>
+                                </td>
                         </td>
                         <td class="px-4 py-3 text-xs">
                             <span
@@ -253,7 +263,7 @@
                                 <x-potential-customers.contacted-modal :customer="$customer" />
                                 <x-potential-customers.cancelled-modal :customer="$customer" />
                                 <x-potential-customers.confirmed-modal :customer="$customer" :isStoreRoute="false"
-                                        :route="route('potential-customers.update-status', $customer->id)" />
+                                    :route="route('potential-customers.update-status', $customer->id)" />
 
 
                             </div>

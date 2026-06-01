@@ -16,12 +16,18 @@ use Illuminate\Support\Facades\DB;
 
 class PotentialCustomerService
 {
-    public function getPaginated($user, array $filters = [], $perPage = 10)
+   public function getPaginated($user, array $filters = [], $perPage = 10)
     {
         $query = PotentialCustomer::with('creator');
 
+        // Role restriction: Non-CEOs can only see their own records
         if ($user->role !== UserRole::CEO) {
             $query->where('user_id', $user->id);
+        } else {
+            // CEO restriction: Can filter by a specific user_id if provided
+            if (!empty($filters['user_id'])) {
+                $query->where('user_id', $filters['user_id']);
+            }
         }
 
         if (!empty($filters['search'])) {

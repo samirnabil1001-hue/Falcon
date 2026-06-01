@@ -25,10 +25,9 @@ class PotentialCustomerController extends Controller
     {
         $customers = $this->customerService->getPaginated(auth()->user(), $request->all());
 
-        // جلب المستخدمين فقط إذا كان المسجل CEO لعرضهم في الـ Dropdown
         $users = auth()->user()->isCEO()
             ? \App\Models\User::all()
-            : collect();
+        : collect();
 
         return view('potential_customers.index', compact('customers', 'users'));
     }

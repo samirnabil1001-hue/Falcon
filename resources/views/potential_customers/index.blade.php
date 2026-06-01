@@ -71,7 +71,7 @@
 
         <x-potential-customers.header :totalCount="$customers->total()" />
 
-        <x-potential-customers.filter-panel :search="request('search')" :dateFrom="request('date_from')" :dateTo="request('date_to')" :source="request('source')"
+        <x-potential-customers.filter-panel :users="$users" :search="request('search')" :dateFrom="request('date_from')" :dateTo="request('date_to')" :source="request('source')"
             :status="request('status')" :sortBy="request('sort_by', 'added_at')" :sortOrder="request('sort_order', 'desc')" />
 
         <div

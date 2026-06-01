@@ -58,9 +58,15 @@
                                 </td>
 
                                 <!-- رقم هاتف العميل -->
-                                <td
+                                <td dir="ltr"
                                     class="p-4 text-center whitespace-nowrap text-xs font-medium text-gray-600 dark:text-slate-300">
-                                    {{ $service->potentialCustomer->phone ?? 'N/A' }}
+                                    <span>
+                                        {{  $service->potentialCustomer->country_code }}
+                                    </span>
+                                    <span>
+                                        {{ $service->potentialCustomer->phone ?? 'N/A' }}
+                                    </span>
+
                                 </td>
 
                                 <!-- عدد مرات طلب الخدمة (إجمالي الطلبات للعميل) -->
@@ -132,18 +138,18 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M12 4v16m8-8H4" />
                                                 </svg>
-                                                إضافة خدمه 
+                                                إضافة خدمه
                                             </button>
                                         </div>
 
                                         <div x-show="showConfirmedModal" x-cloak
                                             @close-modal.window="showConfirmedModal = false">
-                                 
-                                                <x-potential-customers.confirmed-modal 
-                                                    :customer="$currentCustomer" 
-                                                    :isStoreRoute="true" 
-                                                    :route="route('potential-customer-services.store', $currentCustomer->id)" 
-                                                />
+
+                                            <x-potential-customers.confirmed-modal :customer="$currentCustomer" :isStoreRoute="true"
+                                                :route="route(
+                                                    'potential-customer-services.store',
+                                                    $currentCustomer->id,
+                                                )" />
                                         </div>
                                     @else
                                         <span class="text-xs text-gray-400 italic">No Customer</span>
